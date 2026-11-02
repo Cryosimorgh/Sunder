@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "evidence": "C:\\SunderP10Audit\\evidence\\p10\\world-sweep\\runs\\20261102T061021Z-ccb687d9\\world-empty.json",
+  "summary": {
+    "accepted": 4,
+    "rejected": 0,
+    "gpu_us": {
+      "samples": 4,
+      "p50": 268.25,
+      "p95": 269.4625,
+      "p99": 269.4925,
+      "worst": 269.5
+    },
+    "cpu_production_thread_us": {
+      "samples": 4,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "worst": 0.0
+    },
+    "host_wall_submission_completion_us": {
+      "samples": 4,
+      "p50": 666.5,
+      "p95": 1279.0199999999998,
+      "p99": 1346.6039999999998,
+      "worst": 1363.5
+    },
+    "deadline_misses": 0,
+    "gpu_fixed_step_deadline_misses": 0,
+    "host_fixed_step_deadline_misses": 0,
+    "peak_tracked_committed_bytes": 851968,
+    "failures": [],
+    "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+  },
+  "reason": null
+}

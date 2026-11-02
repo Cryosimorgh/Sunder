@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-02",
+  "verdict": "GO: bounded P10 native correctness; no production or real-time qualification",
+  "tested_pr_head": "089b0666f2e413ab75ca5a3980c7d12346eb708b",
+  "run_id": "20261102T061021Z-ccb687d9",
+  "command": "python run_world_sweep.py --full",
+  "original_audit": "docs/P10_NATIVE_AUDIT_20261102.json",
+  "gates": [
+    {
+      "name": "cpu-world",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "build",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "world-empty",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "native-world",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "world-16",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "world-1024",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "native-physics",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "legacy-pool-rail",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "native-stress",
+      "status": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "source_hashes_verified": 15,
+  "build_source_hashes_verified": 14,
+  "native_output_hashes_recomputed": 10,
+  "host_tests": 21,
+  "hardware": [
+    {
+      "Name": "Meta Virtual Monitor",
+      "DriverVersion": "17.12.55.198",
+      "PNPDeviceID": "ROOT\\DISPLAY\\0000"
+    },
+    {
+      "Name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "DriverVersion": "32.0.16.1088",
+      "PNPDeviceID": "PCI\\VEN_10DE&DEV_2705&SUBSYS_89571043&REV_A1\\4&256A0AA8&0&0008"
+    }
+  ],
+  "stress_summary": [
+    {
+      "n": 10000,
+      "contacts": 5000,
+      "gpu_median_us": 2238.5,
+      "committed_bytes": 16187392
+    },
+    {
+      "n": 100000,
+      "contacts": 50000,
+      "gpu_median_us": 11893.0,
+      "committed_bytes": 155779072
+    },
+    {
+      "n": 1000000,
+      "contacts": 500000,
+      "gpu_median_us": 97661.5,
+      "committed_bytes": 1552875520
+    }
+  ],
+  "limitations": [
+    "Single adapter and bounded samples",
+    "1M degree-1 stress exceeds fixed-step deadline; no real-time claim",
+    "Actual device/allocation fault during growth not induced; host rollback injection and native normal growth covered",
+    "P9 bitwise incomplete, G5 deferred, GPU-02 unverified, G6 and production release unqualified"
+  ],
+  "final_merge_preconditions": [
+    "Relevant final-head CI PASS",
+    "No required reviews/protection/rulesets found",
+    "Live PR head equals tested_pr_head; expected-head atomic merge required"
+  ],
+  "ci": {
+    "headRefOid": "089b0666f2e413ab75ca5a3980c7d12346eb708b",
+    "reviews": [],
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-02T06:05:39Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Cryosimorgh/Sunder/actions/runs/41397668631/job/125122410979",
+        "name": "windows-native-build",
+        "startedAt": "2026-11-02T06:04:30Z",
+        "status": "COMPLETED",
+        "workflowName": "P10 Windows native build (no GPU qualification)"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-02T06:05:37Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Cryosimorgh/Sunder/actions/runs/41397663574/job/125122394317",
+        "name": "windows-native-build",
+        "startedAt": "2026-11-02T06:04:27Z",
+        "status": "COMPLETED",
+        "workflowName": "P10 Windows native build (no GPU qualification)"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-02T06:04:40Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Cryosimorgh/Sunder/actions/runs/41397668535/job/125122410789",
+        "name": "cpu-contracts",
+        "startedAt": "2026-11-02T06:04:31Z",
+        "status": "COMPLETED",
+        "workflowName": "P10 headless world CPU contracts"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-11-02T06:04:36Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/Cryosimorgh/Sunder/actions/runs/41397663739/job/125122394635",
+        "name": "cpu-contracts",
+        "startedAt": "2026-11-02T06:04:27Z",
+        "status": "COMPLETED",
+        "workflowName": "P10 headless world CPU contracts"
+      }
+    ]
+  }
+}

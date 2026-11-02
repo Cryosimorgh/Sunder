@@ -1,0 +1,175 @@
+{
+  "status": "PASS",
+  "config": {
+    "capacity": 1,
+    "contact_capacity": 64,
+    "iterations": 128,
+    "dt": 0.0078125,
+    "gravity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cell_size": 2.0,
+    "lower": [
+      -512.0,
+      -512.0,
+      -512.0
+    ],
+    "upper": [
+      512.0,
+      512.0,
+      512.0
+    ],
+    "units": "metre-kilogram-second",
+    "shader_dir": "evidence/p10/build",
+    "debug": false,
+    "deadline_ms": 16.0
+  },
+  "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+  "source_provenance": {
+    "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "sha256": {
+      "evidence\\p10\\build\\physics3.dll": "20ccd6eae06a2dc4cfdffb0add6070219268272aae77382ca58ec976070453b7",
+      "physics3.hlsl": "b45431ea5baed9d5e53d21ca50df9a4a455a38750f19ff03bbbdb0f27631ba22",
+      "physics3-schema.json": "2f86c499d5d9bc3de9695b005fc00be0a82abfcb1616b2d01bab3df224aa2d86",
+      "evidence\\p10\\build\\manifest.json": "1c97505a24ea6f391ca64a6296af4b43c441781ce171511b7cc58bef4992e1f0"
+    }
+  },
+  "summary": {
+    "accepted": 4,
+    "rejected": 0,
+    "gpu_us": {
+      "samples": 4,
+      "p50": 268.25,
+      "p95": 269.4625,
+      "p99": 269.4925,
+      "worst": 269.5
+    },
+    "cpu_production_thread_us": {
+      "samples": 4,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "worst": 0.0
+    },
+    "host_wall_submission_completion_us": {
+      "samples": 4,
+      "p50": 666.5,
+      "p95": 1279.0199999999998,
+      "p99": 1346.6039999999998,
+      "worst": 1363.5
+    },
+    "deadline_misses": 0,
+    "gpu_fixed_step_deadline_misses": 0,
+    "host_fixed_step_deadline_misses": 0,
+    "peak_tracked_committed_bytes": 851968,
+    "failures": [],
+    "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+  },
+  "ticks": [
+    {
+      "status": "ACCEPTED",
+      "tick": 1,
+      "epoch": 0,
+      "error_bits": 0,
+      "contacts": 0,
+      "active": 0,
+      "gpu_us": 269.25,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1363.5,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 2,
+      "epoch": 0,
+      "error_bits": 0,
+      "contacts": 0,
+      "active": 0,
+      "gpu_us": 267.0,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 532.7,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 3,
+      "epoch": 0,
+      "error_bits": 0,
+      "contacts": 0,
+      "active": 0,
+      "gpu_us": 269.5,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 800.3,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 4,
+      "epoch": 0,
+      "error_bits": 0,
+      "contacts": 0,
+      "active": 0,
+      "gpu_us": 267.25,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 507.0,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    }
+  ],
+  "inspections": [
+    {
+      "tick": 1,
+      "epoch": 0,
+      "active": 0,
+      "first": null
+    },
+    {
+      "tick": 2,
+      "epoch": 0,
+      "active": 0,
+      "first": null
+    },
+    {
+      "tick": 3,
+      "epoch": 0,
+      "active": 0,
+      "first": null
+    },
+    {
+      "tick": 4,
+      "epoch": 0,
+      "active": 0,
+      "first": null
+    }
+  ],
+  "workload": "authored independently separated moving sphere pairs; full GPU interaction, not a storage-only scan",
+  "production_release": "NOT QUALIFIED",
+  "replay": {
+    "comparison": {
+      "equal": true,
+      "first_divergence": null,
+      "atol": 2e-05,
+      "rtol": 2e-05
+    },
+    "two_native_runs": true,
+    "cpu_readback_comparison_us": 318723.9,
+    "bitwise": "UNSUPPORTED"
+  }
+}

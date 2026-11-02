@@ -1,0 +1,109 @@
+{
+  "status": "PASS",
+  "tests": [
+    {
+      "name": "axes",
+      "status": "PASS",
+      "seconds": 1.9831151999997019,
+      "details": null
+    },
+    {
+      "name": "impacts",
+      "status": "PASS",
+      "seconds": 1.8133023000000321,
+      "details": [
+        {
+          "contacts": 1,
+          "residual": 0.0,
+          "energy_before": 1.0800000023841858,
+          "energy_after": 0.7200000214576723
+        },
+        {
+          "contacts": 1,
+          "residual": 7.450581804291367e-09,
+          "energy_before": 1.0800000023841858,
+          "energy_after": 0.7085714517260087
+        },
+        {
+          "contacts": 1,
+          "residual": 0.0,
+          "energy_before": 1.0800000023841858,
+          "energy_after": 0.7200000214576723
+        },
+        {
+          "contacts": 1,
+          "residual": 7.450581804291367e-09,
+          "energy_before": 1.0800000023841858,
+          "energy_after": 0.7085714517260087
+        },
+        {
+          "contacts": 1,
+          "residual": 0.0,
+          "energy_before": 1.0800000023841858,
+          "energy_after": 0.7200000214576723
+        },
+        {
+          "contacts": 1,
+          "residual": 7.450581804291367e-09,
+          "energy_before": 1.0800000023841858,
+          "energy_after": 0.7085714517260087
+        },
+        {
+          "contacts": 1,
+          "residual": 1.636616442368677e-08,
+          "energy_before": 1.0799999794879,
+          "energy_after": 0.7200000102073069
+        },
+        {
+          "contacts": 1,
+          "residual": 4.9580872587408466e-08,
+          "energy_before": 1.0799999794879,
+          "energy_after": 0.7085714126445958
+        }
+      ]
+    },
+    {
+      "name": "planes_and_rest",
+      "status": "PASS",
+      "seconds": 1.3328668999997717,
+      "details": null
+    },
+    {
+      "name": "grazing_and_multisphere",
+      "status": "PASS",
+      "seconds": 0.7740219999996043,
+      "details": null
+    },
+    {
+      "name": "rejection_and_snapshots",
+      "status": "PASS",
+      "seconds": 0.6047218999997312,
+      "details": null
+    },
+    {
+      "name": "transactional_world_edits",
+      "status": "PASS",
+      "seconds": 0.15549950000013268,
+      "details": null
+    },
+    {
+      "name": "native_replay",
+      "status": "PASS",
+      "seconds": 0.305280799999764,
+      "details": {
+        "bitwise_equal_observed": true,
+        "max_numeric_difference": 0.0,
+        "requirement": "independent numerical validity; no bitwise promise"
+      }
+    },
+    {
+      "name": "debug_validation",
+      "status": "PASS",
+      "seconds": 1.9269395999999688,
+      "details": null
+    }
+  ],
+  "stress": [],
+  "bitwise_replay": "NOT CLAIMED",
+  "qualification": false
+}

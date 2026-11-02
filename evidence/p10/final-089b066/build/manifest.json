@@ -1,0 +1,162 @@
+{
+  "commands": [
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_clear",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_clear.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_prepare",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_prepare.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_hash",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_hash.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_contacts",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_contacts.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_solve",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_solve.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_gather",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_gather.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_integrate",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_integrate.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_validate",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_validate.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe",
+      "-T",
+      "cs_6_0",
+      "-Gis",
+      "-E",
+      "p3_publish",
+      "-Fo",
+      "C:\\SunderP10Audit\\evidence\\p10\\build\\p3_publish.dxil",
+      "physics3.hlsl"
+    ],
+    [
+      "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Microsoft\\WinGet\\Packages\\zig.zig_Microsoft.Winget.Source_8wekyb3d8bbwe\\zig-x86_64-windows-0.15.2\\zig.EXE",
+      "build-lib",
+      "-dynamic",
+      "-cflags",
+      "-O2",
+      "--",
+      "physics3.c",
+      "runtime.c",
+      "-I.",
+      "-isystem",
+      "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\um",
+      "-isystem",
+      "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\shared",
+      "-isystem",
+      "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.26100.0\\ucrt",
+      "-ld3d12",
+      "-ldxgi",
+      "-ldxguid",
+      "-lkernel32",
+      "-lc",
+      "-O",
+      "ReleaseSafe",
+      "-target",
+      "x86_64-windows-gnu",
+      "-femit-bin=C:\\SunderP10Audit\\evidence\\p10\\build\\physics3.dll"
+    ]
+  ],
+  "sources": {
+    "api.h": "a2a27a3194a1e7bf57a2a4a26f9e20e92abcfd551ebbd3ba1d6a34d543865c7f",
+    "build_physics3.py": "e2b477cee0127f7d5a2091ed301e249d1fbf597e7d01083a657f5caa20a59ce0",
+    "device-lifecycle.inc": "18c91cc16932dfcb8d05025617f6d63b32833a49edfa0aa300840baa329db05d",
+    "layout.h": "b89bdbf82ac5bd58379b17c3332391107a7fdab53f4ff68a373160e76cd9b26a",
+    "physics-layout.h": "bff48791066e3479112fb1157b6bb9ea2587114e650b1b05b98892c1a1548524",
+    "physics-math.hlsl": "8a47dd35fd926853a1e1f5d6242f33d1a7ae4ef870b513bd3ce3f0e00d7d7cda",
+    "physics3-schema.json": "2f86c499d5d9bc3de9695b005fc00be0a82abfcb1616b2d01bab3df224aa2d86",
+    "physics3.c": "865048de98a55f532140a04c6afd49600741e0ed54fae55daba71362ad581a10",
+    "physics3.h": "e3692db65b80fd45a44459bb1ff8840c4bc27089b2ed4dc24eb469fd871b9162",
+    "physics3.hlsl": "b45431ea5baed9d5e53d21ca50df9a4a455a38750f19ff03bbbdb0f27631ba22",
+    "publication-runtime.inc": "a5ee1725d899c87379c7affd65233c2926e22c6e803ecacda370f79c834200dc",
+    "resource-claims.inc": "6378503795e162f776b06e9e926bc376b8582ea1593dcf7519cebe6d044b6baa",
+    "runtime.c": "df9c677dca0cd88aace480109b910e3c757c70b0b367fe081a18c11155378e0d",
+    "runtime.h": "9a00f09b554f5ad5b991ac528b8dcb16d6586f1d34d031811fdf58e659cdab41"
+  },
+  "tools": {
+    "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Microsoft\\WinGet\\Packages\\zig.zig_Microsoft.Winget.Source_8wekyb3d8bbwe\\zig-x86_64-windows-0.15.2\\zig.EXE": "d408dd38eed3e5204af841bcebf70502a4dbbb8399a3a3262be55059370bc018",
+    "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\dxc.exe": "7c6918a0e2d4e437629fa8549f5ce800970494780f363bbbe1e3d3034f435aee"
+  },
+  "outputs": {
+    "p3_clear.dxil": "5a95eeba3542905962b9a739c9fc35deff4da44deddd683b78a993f3a3909fa1",
+    "p3_contacts.dxil": "7fb9565ee0f2bd67f4216dae072336ae70310be7eac0afddfaf27c4885d227f3",
+    "p3_gather.dxil": "2da7e782abffb33feac866401e84f3bc1be41bb1ec465c4af32b5867a79f943b",
+    "p3_hash.dxil": "6dad67d90cd39478e5fb3689e3948928a3bedc64b5c6ee2d150ac52eba3ac2b4",
+    "p3_integrate.dxil": "94c75fc85107232b053b2355b0d8b342006e73bd907eee8d09c1b9d3c2bf4e19",
+    "p3_prepare.dxil": "113033fb3e5d222931bb0660d1fee6be2e9534e26156fc3ee15422aa7893471d",
+    "p3_publish.dxil": "5a4088294e8f192685e31cb505c40dde0ff0311b4d5462d3daa9c784655ce0f4",
+    "p3_solve.dxil": "c8a76d0497e06b4e6786a0e80e3e005731ccd3dfe430959eb6efd6846f593cb5",
+    "p3_validate.dxil": "0308ad32acf153ea7ada35e85324d904516d754d06b0d55ab47b0357218de87e",
+    "physics3.dll": "20ccd6eae06a2dc4cfdffb0add6070219268272aae77382ca58ec976070453b7"
+  }
+}

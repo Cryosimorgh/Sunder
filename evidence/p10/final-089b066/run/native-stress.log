@@ -1,0 +1,4 @@
+PASS stress 10000 contacts 5000 GPU us 2238.5
+PASS stress 100000 contacts 50000 GPU us 12440.5
+PASS stress 1000000 contacts 500000 GPU us 101487.5
+RESULT PASS C:\SunderP10Audit\evidence\p10\world-sweep\runs\20261102T061021Z-ccb687d9\stress-10000-100000-1000000.json

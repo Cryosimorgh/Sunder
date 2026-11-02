@@ -1,0 +1,1 @@
+{"version":2,"n":32,"capacity":32,"contact_capacity":256,"pair_capacity":256,"scan_base":5504,"scan_end":5504,"bytes":[2304,5760,32000,300,32000],"committed":[65536,65536,65536,65536,65536],"publication_slots":2,"publication_bytes_per_slot":2688,"publication_committed":131072,"total":458752,"frames":1,"trial_layout":"SoA, exact 16 G1 fields"}

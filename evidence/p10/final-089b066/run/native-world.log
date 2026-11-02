@@ -1,0 +1,9 @@
+PASS authored_lifecycle_growth
+PASS gravity_force_impulse
+PASS collision_friction
+PASS sleep_wake
+PASS three_snapshot_backpressure
+PASS staged_rejection_and_recovery
+PASS invalid_commands_world_isolation
+PASS two_independent_native_replays
+{"status": "PASS", "evidence": "C:\\SunderP10Audit\\evidence\\p10\\world-sweep\\runs\\20261102T061021Z-ccb687d9\\native-world.json", "failure": null, "not_run": []}

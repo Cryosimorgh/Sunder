@@ -1,0 +1,278 @@
+{
+  "ATTESTATION.json": {
+    "sha256": "513474ba8e305ca639138c092e978d194ca4d20e056f384e69b255ccaa4cfdcd",
+    "bytes": 4504
+  },
+  "build/build-0.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-1.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-2.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-3.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-4.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-5.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-6.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-7.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-8.log": {
+    "sha256": "320a60fa4bd2b8469d1cf8a63c3fc1eb55ac94ad165eebbdaa433ef72547577c",
+    "bytes": 10085
+  },
+  "build/build-9.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "build/manifest.json": {
+    "sha256": "1c97505a24ea6f391ca64a6296af4b43c441781ce171511b7cc58bef4992e1f0",
+    "bytes": 6064
+  },
+  "build/p3_clear.dxil": {
+    "sha256": "5a95eeba3542905962b9a739c9fc35deff4da44deddd683b78a993f3a3909fa1",
+    "bytes": 3860
+  },
+  "build/p3_contacts.dxil": {
+    "sha256": "7fb9565ee0f2bd67f4216dae072336ae70310be7eac0afddfaf27c4885d227f3",
+    "bytes": 11364
+  },
+  "build/p3_gather.dxil": {
+    "sha256": "2da7e782abffb33feac866401e84f3bc1be41bb1ec465c4af32b5867a79f943b",
+    "bytes": 6476
+  },
+  "build/p3_hash.dxil": {
+    "sha256": "6dad67d90cd39478e5fb3689e3948928a3bedc64b5c6ee2d150ac52eba3ac2b4",
+    "bytes": 4484
+  },
+  "build/p3_integrate.dxil": {
+    "sha256": "94c75fc85107232b053b2355b0d8b342006e73bd907eee8d09c1b9d3c2bf4e19",
+    "bytes": 8380
+  },
+  "build/p3_prepare.dxil": {
+    "sha256": "113033fb3e5d222931bb0660d1fee6be2e9534e26156fc3ee15422aa7893471d",
+    "bytes": 9684
+  },
+  "build/p3_publish.dxil": {
+    "sha256": "5a4088294e8f192685e31cb505c40dde0ff0311b4d5462d3daa9c784655ce0f4",
+    "bytes": 4228
+  },
+  "build/p3_solve.dxil": {
+    "sha256": "c8a76d0497e06b4e6786a0e80e3e005731ccd3dfe430959eb6efd6846f593cb5",
+    "bytes": 6444
+  },
+  "build/p3_validate.dxil": {
+    "sha256": "0308ad32acf153ea7ada35e85324d904516d754d06b0d55ab47b0357218de87e",
+    "bytes": 11120
+  },
+  "build/physics3.dll": {
+    "sha256": "20ccd6eae06a2dc4cfdffb0add6070219268272aae77382ca58ec976070453b7",
+    "bytes": 308224
+  },
+  "build/physics3.lib": {
+    "sha256": "0556251c97cc181ec110b946cdcbd0a095cb1e2fc9495385dceb7162187b6430",
+    "bytes": 3914
+  },
+  "build/physics3.pdb": {
+    "sha256": "2e01ec1cef6af079da193745549f93771cf4f6070775cf24364221ddd0f759e7",
+    "bytes": 2052096
+  },
+  "run/build.log": {
+    "sha256": "08e29724a1339a773211e40c6f49f95815b26218ee291d4da9a92de3685e6293",
+    "bytes": 47
+  },
+  "run/consolidated.json": {
+    "sha256": "e3ed3b552cea7464f7bfb8bbd40afb96d0a147f2648413da433d0f7e37069ad6",
+    "bytes": 16212
+  },
+  "run/cpu-world.log": {
+    "sha256": "f7dbd2fd016c9b63b223e8ee40df02abd172c8d4c17bc3c814b1dadfa1aedd42",
+    "bytes": 761
+  },
+  "run/demo.json": {
+    "sha256": "61c0021199f979046e76043558fa0be389236074e1609dc2314d0b9c6a239696",
+    "bytes": 30388
+  },
+  "run/legacy-pool-rail.log": {
+    "sha256": "37edc1f5183360524070c59b2e46aac52f515ae09bd3f06b69f56fc63427806c",
+    "bytes": 278
+  },
+  "run/native-physics.log": {
+    "sha256": "4de598800bede87ca839f65054ccabf152067d605b5b5c4b95d35340f6451b77",
+    "bytes": 280
+  },
+  "run/native-stress.log": {
+    "sha256": "56f38f52f84c6a7382cd728e2e304db2074d186c938751c79a893ed822dc2c78",
+    "bytes": 270
+  },
+  "run/native-world.json": {
+    "sha256": "d227b8cf3a0dd76f94d7385719b8de57757201b6c41e6c251e5b6e46411983ff",
+    "bytes": 25779
+  },
+  "run/native-world.log": {
+    "sha256": "8368e9b29134a08c22c2c3f7ed881cfeae5414baf4f28c45cb255c9fdeeea5f1",
+    "bytes": 414
+  },
+  "run/stress-10000-100000-1000000.json": {
+    "sha256": "637aeaae3748ce7262a2b0f341242e5d4e6992657469f6a650a2608096aca550",
+    "bytes": 4864
+  },
+  "run/tests.json": {
+    "sha256": "ee945f1a07f696595383a4451c7b2adaf186e08330cfa3c5e63cf3d6ad66f8c9",
+    "bytes": 2831
+  },
+  "run/world-1024-commands.json": {
+    "sha256": "df47f41e68394ed1e1ec2a56f1439268ba8c8183b9b185467d792b9a888ebed0",
+    "bytes": 612621
+  },
+  "run/world-1024.json": {
+    "sha256": "ae19e064398ec6325e90ad14175fd271b7cefc1f7d74a895ce1830da9708d893",
+    "bytes": 13360
+  },
+  "run/world-1024.log": {
+    "sha256": "c3f301f4e2505568e7e82a0fa8709cde844f1d398c03f4287d085ba37e21750d",
+    "bytes": 972
+  },
+  "run/world-16-commands.json": {
+    "sha256": "10789151350f5cf9dafa8471b95600d765419039a646ddb1f8be6313b8bc8b23",
+    "bytes": 16438
+  },
+  "run/world-16.json": {
+    "sha256": "b8c6e846e8c65c23109261916a183ee014b6c8095309be423d0786062286616f",
+    "bytes": 13253
+  },
+  "run/world-16.log": {
+    "sha256": "ec0ed745ab596884aa87169767ec826eefa6452018018b79865aca950c0ec145",
+    "bytes": 934
+  },
+  "run/world-empty-commands.json": {
+    "sha256": "8c8c320d88fb7ab47f5f129908934cb2277e23654d0271b042ffe3bd6c81c7c8",
+    "bytes": 3114
+  },
+  "run/world-empty.json": {
+    "sha256": "e1334894683621fa3d81cfac7d020764a41abb63adec011792154096fa27f1ec",
+    "bytes": 4257
+  },
+  "run/world-empty.log": {
+    "sha256": "df1e8bfea545e5a44819b97b7eec44361cebe4f03520c6f8dba886e6964955f1",
+    "bytes": 948
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/all.log": {
+    "sha256": "32da16436e988ebe2baf7c6801dd2a70227513ba98d385582b53c20b73e75ee0",
+    "bytes": 1173
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-physics.log": {
+    "sha256": "dccd25da70d99b4635365f66d51fddc91464209b8a175d8c0ce5e25cadecd005",
+    "bytes": 722
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-ph_append.log": {
+    "sha256": "099a6c8b0724b1487e0d4398552708b5bbf48aa59d0c38f54f39bbaab835c277",
+    "bytes": 164
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-ph_ready.log": {
+    "sha256": "57cc1c6e88a1345c58b9e3a27406cb15946881c88888c24247dc0c0a9e53a01e",
+    "bytes": 162
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-ph_solve.log": {
+    "sha256": "7c0fbf68da45dd22de9e81a58e73e3e6043130be521f5cce9d1623f81c595940",
+    "bytes": 162
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-ph_walls.log": {
+    "sha256": "faca45794e32beeaa6724583f783e0939bd32380dc6d6dffe3207b25050a74df",
+    "bytes": 162
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-playground_gpu_tests.log": {
+    "sha256": "f8036c06b984f935cc25c4175f88058796ef3afbd824095d7dd3ad7677d574a5",
+    "bytes": 743
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-pool_tests.log": {
+    "sha256": "911570ce82e64ff4e8c34094e52a6d4e714f10272ce40d171f72027314a94c00",
+    "bytes": 723
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-spatial.log": {
+    "sha256": "54239bdc3d17c0967c7deed4107baafac6b53b5201ea4b9a0b8327d43d18af76",
+    "bytes": 670
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/build-storage.log": {
+    "sha256": "6970d4e69c6a25b73a83397b981e2d546bb38101ee91fbdd33e5eb6f29a4e502",
+    "bytes": 649
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/cli.json": {
+    "sha256": "2eafe4807a8d5b271f86cb70bed9619cba8c217d7e34760bbf70c1d05bea9d63",
+    "bytes": 20691
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/cli.json.ledger.json": {
+    "sha256": "1544a29f28efc33b517be0623e41faf2889dc9ecd7785f8b3ee65dd29699805e",
+    "bytes": 344
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/cli.json.ledger.json.spatial.json": {
+    "sha256": "6ffe7e9e49af0b38d7af645da0cbb600833ed20ce096b8bfc2d0cdd23d09a874",
+    "bytes": 283
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/cli.log": {
+    "sha256": "226582a17daa3798c7a7b418a2975037c4a6b94aef5832e655e86e92b94c4bea",
+    "bytes": 244
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/commands.log": {
+    "sha256": "c77b2617c096661e002157f020a775c9e978dc07d90508b963fa9e1a5dd27158",
+    "bytes": 261
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/cpu.log": {
+    "sha256": "82eebb4ee69b3179054fee8336f7dfc4b519945a95898f038fa0ebb910cfd2c3",
+    "bytes": 543
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/device.json": {
+    "sha256": "bddc30bb5d2f2241fef3ecd6f1c249149f15a2e50ac8bba95b267687f065a767",
+    "bytes": 132
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/device.log": {
+    "sha256": "f69c7da4d7bdf168c509689cd1ae339ffd1496509d0404c0bf0925620f4c5a3b",
+    "bytes": 169
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/overhead.log": {
+    "sha256": "1a6676a3f03f325b982b366a151615b3a5271ab450287e76889a4a2566124329",
+    "bytes": 18249
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/result.json": {
+    "sha256": "2933fe6d0db129a0f9dcd5608487c1bd2694018824b8abd969dd6e9130f28f8a",
+    "bytes": 52978
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/spatial.json": {
+    "sha256": "116f14260405ea8df030eefd698be8bbf2b88a7602ada3db97018e245b1c90cb",
+    "bytes": 1705
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/spatial.json.ledger.json": {
+    "sha256": "1ee6595b64fc20776994ec6b1c00beebd226e5fc0916aaca8225b023afad8ba6",
+    "bytes": 287
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/spatial.log": {
+    "sha256": "600fd97de2e00847bd44a1b2ee88727b1cf1bb4d1e7f4a6ece135fbeb9c0f240",
+    "bytes": 205
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/storage.json": {
+    "sha256": "78a14675e379974d0262975b92f2a75ccebac415eb06dafbb68a99f3a2529b25",
+    "bytes": 2246
+  },
+  "run/legacy-dev-test/20261102T061037.168364Z/storage.log": {
+    "sha256": "8947aa5a986c07f9cec1bbe6aaeb273b7b5ff746e2baca9494dece173da4c7c9",
+    "bytes": 265
+  }
+}

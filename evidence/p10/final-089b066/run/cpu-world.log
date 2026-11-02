@@ -1,0 +1,22 @@
+----------------------------------------------------------------------
+Ran 21 tests in 0.166s
+
+OK
+{
+  "archive": "C:\\Users\\SHIELD~1\\AppData\\Local\\Temp\\tmp6_ogyign\\P10-RESULTS-TO-SEND\\Sunder-P10-20261031T130000Z-bbb-GO-20261102T061021Z-503650.zip",
+  "bytes": 1630,
+  "qualified": true,
+  "files": 4
+}
+{
+  "archive": "C:\\Users\\SHIELD~1\\AppData\\Local\\Temp\\tmpz2hjplq5\\P10-RESULTS-TO-SEND\\Sunder-P10-20261031T120000Z-aaa-NO-GO-20261102T061021Z-3b27be.zip",
+  "bytes": 1640,
+  "qualified": false,
+  "files": 4
+}
+{
+  "archive": "C:\\Users\\SHIELD~1\\AppData\\Local\\Temp\\tmpz2hjplq5\\P10-RESULTS-TO-SEND\\Sunder-P10-20261031T120000Z-aaa-NO-GO-20261102T061021Z-cf48fe.zip",
+  "bytes": 1640,
+  "qualified": false,
+  "files": 4
+}

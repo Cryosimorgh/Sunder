@@ -1,0 +1,9 @@
+PASS all 104.01s
+PASS overhead 0.39s GPU p50/p95 270.5/273.8 us; CPU record 220.1 us
+PASS cpu 0.02s
+PASS commands 6.36s
+PASS cli 0.34s
+PASS device 0.30s
+PASS storage 0.26s
+PASS spatial 0.29s
+PASS full 140.18s; built 9; evidence dev-test-results\20261102T061037.168364Z

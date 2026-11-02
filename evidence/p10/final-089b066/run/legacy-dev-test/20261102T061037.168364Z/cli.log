@@ -1,0 +1,1 @@
+["C:\\SunderP10Audit\\zig-out\\bin\\physics.exe", "--n", "32", "--fixture", "1", "--steps", "4", "--contacts", "256", "--pairs", "256", "--verify-every-tick", "--out", "C:\\SunderP10Audit\\dev-test-results\\20261102T061037.168364Z\\cli.json"]

@@ -1,0 +1,9 @@
+PASS axes
+PASS impacts
+PASS planes_and_rest
+PASS grazing_and_multisphere
+PASS rejection_and_snapshots
+PASS transactional_world_edits
+PASS native_replay
+PASS debug_validation
+RESULT PASS C:\SunderP10Audit\evidence\p10\world-sweep\runs\20261102T061021Z-ccb687d9\tests.json

@@ -1,0 +1,2 @@
+["C:\\SunderP10Audit\\zig-out\\bin\\storage.exe", "--n", "32", "--layout", "1", "--steps", "2", "--out", "C:\\SunderP10Audit\\dev-test-results\\20261102T061037.168364Z\\storage.json"]
+VERIFIED N=32 layout=1 active=4 steps=2 words=512 coverage=256 committed=720896
