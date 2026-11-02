@@ -108,6 +108,7 @@ class TickResult:
     gpu_max_degree: int = 0
     candidate_stage_us: float = 0.
     native_submit_completion_us: float = 0.
+    gpu_passes_us: tuple[float, ...] = ()
 
 
 class NativeResult(C.Structure):
@@ -597,7 +598,8 @@ class World:
                                 wall_us,
                                 float(r.phases_us[7]) > self.config.dt * 1_000_000,
                                 wall_us > self.config.dt * 1_000_000,
-                                int(r.candidates), int(r.max_degree), stage_us, native_us)
+                                int(r.candidates), int(r.max_degree), stage_us, native_us,
+                                tuple(float(r.phases_us[i]) for i in range(7)))
             self._history.append({"tick": self.tick_id, "commands": commands,
                                   "result": asdict(report)})
             self._clear_staging()
