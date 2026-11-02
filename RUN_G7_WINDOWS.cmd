@@ -3,6 +3,7 @@ setlocal EnableExtensions
 cd /d "%~dp0"
 title Sunder G7 - Dense D3D12 Native Benchmark
 echo Sunder G7 native hardware benchmark - no CPU solver or simulated GPU.
+echo This is HEADLESS. For interactive 3D spheres, run LAUNCH_G7_DEMO.cmd.
 echo Default: full 1K, 10K, 100K, two independent runs each.
 echo Run with --quick for a smoke-only (non-qualifying) handoff.
 where python >nul 2>nul
