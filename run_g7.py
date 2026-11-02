@@ -33,7 +33,7 @@ FIELDS = ("status", "tick", "epoch", "error_bits", "contacts", "active", "gpu_us
           "cpu_us", "committed_bytes", "deadline_miss", "cause", "wall_us",
           "gpu_fixed_step_deadline_miss", "host_fixed_step_deadline_miss",
           "gpu_candidates", "gpu_max_degree", "candidate_stage_us",
-          "native_submit_completion_us")
+          "native_submit_completion_us", "gpu_passes_us")
 
 
 def percentile(data, p):
@@ -296,6 +296,16 @@ def case(spec, args, directory, repeat):
                 report["final_state_diagnostic_us"] = state["diagnostic_readback_us"]
         report["actual_peak_tracked_committed_bytes"] = max((r["committed_bytes"] for r in rows), default=0)
         report["samples"] = len(samples)
+        native_stages = ("clear_prepare", "spatial_hash", "contacts",
+                         "solve_gather", "integrate", "validate", "publish")
+        report["gpu_pass_stats"] = {}
+        for i, stage_name in enumerate(native_stages):
+            values = [float(row["gpu_passes_us"][i]) for row in rows
+                      if row["status"] == "ACCEPTED" and len(row["gpu_passes_us"]) == 7]
+            report["gpu_pass_stats"][stage_name] = {
+                "count": len(values), "p50": percentile(values, .5),
+                "p95": percentile(values, .95), "p99": percentile(values, .99),
+                "worst": max(values) if values else None}
         report["phase_stats"] = {
             "gpu_native_us": stats(rows, "gpu_us"),
             "host_submit_completion_us": stats(rows, "native_submit_completion_us"),
