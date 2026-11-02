@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstddef>
 #include <cstdio>
 #include <limits>
 
@@ -24,7 +25,7 @@ inline bool parse_positive_u32(const char *s,uint32_t &out){
  out=(uint32_t)value;
  return true;
 }
-template<size_t N>inline void write_unsigned(char (&target)[N],uint64_t value){
+template<std::size_t N>inline void write_unsigned(char (&target)[N],uint64_t value){
  std::snprintf(target,N,"%llu",(unsigned long long)value);
 }
 }
