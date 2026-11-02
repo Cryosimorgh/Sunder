@@ -84,6 +84,48 @@ class G7SceneTests(unittest.TestCase):
         churn, _ = topology(a, [0,0,1,1,1], 5, edges)
         self.assertEqual(churn["contact_churn_since_previous_sample"], 0)
 
+    def test_cube_staged_static_then_dynamic_activation_host_contract(self):
+        # This validates world orchestration only; FakeGPU is NOT a solver.
+        from dataclasses import replace
+        from test_sunder_world import FakeGPU
+        from sunder_world import World, WorldConfig
+        particles = list(generate(SceneSpec("cube", 8, preset="dense"))[1])
+        with World(WorldConfig(capacity=8, contact_capacity=32,
+                               gravity=(0., -9.8, 0.)), backend_factory=FakeGPU) as world:
+            handles = []
+            for start in (0, 4):
+                for particle in particles[start:start+4]:
+                    handles.append(world.create_body(replace(
+                        particle.body, static=True, velocity=(0.,0.,0.))))
+                result = world.step()
+                self.assertEqual(result.status, "ACCEPTED")
+                self.assertEqual(result.active, len(handles))
+            with world.acquire() as snapshot:
+                self.assertTrue(all(snapshot.body(h)["static"] for h in handles))
+            for handle, particle in zip(handles, particles):
+                world.update_body(handle, static=False, mass=particle.body.mass,
+                                  velocity=particle.body.velocity)
+            result = world.step()
+            self.assertEqual((result.status, result.active), ("ACCEPTED", 8))
+            with world.acquire() as snapshot:
+                self.assertTrue(all(not snapshot.body(h)["static"] for h in handles))
+
+    def test_controlled_perturbation_and_distribution_validation(self):
+        spec = SceneSpec("belts", 128, seed=21, preset="dense",
+                         radius_spread=.06, mass_spread=.2, perturbation=.04)
+        params, stream = generate(spec)
+        bodies = list(stream)
+        self.assertEqual(params["perturbation"], .04)
+        self.assertEqual(len(bodies), 128)
+        self.assertEqual(authored_hash(bodies), authored_hash(list(generate(spec)[1])))
+        check_separation(bodies)
+        with self.assertRaises(SceneAdmissionError):
+            SceneSpec("cube", 16, radius_spread=.12)
+        with self.assertRaises(SceneAdmissionError):
+            SceneSpec("belts", 16, perturbation=1.)
+        self.assertEqual(len(list(generate(SceneSpec(
+            "cube", 27, preset="dense", velocity_field="funnel"))[1])), 27)
+
     def test_replay_contract_not_bitwise(self):
         self.assertTrue(compare_states([(1.,2.)], [(1.,2.)])["equal"])
         mismatch = compare_states([(1.,2.)], [(1.,3.)])
