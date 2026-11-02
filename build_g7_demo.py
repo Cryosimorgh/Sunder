@@ -25,7 +25,7 @@ def main():
                      '-L' + str(sdk()[0].parents[1] / 'Lib' / sdk()[0].name / 'um/x64'), '-ld3dcompiler', '-ldwmapi',
                      '-lc++', '-lc', '-O', 'ReleaseSafe', '-target', 'x86_64-windows-gnu', '-mcpu=baseline',
                      '-femit-bin=' + str(OUT / 'SunderG7.exe')])
-    files = dependencies(['g7_demo.cpp', 'g7_scene.h', 'g7_native.h', 'g7_render.hlsl', 'physics3.c', 'runtime.c', 'build_g7_demo.py'])
+    files = dependencies(['g7_demo.cpp', 'g7_scene.h', 'g7_ui_numbers.h', 'g7_native.h', 'g7_render.hlsl', 'physics3.c', 'runtime.c', 'build_g7_demo.py'])
     files = sorted(set(files + imgui + ['third_party/imgui/backends/imgui_impl_win32.cpp', 'third_party/imgui/backends/imgui_impl_dx12.cpp']))
     identity = dict(commands=commands, sources={p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in files},
                     tools={str(p): hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in [compiler(), sdk()[1]]})
