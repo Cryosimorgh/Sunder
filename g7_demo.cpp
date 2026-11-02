@@ -10,6 +10,7 @@
 #include <string>
 #include <cstdint>
 #include <cerrno>
+#include <climits>
 #include <limits>
 #include <cmath>
 #include <stdexcept>
@@ -266,6 +267,11 @@ int main(int argc,char **argv){
    auto positive32=[&](const char *s)->uint32_t{
     uint64_t v=number(s);if(!v||v>UINT32_MAX)throw std::runtime_error("Value outside native uint32 representation");return uint32_t(v);
    };
+   auto signed32=[](const char *s)->int{
+    errno=0;char *end=nullptr;long long v=strtoll(s,&end,10);
+    if(errno==ERANGE||!end||*end||v<INT_MIN||v>INT_MAX)throw std::runtime_error("Signed integer outside native int32 representation");
+    return int(v);
+   };
    auto decimal=[](const char *s)->float{
     errno=0;char *end=nullptr;float v=strtof(s,&end);
     if(errno==ERANGE||!end||*end||!std::isfinite(v))throw std::runtime_error(std::string("Invalid/overflowed float: ")+s);return v;
@@ -299,8 +305,8 @@ int main(int argc,char **argv){
     else if(option=="--emitter-width-x")sim.config.emitterWidthX=decimal(value);
     else if(option=="--emitter-width-y")sim.config.emitterWidthY=decimal(value);
     else if(option=="--emitter-height")sim.config.emitterHeight=decimal(value);
-    else if(option=="--seed")sim.config.seed=int(positive32(value));
-    else if(option=="--scene")sim.config.scene=int(number(value));
+    else if(option=="--seed")sim.config.seed=signed32(value);
+    else if(option=="--scene")sim.config.scene=signed32(value);
     else if(option=="--placement-attempts")sim.config.placementAttempts=positive32(value);
     else throw std::runtime_error("Unknown option "+option);
    }
