@@ -3,13 +3,13 @@
   "repository": "Cryosimorgh/Sunder",
   "branch": "p10-headless-world-api-20261031",
   "baseline_main": "0eb15233e37a698bc6b28c8916afbcb8d6cbcb8a",
-  "decision": "BOUNDED CORRECTNESS GO at ed618f9; fresh final-head sweep and CI required before merge",
+  "decision": "BOUNDED NATIVE CORRECTNESS GO from audited hardware evidence; corrected runner final-head full sweep and CI required before merge",
   "historical_native_3d": "Earlier merged P10 native bounded 3D evidence; NOT evidence for the new wrapper",
   "P8b": "CORRECTED and MERGED in PR #5; historical 4072 tick failure preserved",
   "P9": "PR #6 MERGED AS EVIDENCE; FAIL/INCOMPLETE for bitwise qualification",
   "fresh_tests": {
     "uploaded_full_sweep": "PASS all 9 at ed618f9bf7c80bd78f8d73d57f38f7791d3f6dfe",
-    "reviewer_host_packaging": "PASS 19 tests",
+    "reviewer_host_packaging": "PASS 21 host/packaging/runner-verdict tests",
     "native": "PASS 8 world API cases and 8 native oracle groups",
     "legacy": "PASS all 8 dev_test cases; 10598 all-case accepted ticks and 2 expected rejections",
     "stress": "PASS 10K/100K/1M, contacts 5000/50000/500000",
@@ -370,7 +370,6 @@
     "general ECS",
     "sparse GPU compaction"
   ],
-  "merge_authorized": false,
   "execution_notes": "Uploaded hardware run audited offline; no verified source defect or tolerance change. Hosted failure retained as historical.",
   "review_20261031": {
     "verdict": "NO-GO: cannot claim native correctness from Linux container or compile-only hosted CI",
@@ -512,5 +511,7 @@
     ],
     "execution_notes": "Earlier CPU/compilation CI passes and newly added CPU tests are not a substitute for native GPU execution. No new GPU timing, memory or replay measurements are claimed."
   },
-  "current_audit": "docs/P10_NATIVE_AUDIT_20261102.json"
+  "current_audit": "docs/P10_NATIVE_AUDIT_20261102.json",
+  "verified_runner_fix": "Final failed stress gate could incorrectly promote to GO; return immediately on failure. Each gate failure and all-pass regression included in full sweep/CI. Original stress JSON/log independently PASS.",
+  "merge_policy": "Authorize merge only after exact full sweep PASS on final PR SHA, unchanged current head, relevant CI PASS and review requirements checked. Final attestation and retained results in PR #8."
 }

@@ -21,7 +21,7 @@ RUN_ID = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid
 RUN = BASE / "runs" / RUN_ID
 SOURCES = ("physics3.c", "physics3.h", "physics3.hlsl", "physics3-schema.json",
            "sunder_world.py", "headless_demo.py", "test_physics3.py",
-           "test_sunder_world.py", "test_native_world.py", "run_world_sweep.py",
+           "test_sunder_world.py", "test_native_world.py", "test_world_sweep.py", "run_world_sweep.py",
            "package_p10_evidence.py", "test_p10_packaging.py",
            "RUN_P10_WINDOWS.cmd", "build_physics3.py")
 CASES = ("cpu-world", "build", "world-empty", "native-world", "world-16",
@@ -163,7 +163,8 @@ def main():
             result["failure"] = "Windows x64 with functional D3D12 hardware adapter required"
             return 1
         tests = [
-            ("cpu-world", ["-m", "unittest", "test_sunder_world", "-q"], 90, None),
+            ("cpu-world", ["-m", "unittest", "test_sunder_world", "test_p10_packaging",
+                           "test_world_sweep", "-q"], 90, None),
             ("build", ["build_physics3.py"], 300, None),
             ("world-empty", ["headless_demo.py", "--capacity", "1", "--bodies",
                              "0", "--steps", "4", "--replay", "--out",
@@ -185,7 +186,7 @@ def main():
             result["unexecuted"].remove(name)
             if not ok:
                 result["failure"] = "first failing gate: " + name
-                break
+                return 1
         if result["unexecuted"]:
             return 1
         if first != digest():

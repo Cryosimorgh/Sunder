@@ -670,8 +670,18 @@
       "wall_seconds_including_init_readback_cpu_oracle": 1.405620599980466
     }
   ],
-  "verified_defects": [],
-  "fixes": [],
+  "verified_defects": [
+    {
+      "file": "run_world_sweep.py",
+      "failure": "Final native-stress failure removed the last unexecuted case, broke out of loop, then overwrote NO-GO with GO and returned 0.",
+      "reproduction": "python -m unittest test_world_sweep -q before fix fails final-stress subtest; injected final failure produced qualified=true and exit 0.",
+      "impact": "Verdict integrity defect; original uploaded stress evidence independently PASS, so uploaded results remain valid."
+    }
+  ],
+  "fixes": [
+    "Return nonzero immediately on any failed gate; finally retains NO-GO and original failure record.",
+    "Regression covers failure at each of nine positions plus all-pass; included in full-sweep CPU gate and CI."
+  ],
   "adversarial_review": {
     "growth": "host seed-failure injection preserves old state/clock/handles; native successful growth PASS; actual allocation/device failure not induced",
     "staging": "native injected validation flag 16 rejects staged candidate, retains accepted state and recovers",
@@ -686,5 +696,11 @@
     "Stress GPU fixed-step deadline misses derived from raw timestamps: 0/3 at 10K, 0/3 at 100K, 3/3 at 1M (dt=1/128). Stress host per-tick timings and allocation-event counts unavailable.",
     "Coarse Windows CPU thread accounting gives zeros, not zero host work. Host wall and oracle/readback costs are separate.",
     "P9 bitwise INCOMPLETE; G5 DEFERRED; GPU-02 UNVERIFIED; formal G6 and production release NOT QUALIFIED."
-  ]
+  ],
+  "reviewer_tests": "PASS 21 host/packaging/verdict tests after fix",
+  "intermediate_native_run": {
+    "commit": "032cffcb2c43054d3eb9453c68f798eecbe8bed2",
+    "run": "20261102T060628Z-5ad8b2f7",
+    "result": "PASS all nine gates, retained as intermediate before runner fix"
+  }
 }

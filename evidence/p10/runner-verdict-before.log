@@ -1,0 +1,12 @@
+======================================================================
+FAIL: test_each_failed_gate_is_no_go_including_final_stress (test_world_sweep.SweepVerdictTests.test_each_failed_gate_is_no_go_including_final_stress) (failed_case='native-stress')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\SunderP10Audit\test_world_sweep.py", line 43, in test_each_failed_gate_is_no_go_including_final_stress
+    self.assertNotEqual(code, 0)
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.124s
+
+FAILED (failures=1)
