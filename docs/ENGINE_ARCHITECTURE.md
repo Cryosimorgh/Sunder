@@ -1,10 +1,10 @@
 # Sunder — Technical Architecture and Development Record
 
 **Project:** [Cryosimorgh/Sunder](https://github.com/Cryosimorgh/Sunder)  
-**Record date:** 2026-10-31
+**Record date:** 2026-11-02
 **Document type:** Living engineering record  
 **Style:** Clear technical English, based on ASD-STE100 principles without strict controlled-language limits  
-**Status:** Experimental GPU physics engine. **P10 native 3D foundation: GO within the historical bounded tested envelope. P10 general-purpose headless world API: IMPLEMENTED ON FEATURE BRANCH / NO-GO UNTIL NATIVE REVALIDATION.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
+**Status:** Experimental GPU physics engine. **P10 native 3D foundation: GO within the historical bounded tested envelope. P10 general-purpose headless world API: BOUNDED NATIVE CORRECTNESS GO at ed618f9; final-head sweep and CI required before merge.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
 
 > **Update rule:** Update this document in the same change that closes, rejects, or reopens a development breakpoint. Keep prior results and their limitations. Do not turn a local experiment into a released feature by changing its status here.
 
@@ -35,7 +35,13 @@ Use these labels throughout the document:
 | **Experimental** | A local or branch-specific change needs broader evidence. |
 | **Planned** | A design target. No implementation claim. |
 
-### Application-facing headless world API — P10 feature branch / NO-GO (2026-10-31)
+### Application-facing headless world API — P10 bounded native evidence GO (2026-11-02)
+
+**Current audit (2026-11-02):** User hardware run `20261031T195427Z-3f1028cd` passes all nine full-sweep gates at `ed618f9bf7c80bd78f8d73d57f38f7791d3f6dfe`, Windows 11 x64, RTX 4070 Ti SUPER, driver `32.0.16.1088`. ZIP CRC, all 135 checksums, 14 sweep-source and 14 native-build source hashes verify. Eight native world cases, eight native oracle groups, all eight legacy dev-test cases and 10K/100K/1M separated-pair stress PASS. Expected native-world rejections: leased-slot backpressure and injected validation flag 16; recovery PASS. No source defect or tolerance change indicated. Raw original files: `evidence/p10/qualification-20261102/original/`. [Detailed audit](P10_NATIVE_AUDIT_20261102.json). The hosted failure and preparation-only statements below are historical, superseded by this hardware evidence.
+
+Authored 16/1024 GPU p50/p95/p99/worst are 1151.75/1152.5/1152.5/1152.5 and 3004/3024.6/3030.92/3032.5 microseconds. Host worst is 2344.9/4441.2 microseconds, zero reported deadline misses. Stress GPU medians: 1852.25/7323.25/60727 microseconds; tracked bytes: 16,187,392/155,779,072/1,552,875,520. Three degree-1 samples per size; all three 1M samples exceed the 7.8125 ms step. No sustained, real-time or arbitrary-topology claim. Stress host per-tick timing and allocation-event counts unavailable; CPU thread zeros reflect coarse accounting. Archive omits DLL/DXIL bytes, so output hashes are recorded, not recomputed from it.
+
+**Integration condition:** Run exact `python run_world_sweep.py --full` on the final documentation/evidence commit, attach immutable results and SHA to PR #8, check CI and compare live PR head before merge. Bounded P10 correctness only. P9 bitwise stays INCOMPLETE; G5 DEFERRED, GPU-02 UNVERIFIED, formal G6 and production release NOT QUALIFIED.
 
 **Implementation proposal:** [P10_WORLD_API.md](P10_WORLD_API.md) describes
 `sunder_world.py`, `headless_demo.py`, `run_world_sweep.py`, the new native
@@ -1388,6 +1394,7 @@ Next action:
 
 | Date | Breakpoint | Record update |
 |---|---|---|
+| 2026-11-02 | P10 hardware evidence audit - bounded correctness GO, final-head integration conditional | 135 checksums and 28 source hashes verified; all 9 gates PASS at ed618f9 on RTX 4070 Ti SUPER. Original evidence retained. No physics changes. Full sweep and CI required on final commit before merge. |
 | 2026-10-31 | P10 native 3D foundation — bounded GO | Added tensor/quaternion 3D GPU sphere/plane dynamics, immutable publication and real delayed-reader proof. Seven native groups, all three stress scales and unchanged full 2D regressions pass. Numerical native validity required; bitwise replay remains unqualified. Formal G6/release remains not qualified. |
 | 2026-10-31 | P10 full native Windows attempt — NO-GO / no suitable D3D12 compute adapter | Source 510192f, 17 CPU-only PASS, 9 shaders and DLL compiled. Empty authored world fails D3D12 context/admission on Hyper-V Video; 16/1K, native oracle/replay, pool/rail and 10K/100K/1M NOT RUN. Immutable Actions artifact 13053607373, SHA-256 retained; PR #8 unmerged. |
 | 2026-10-31 | P10 PR #8 adversarial qualification follow-up — NO-GO pending hardware GPU | Fail-closed candidate discard and capacity migration safety, async-close tests, replay field coverage and unique run evidence added; no D3D12 hardware qualification or physics performance evidence. Keep PR draft/unmerged. |
