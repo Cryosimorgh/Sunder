@@ -216,9 +216,9 @@ def case(spec, args, directory, repeat):
         with World(cfg) as world, (directory / "ticks.csv").open("w", newline="", encoding="utf-8") as csvfile:
             writer = csv.DictWriter(csvfile, FIELDS)
             writer.writeheader()
-            # Cube bodies remain motionless during staged insertion. Only after
-            # capacity is accepted do inward velocities start, avoiding overlaps
-            # between previously moved particles and newly authored particles.
+            # Cube bodies are temporarily static during staged insertion,
+            # including for nonzero gravity. Only after the entire volume is
+            # accepted do all bodies become dynamic and compression begin.
             total = max(args.duration_ticks, math.ceil(spec.bodies / args.spawn_batch) + args.post_full_ticks) if spec.scenario == "cube" else args.duration_ticks
             cursor = 0
             for frame in range(total):
@@ -229,7 +229,9 @@ def case(spec, args, directory, repeat):
                     report["created_attempts"] += 1
                     body = particle.body
                     if spec.scenario == "cube":
-                        body = replace(body, velocity=(0., 0., 0.))
+                        # Temporary static bodies cannot drift under authored
+                        # gravity before the last spawn is accepted.
+                        body = replace(body, velocity=(0., 0., 0.), static=True)
                     handle = world.create_body(body)
                     handles.append(handle)
                     body_belts.append(particle.belt)
@@ -238,7 +240,8 @@ def case(spec, args, directory, repeat):
                 if (spec.scenario == "cube" and report.get("fill_tick") is not None and
                     frame == report["fill_tick"]):
                     for handle, particle in zip(handles, particles):
-                        world.update_body(handle, velocity=particle.body.velocity)
+                        world.update_body(handle, velocity=particle.body.velocity,
+                                          mass=particle.body.mass, static=False)
                 cpu_edits_us = (time.perf_counter_ns() - edit_start) / 1000
                 result = world.step()
                 row = asdict(result)
