@@ -158,7 +158,7 @@ def _belts(spec: SceneSpec, params: dict):
     each = ((spec.bodies + 1) // 2, spec.bodies // 2)
     for belt, target in enumerate(each):
         accepted, attempts = 0, 0
-        limit = max(1000, target * 100)
+        limit = max(100000, target * 100)
         while accepted < target:
             attempts += 1
             if attempts > limit:

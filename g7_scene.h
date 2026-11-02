@@ -8,7 +8,7 @@
 // CPU authors initial conditions only. All subsequent motion is Physics3.
 struct G7Config {int scene=2,count=512,batch=32,seed=7,density=1;float radius=.30f,mass=1,radiusSpread=.03f,massSpread=.1f,gravity=-19.62f,spawnHz=4;};
 struct G7Scene {
- static constexpr unsigned capacity=1000;
+ static constexpr unsigned capacity=100000;
  std::vector<float> authored;
  float extent=6;
  uint32_t rng=7;
@@ -22,7 +22,7 @@ struct G7Scene {
   uint32_t id=i,gen=1;memcpy(&at(s,36,i),&id,4);memcpy(&at(s,37,i),&gen,4);at(s,38,i)=float(belt);
  }
  void generate(const G7Config&c){
-  if(c.count<1||c.count>1000||c.radius<=0||c.radius>.44f)throw std::runtime_error("Scene admission: count 1..1000, radius .1..44");
+  if(c.count<1||c.count>100000||c.radius<=0||c.radius>.44f)throw std::runtime_error("Scene admission: count 1..1000, radius .1..44");
   if(c.scene==2&&c.spawnHz>3.5f/(2*c.radius*(1+c.radiusSpread)+.07f)+1e-5f)throw std::runtime_error("Spawn rate exceeds non-overlapping emitter clearance; lower spawn rate or radius");
   rng=uint32_t(c.seed)|1;authored.assign(48*capacity,0);
   int side=int(ceil(cbrt(double(c.count))));while(side*side*side<c.count)side++;
