@@ -20,7 +20,7 @@ struct G7Config {
  int scene=2, seed=7, density=1;
  float radius=.30f, mass=1, radiusSpread=.03f, massSpread=.1f;
  float gravity=-19.62f, gravityX=0, gravityY=0, spawnHz=4;
- float restitution=.92f, friction=0, initialVz=-7, cell=2.5f;
+ float restitution=-1, friction=-1, initialVz=-7, cell=0; // -1/0: per-scene native defaults
  uint32_t contacts() const {
   uint64_t desired=contactBudget;
   if(!desired) {
@@ -42,7 +42,7 @@ struct G7Config {
      !finite(restitution)||!finite(friction)||!finite(initialVz)||!finite(cell))
    throw std::runtime_error("Scene settings must be finite numbers");
   if(radius<=0||radiusSpread<0||radiusSpread>=1||mass<=0||massSpread<0||massSpread>=1||
-     restitution<0||restitution>1||friction<0||spawnHz<=0||cell<=0)
+     (restitution<0&&restitution!=-1)||restitution>1||(friction<0&&friction!=-1)||spawnHz<=0||cell<0)
    throw std::runtime_error("Invalid physical parameter: radius/mass/cell/rate must be positive, spread in [0,1), restitution in [0,1], friction >=0");
   contacts();
  }
@@ -88,6 +88,8 @@ struct G7Scene {
   float cellWidth=2*c.radius*(1+c.radiusSpread)+.00001f;
   std::unordered_map<Cell,std::vector<uint32_t>,CellHash> occupied;
   auto cellOf=[&](float x,float y,float z)->Cell{return {int64_t(std::floor(double(x)/cellWidth)),int64_t(std::floor(double(y)/cellWidth)),int64_t(std::floor(double(z)/cellWidth))};};
+  float materialR=c.restitution<0?(c.scene==2?.92f:.65f):c.restitution;
+  float materialMu=c.friction<0?(c.scene==2?0.f:.3f):c.friction;
   for(uint32_t i=0;i<capacity;i++){
    float r=c.radius*(1+c.radiusSpread*(2*random()-1)),m=c.mass*(1+c.massSpread*(2*random()-1));
    if(c.scene==2){
@@ -95,10 +97,10 @@ struct G7Scene {
     float middle=(columns-1)*.5f;
     float dx=(emitter%columns-middle)*std::max(.95f,36.f*(c.density==0?1.15f:1)/std::max(1u,columns-1));
     float dy=(emitter/columns-middle)*std::max(.95f,24.f*(c.density==0?1.15f:1)/std::max(1u,columns-1));
-    body(authored,i,dx,dy,28+(i/c.batch%2)*.05f,(random()-.5f)*.4f,(random()-.5f)*.4f,c.initialVz,r,m,0,c.restitution,c.friction);
+    body(authored,i,dx,dy,28+(i/c.batch%2)*.05f,(random()-.5f)*.4f,(random()-.5f)*.4f,c.initialVz,r,m,0,materialR,materialMu);
    }else if(c.scene==0){
     uint32_t x=i%side,y=(i/side)%side,z=uint32_t(uint64_t(i)/(uint64_t(side)*side));
-    body(authored,i,x*pitch-half,y*pitch-half,z*pitch-half,x%2?-.7f:.7f,0,0,r,m,0,c.restitution,c.friction);
+    body(authored,i,x*pitch-half,y*pitch-half,z*pitch-half,x%2?-.7f:.7f,0,0,r,m,0,materialR,materialMu);
    }else{
     int belt=i>=uint32_t((c.count+1)/2);
     bool found=false;
@@ -116,7 +118,7 @@ struct G7Scene {
      }
      if(found){
       float spin=belt?-.025f:.025f;
-      body(authored,i,x,y,z,belt?-.6f:.6f,-spin*z,spin*y,r,m,belt,c.restitution,c.friction);
+      body(authored,i,x,y,z,belt?-.6f:.6f,-spin*z,spin*y,r,m,belt,materialR,materialMu);
       occupied[key].push_back(i);
      }
     }
@@ -129,7 +131,7 @@ struct G7Scene {
   if(active>capacity)throw std::runtime_error("Scene active count exceeds physical allocation");
   auto s=authored;
   for(uint32_t i=0;i<capacity;i++){
-   if(i>=active){for(uint32_t f=0;f<48;f++)at(s,f,i)=0;body(s,i,1000+4*float(i),1000,1000,0,0,0,.1f,0,0,.92f,0);}
+   if(i>=active){for(uint32_t f=0;f<48;f++)at(s,f,i)=0;body(s,i,1000+4*float(i%1000),1000+4*float((i/1000)%1000),1000+4*float(i/1000000),0,0,0,.1f,0,0,.92f,0);}
    else if(!moving){at(s,19,i)=0;for(uint32_t f=3;f<6;f++)at(s,f,i)=0;}
   }
   return s;
