@@ -44,7 +44,7 @@ struct Simulation {
  std::atomic<bool> sample{false},stop{false},paused{false},reset{false},single{false};std::atomic<float> speed{1};
  G7Config config,requested;G7Scene scene;unsigned active=0,spawned=0,accepted=0,rejected=0,epoch=0;bool moving=false,fault=false;double nextSpawn=0;
  Ph3Result result={};Ph3Validation validation={};double cpuUs=0,hostUs=0,tps=0;unsigned geometric=0,cross=0,island=0,sampleTick=0;char error[256]={};HANDLE thread=nullptr;FILE *log=nullptr;
- void init(){config.validate();p=ph3_open(uint32_t(config.count),config.contacts(),config.iterations,0,"evidence/p10/build");if(!p)throw std::runtime_error("Physics3 device/admission failed: check GPU memory budget and requested body/contact capacities");char path[512];SYSTEMTIME time;GetSystemTime(&time);snprintf(path,sizeof(path),"evidence/g7/native-showcase/session-%04u%02u%02u-%02u%02u%02u-%lu.jsonl",time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,(unsigned long)GetCurrentProcessId());log=fopen(path,"w");restart();}
+ void init(){config.validate();p=ph3_open(uint32_t(config.count),config.contacts(),config.iterations,0,"evidence/p10/build");if(!p)throw std::runtime_error("Physics3 device/admission failed: check GPU memory budget and requested body/contact capacities");static std::atomic<unsigned> serial{0};char path[512];SYSTEMTIME time;GetSystemTime(&time);snprintf(path,sizeof(path),"evidence/g7/native-showcase/session-%04u%02u%02u-%02u%02u%02u-%lu-%u.jsonl",time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,(unsigned long)GetCurrentProcessId(),serial++);log=fopen(path,"w");restart();}
  void restart(){
   config.validate();if(scene.capacity&&scene.capacity!=config.count)throw std::runtime_error("Body capacity change requires a full native renderer/context rebuild");scene.generate(config);auto s=scene.initial(0,false);auto planes=scene.planes(config.scene);
   // All tracked consumer fences must finish before replacing a scene.
@@ -185,6 +185,54 @@ int main(int argc,char **argv){
   }else if(argc>1&&strcmp(argv[1],"--verify")==0){sim.config.count=argc>2?atoi(argv[2]):512;sim.config.scene=argc>3?atoi(argv[3]):0;int ticks=argc>4?atoi(argv[4]):512;if(sim.config.scene!=2){sim.config.batch=256;sim.config.radius=.4f;sim.config.gravity=0;}sim.init();unsigned impacts=0,geometric=0,cross=0,maxContacts=0,sphereImpulses=0,planeImpulses=0,geometricSpheres=0,upwardReversals=0;std::vector<float> vz(sim.scene.capacity,0),acceptedState(size_t(48)*sim.scene.capacity);double gpu=0;std::vector<unsigned char> records(size_t(sim.config.contacts())*128);
    for(int i=0;i<ticks;i++){sim.tick();gpu+=sim.result.phases_us[7];maxContacts=std::max(maxContacts,sim.result.contacts);if(sim.result.error)break;if(sim.moving&&sim.result.contacts){if(!ph3_contacts(sim.p,records.data(),sim.result.contacts))throw std::runtime_error("Diagnostic readback failed");for(unsigned k=0;k<sim.result.contacts;k++){auto r=records.data()+k*128;unsigned a,b;double impulse,gap;memcpy(&a,r,4);memcpy(&b,r+4,4);memcpy(&impulse,r+16,8);memcpy(&gap,r+80,8);impacts+=impulse>0;geometric+=gap<=0;sphereImpulses+=impulse>0&&b<sim.scene.capacity;planeImpulses+=impulse>0&&b>=sim.scene.capacity;geometricSpheres+=gap<=0&&b<sim.scene.capacity;if(gap<=0&&a<unsigned(sim.config.count)&&b<unsigned(sim.config.count)&&sim.scene.authored[size_t(38)*sim.scene.capacity+a]!=sim.scene.authored[size_t(38)*sim.scene.capacity+b])cross++;}}if(!ph3_read(sim.p,acceptedState.data()))throw std::runtime_error("Accepted motion diagnostic failed");for(unsigned j=0;j<sim.active;j++){float current=acceptedState[5*sim.scene.capacity+j];if(vz[j]<-.5f&&current>.5f)upwardReversals++;vz[j]=current;}}
    printf("{\"adapter\":\"%s\",\"count\":%llu,\"scene\":%d,\"accepted\":%u,\"rejected\":%u,\"flags\":%u,\"max_constraints\":%u,\"positive_impulses\":%u,\"geometric_contacts\":%u,\"cross_belt_geometric\":%u,\"sphere_impulse_contacts\":%u,\"plane_impulse_contacts\":%u,\"geometric_sphere_contacts\":%u,\"upward_velocity_reversals\":%u,\"normal_ratio\":%.3f,\"tangent_ratio\":%.3f,\"mean_gpu_us\":%.3f,\"committed\":%llu}\n",ph3_adapter(sim.p),(unsigned long long)sim.config.count,sim.config.scene,sim.accepted,sim.rejected,sim.result.error,maxContacts,impacts,geometric,cross,sphereImpulses,planeImpulses,geometricSpheres,upwardReversals,sim.validation.normal_ratio,sim.validation.tangent_ratio,gpu/std::max(1u,sim.accepted+sim.rejected),(unsigned long long)sim.result.committed);if(sim.rejected&&sim.validation.normal){unsigned char raw[256];ph3_debug_control(sim.p,raw);unsigned a,b;double target,vn,tol,ln;memcpy(&a,raw+84,4);memcpy(&b,raw+88,4);memcpy(&target,raw+96,8);memcpy(&vn,raw+104,8);memcpy(&tol,raw+112,8);memcpy(&ln,raw+120,8);fprintf(stderr,"normal witness a=%u b=%u target=%.17g vn=%.17g tol=%.17g impulse=%.17g\n",a,b,target,vn,tol,ln);}exitCode=sim.rejected?2:0;
+  }else if(argc>1&&strcmp(argv[1],"--fill-until-limit")==0){
+   uint64_t current=512,chosenMax=G7_MAX_STATE_SLOTS,lastSuccess=0,firstFailure=0;
+   uint32_t batch=32,trialTicks=8;double multiplier=2;unsigned attempts=0;
+   for(int i=2;i<argc;i++){
+    const std::string flag=argv[i];if(i+1>=argc)throw std::runtime_error("Missing fill benchmark argument value");
+    const char *s=argv[++i];if(*s=='-')throw std::runtime_error("Negative fill benchmark argument");
+    errno=0;char *end=nullptr;
+    if(flag=="--multiplier"){
+     multiplier=strtod(s,&end);
+     if(errno==ERANGE||!end||*end||!std::isfinite(multiplier)||multiplier<=1)throw std::runtime_error("Fill multiplier must be a finite number >1");
+     continue;
+    }
+    uint64_t n=strtoull(s,&end,10);
+    if(errno==ERANGE||!end||*end)throw std::runtime_error("Invalid/overflowing fill benchmark integer");
+    if(flag=="--start")current=n;
+    else if(flag=="--max-count")chosenMax=n;
+    else if(flag=="--batch"){if(!n||n>UINT32_MAX)throw std::runtime_error("Fill batch outside native uint32");batch=uint32_t(n);}
+    else if(flag=="--ticks"){if(!n||n>UINT32_MAX)throw std::runtime_error("Fill ticks outside native uint32");trialTicks=uint32_t(n);}
+    else throw std::runtime_error("Unknown fill benchmark option "+flag);
+   }
+   if(!current||!chosenMax||current>chosenMax)throw std::runtime_error("Invalid fill start/max");
+   chosenMax=std::min(chosenMax,G7_MAX_STATE_SLOTS);
+   std::string stopped="requested maximum tested";uint64_t attempted=0,lastAdmitted=0,lastCommitted=0;
+   while(current<=chosenMax){
+    attempted=current;attempts++;
+    Simulation probe;
+    try{
+     probe.config.count=current;probe.config.batch=uint32_t(std::min<uint64_t>(batch,current));
+     probe.init();
+     while(probe.active<current&&!probe.fault)probe.tick();
+     if(probe.fault||probe.active!=current)throw std::runtime_error(std::string("GPU rejected population fill: ")+probe.error);
+     for(uint32_t t=0;t<trialTicks&&!probe.fault;t++)probe.tick();
+     if(probe.fault)throw std::runtime_error(std::string("GPU rejected settled simulation: ")+probe.error);
+     lastSuccess=current;lastAdmitted=probe.active;lastCommitted=probe.result.committed;
+     probe.close();
+    }catch(const std::exception&e){
+     firstFailure=current;lastAdmitted=probe.active;lastCommitted=probe.result.committed;
+     stopped=e.what();probe.close();break;
+    }
+    if(current==chosenMax)break;
+    double candidate=std::ceil(double(current)*multiplier);
+    if(candidate>double(chosenMax))current=chosenMax;
+    else current=std::max<uint64_t>(current+1,uint64_t(candidate));
+   }
+   printf("{\"mode\":\"headless_native_capacity_ramp\",\"last_successful_population\":%llu,\"first_failed_population\":%llu,\"last_attempted_population\":%llu,\"last_admitted_population\":%llu,\"last_committed_bytes\":%llu,\"attempts\":%u,\"termination\":\"%s\",\"true_hardware_limit_proved\":false}\n",
+    (unsigned long long)lastSuccess,(unsigned long long)firstFailure,(unsigned long long)attempted,
+    (unsigned long long)lastAdmitted,(unsigned long long)lastCommitted,attempts,stopped.c_str());
+   if(!lastSuccess)exitCode=2;
   }else{
    bool benchmark=argc>1&&strcmp(argv[1],"--render-bench")==0;
    if(benchmark){sim.config.count=1000;sim.config.batch=128;sim.config.spawnHz=4;}
