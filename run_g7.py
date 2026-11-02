@@ -245,6 +245,7 @@ def case(spec, args, directory, repeat):
                 writer.writerow({k: row.get(k) for k in FIELDS})
                 rows.append(dict(row, frame=frame, cpu_command_authoring_us=cpu_edits_us))
                 if result.status != "ACCEPTED":
+                    report["rejected_body_count"] += count
                     report["failure"] = f"frame {frame}: {result.status}: {result.cause}; bits={result.error_bits}"
                     break
                 if result.active != cursor:
@@ -294,6 +295,47 @@ def case(spec, args, directory, repeat):
         report["deadline_misses"] = sum(x["deadline_miss"] for x in rows)
         report["gpu_fixed_step_deadline_misses"] = sum(x["gpu_fixed_step_deadline_miss"] for x in rows)
         report["host_fixed_step_deadline_misses"] = sum(x["host_fixed_step_deadline_miss"] for x in rows)
+        # Explicit phase boundaries are inferred from sampled native GPU
+        # contacts, not claimed as a continuous event detector.
+        if spec.scenario == "belts":
+            impact = first_cross_tick
+            peak_tick = (max(samples, key=lambda x: (x["cross_belt_edges"],
+                         x["overlapping_contacts"], x["observed_edges"]))["accepted_tick"]
+                         if samples and impact is not None else None)
+            def phase_for(tick):
+                if impact is None:
+                    return "pre_impact_unverified"
+                if tick < impact:
+                    return "pre_impact"
+                if tick == impact:
+                    return "first_contact_sample"
+                if tick < peak_tick:
+                    return "collision_build"
+                if tick == peak_tick:
+                    return "peak_collision_sample"
+                return "post_impact"
+        else:
+            def phase_for(tick):
+                return "fill" if tick <= report.get("fill_tick", 0) else "post_full_motion"
+        phase_rows = []
+        for name in sorted({phase_for(x["tick"]) for x in rows}):
+            subset = [r for r in rows if phase_for(r["tick"]) == name]
+            phase_rows.append({"phase": name, "accepted_ticks": len(subset),
+                               "gpu_us_p50": stats(subset, "gpu_us")["p50"],
+                               "gpu_us_p95": stats(subset, "gpu_us")["p95"],
+                               "gpu_us_p99": stats(subset, "gpu_us")["p99"],
+                               "host_wall_us_p50": stats(subset, "wall_us")["p50"],
+                               "host_wall_us_p95": stats(subset, "wall_us")["p95"],
+                               "host_wall_us_p99": stats(subset, "wall_us")["p99"],
+                               "max_contacts": max((x["contacts"] for x in subset), default=0),
+                               "deadline_misses": sum(x["deadline_miss"] for x in subset)})
+        report["phases"] = phase_rows
+        with (directory / "phases.csv").open("w", newline="", encoding="utf-8") as phase_file:
+            dw = csv.DictWriter(phase_file, list(phase_rows[0]) if phase_rows else
+                                ["phase", "accepted_ticks"])
+            dw.writeheader()
+            dw.writerows(phase_rows)
+        (directory / "phases.json").write_text(json.dumps(phase_rows, indent=2), encoding="utf-8")
         report["peak_cross_belt_edges"] = peak_cross
         report["peak_largest_contact_island"] = peak_island
         report["peak_overlapping_contacts"] = maximum_overlap
@@ -318,6 +360,8 @@ def case(spec, args, directory, repeat):
             report["final_state_values"] = state["values"]
     except BaseException as exc:
         report["status"] = "NO-GO"
+        report["rejected_body_count"] = (report.get("created_attempts", 0) -
+                                         report.get("accepted_body_count", 0))
         report["failure"] = f"{type(exc).__name__}: {exc}"
         report["exception_traceback"] = traceback.format_exc(limit=8)
     finally:
@@ -350,6 +394,11 @@ def main(argv=None):
     ap.add_argument("--deadline-ms", type=float, default=16.)
     ap.add_argument("--radius", type=float, default=.4)
     ap.add_argument("--mass", type=float, default=1.)
+    ap.add_argument("--radius-spread", type=float, default=.03)
+    ap.add_argument("--mass-spread", type=float, default=.10)
+    ap.add_argument("--velocity-field", choices=("inward", "swirl", "funnel"),
+                    default="inward")
+    ap.add_argument("--perturbation", type=float, default=None)
     ap.add_argument("--cube-size", type=float)
     ap.add_argument("--closing-speed", type=float, default=16.)
     ap.add_argument("--spin-speed", type=float, default=.055)
@@ -388,7 +437,11 @@ def main(argv=None):
                 spec = SceneSpec(scenario=scene, bodies=count, seed=args.seed,
                                  preset=args.preset, radius=args.radius, mass=args.mass,
                                  cube_size=args.cube_size, closing_speed=args.closing_speed,
-                                 spin_speed=args.spin_speed, counter_rotate=args.counter_rotate)
+                                 spin_speed=args.spin_speed, counter_rotate=args.counter_rotate,
+                                 radius_spread=args.radius_spread,
+                                 mass_spread=args.mass_spread,
+                                 velocity_field=args.velocity_field,
+                                 perturbation=args.perturbation)
                 cases = []
                 for repetition in range(args.repeats):
                     entry = case(spec, args, folder / f"{scene}-{count}-r{repetition}", repetition)
