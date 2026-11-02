@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>
 // CPU authors initial conditions only. All subsequent motion is Physics3.
-struct G7Config {int scene=0,count=512,batch=64,seed=7,density=1;float radius=.4f,mass=1,radiusSpread=.03f,massSpread=.1f,gravity=0,spawnHz=8;};
+struct G7Config {int scene=2,count=512,batch=32,seed=7,density=1;float radius=.30f,mass=1,radiusSpread=.03f,massSpread=.1f,gravity=-19.62f,spawnHz=4;};
 struct G7Scene {
  static constexpr unsigned capacity=1000;
  std::vector<float> authored;
@@ -22,14 +23,16 @@ struct G7Scene {
  }
  void generate(const G7Config&c){
   if(c.count<1||c.count>1000||c.radius<=0||c.radius>.44f)throw std::runtime_error("Scene admission: count 1..1000, radius .1..44");
+  if(c.scene==2&&c.spawnHz>3.5f/(2*c.radius*(1+c.radiusSpread)+.07f)+1e-5f)throw std::runtime_error("Spawn rate exceeds non-overlapping emitter clearance; lower spawn rate or radius");
   rng=uint32_t(c.seed)|1;authored.assign(48*capacity,0);
   int side=int(ceil(cbrt(double(c.count))));while(side*side*side<c.count)side++;
   float pitch=c.radius*(c.density==0?2.8f:2.3f),half=(side-1)*pitch*.5f;
-  float scale=cbrtf(float(c.count)/1000),major=7*scale,minor=2.4f*scale,center=minor+1.8f*c.radius;
-  extent=c.scene?major+minor+1:half+2;
+  float scale=cbrtf(float(c.count)/1000),major=7*scale*(c.density==0?1.15f:1),minor=2.4f*scale*(c.density==0?1.15f:1),center=minor+1.8f*c.radius;
+  extent=c.scene==2?24:(c.scene?major+minor+1:half+2);
   for(int i=0;i<c.count;i++){
    float r=c.radius*(1+c.radiusSpread*(2*random()-1)),m=c.mass*(1+c.massSpread*(2*random()-1));
-   if(!c.scene){int x=i%side,y=i/side%side,z=i/(side*side);body(authored,i,x*pitch-half,y*pitch-half,z*pitch-half,x%2?-.7f:.7f,0,0,r,m,0);}
+   if(c.scene==2){int columns=int(ceil(sqrt(double(c.batch)))),emitter=i%c.batch;float center=(columns-1)*.5f;body(authored,i,(emitter%columns-center)*std::max(.95f,36.f*(c.density==0?1.15f:1)/std::max(1,columns-1)),(emitter/columns-center)*std::max(.95f,24.f*(c.density==0?1.15f:1)/std::max(1,columns-1)),28+(i/c.batch%2)*.05f,(random()-.5f)*.4f,(random()-.5f)*.4f,-7.f,r,m,0);at(authored,21,i)=.92f;at(authored,22,i)=0;}
+   else if(!c.scene){int x=i%side,y=i/side%side,z=i/(side*side);body(authored,i,x*pitch-half,y*pitch-half,z*pitch-half,x%2?-.7f:.7f,0,0,r,m,0);}
    else{
     int belt=i>=(c.count+1)/2;bool found=false;
     for(int attempt=0;attempt<10000&&!found;attempt++){
@@ -42,6 +45,7 @@ struct G7Scene {
    }
   }
  }
+ std::vector<float> planes(int scene){if(scene!=2)return {};return {0,0,1,-8, .6f,0,.8f,-9.6f, -.6f,0,.8f,-9.6f, 0,1,0,-16, 0,-1,0,-16};}
  std::vector<float> initial(unsigned active,bool moving){
   auto s=authored;
   for(unsigned i=0;i<capacity;i++){

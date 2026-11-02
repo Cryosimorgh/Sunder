@@ -49,3 +49,8 @@ PH3_API const char *ph3_adapter(Physics3*);
 /* First validation witnesses; counts may be partial after fail-closed early exit. */
 typedef struct Ph3Validation {uint32_t normal,tangent,penetration;float normal_ratio,tangent_ratio,max_penetration;} Ph3Validation;
 PH3_API int ph3_validation(Physics3*,Ph3Validation*);
+
+/* Stage only new slot rows; preserve all existing accepted rows GPU-to-GPU. */
+PH3_API int ph3_stage_append(Physics3*,const float *soa,uint32_t first,uint32_t end);
+
+PH3_API int ph3_debug_control(Physics3*,void *out256);

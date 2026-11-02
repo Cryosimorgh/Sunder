@@ -29,13 +29,14 @@ def main():
         v = Validation()
         if not read(backend.ptr, C.byref(v)):
             raise RuntimeError('native validation witness unavailable')
-        rollback = previous is not None and np.array_equal(previous.view(np.uint32), backend.read().view(np.uint32))
+        rollback = (previous is not None and np.array_equal(previous.view(np.uint32), backend.read().view(np.uint32))) if result['status'] != 'ACCEPTED' else None
         report = {k: result[k] for k in ('status', 'tick', 'active', 'error_bits', 'contacts', 'max_degree', 'gpu_us')}
         report.update(attempt=attempt, accepted_bytes_unchanged=rollback,
                       witnesses={name: getattr(v, name) for name, _ in v._fields_},
-                      qualification='UNSUPPORTED RADIAL STRESS; separate native default required')
+                      qualification='ACTIVATION PROBE ONLY; sustained radial stress remains unqualified',
+                      original_baseline_reproduced=(result['error_bits'] == 12 and result['tick'] == 8))
         print(json.dumps(report))
-        return 0 if result['error_bits'] == 12 and result['tick'] == 8 and rollback else 1
+        return 0 if result['status'] == 'ACCEPTED' or rollback else 1
     finally:
         w.close()
 

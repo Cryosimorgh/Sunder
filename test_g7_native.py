@@ -25,18 +25,27 @@ class NativeShowcase(unittest.TestCase):
         self.assertTrue(r['rollback'])
         self.assertTrue(r['stale_lease_rejected'])
         self.assertTrue(r['delayed_reader'])
+        self.assertTrue(r['append_preserves_dynamic'])
 
     def test_render_benchmark_from_executable_directory(self):
         r = self.run_case('render-from-bin', '--render-bench', '--frames', 600, cwd=EXE.parent)
         self.assertEqual(r['render_frames'], 600)
         self.assertEqual((r['width'], r['height']), (1920, 1080))
         self.assertGreater(r['gpu_snapshot_copies'], 0)
+        self.assertEqual(r['physics_rejected'], 0)
+        self.assertEqual((r['min_population'], r['max_population']), (1000, 1000))
+        self.assertGreater(r['physics_accepted'], r['warmup_accepted'])
 
     def test_launch_from_unrelated_directory(self):
         with tempfile.TemporaryDirectory(prefix='sunder-g7-cwd-') as directory:
             r = self.run_case('render-from-unrelated-directory', '--frames', 30, cwd=directory)
             self.assertEqual(r['render_frames'], 30)
             self.assertEqual(list(Path(directory).iterdir()), [])
+
+    def test_playback_scales_native_ticks(self):
+        r = self.run_case('playback', '--pacing-test')
+        self.assertGreater(r['one_tps'], r['quarter_tps'] * 2.8)
+        self.assertGreater(r['two_tps'], r['half_tps'] * 2)
 
     def test_controlled_device_loss(self):
         r = self.run_case("device-loss", "--device-loss-test", "--frames", 150)

@@ -1,12 +1,108 @@
 # G7 — Dense Dynamic Collision Workloads (experimental implementation)
 
 **Branch:** `g7-dense-dynamic-collision-workloads-20261102` (based on P10 merged `main` 8a5385b).  
-**Qualification:** **NO-GO / NOT RUN** until full native Windows x64/D3D12 hardware
-correctness and raw evidence review. A GitHub CI CPU PASS or compilation alone
+**Qualification:** bounded local native defaults PASS; PR #9 remains DRAFT /
+NO-GO for merge pending independent review and broader qualification. A GitHub CI CPU PASS or compilation alone
 does **not** qualify the GPU. No P10 physical tolerance, iteration bound, or
 legacy P9/G5 requirement has been relaxed.
 
-## Workloads
+## Current default: reference-inspired gravity trough (2026-11-02)
+
+The supplied video was inspected directly in the browser. Its falling spheres,
+sloped container, repeated impacts and accumulation replace the free-floating
+cube as the default experience. Double-click `LAUNCH_G7_CAPABILITIES_DEMO.cmd`
+in `C:\Manavi\Sunder`, or run `zig-out/bin/SunderG7.exe` directly. The cube and
+asteroid belts remain scene choices. Scene selection loads the scene's defaults
+and keeps the requested count. Other scene settings apply with Reset; playback
+changes immediately.
+
+The reference scene uses five genuine Physics3 planes: floor z=-8, two .75-slope
+walls, and end boundaries y=+/-16. The renderer draws matching geometry with a
+front cutaway. Deterministic batches fall from z=28 at initial vertical speed -7;
+gravity is -19.62, restitution .92 and friction 0 (smooth spheres). Radius is .30
+with +/-3% variation; mass is 1 with +/-10%. The roomy container is intentional:
+tighter, frictional pile variants failed KKT validation and remain unqualified.
+
+Births use the new transactional `ph3_stage_append` API: existing accepted rows
+are copied GPU-to-GPU before only new slots are overlaid. Earlier bodies continue
+falling during later admissions. Emitter-rate admission prevents overlapping
+successive release batches. No accepted body state is read back for rendering.
+
+The physics dt remains exactly 1/128 s. A high-resolution timer schedules ticks
+at the requested playback rate; the HUD reports recent achieved speed/TPS and
+indicates throughput saturation. Measured native pacing at .25/.5/1/2x was about
+32/64/128/256 TPS in the dedicated test. Direct UI operation confirmed .20x/26 TPS
+and requested 2x/174 TPS on a settled 512-body load (throughput limited).
+
+Rendering interpolates positions between two GPU copies of accepted states.
+New births and scene epochs bypass history; pause displays the current accepted
+state. No physics state, contact impulse or rejection is modified by smoothing.
+The renderer and physics worker remain independently paced. Frame statistics use
+bounded counters, count successful presents only, and avoid duplicate timestamp
+samples while minimized.
+
+### Solver correction and measurements
+
+Physics3 now warm-starts from an accepted-only sparse contact cache. For bounded
+connected graphs (n<=4096, <=65536 constraints, <=64 active edge colors), GPU
+active-edge coloring supplies race-free projected Gauss-Seidel sweeps. Satisfied
+zero-impulse speculative constraints stay outside the active set; every constraint
+is still checked for convergence. A Jacobi path remains for unsupported coloring
+sizes. GPU predication skips solved work. Final KKT, finite-state, orientation,
+penetration, canary and publication checks retain their original predicates and
+tolerances; `acceptance-policy-proof.json` verifies this independently of new
+solver code. No failed candidate is published or silently dropped.
+
+There are now 17 compute entrypoints, a maximum 1024 application solver sweeps,
+65536 contact slots and a 2.5 reference-scene cell size. The old 512-body radial
+activation that rejected flags 12 now accepts tick 9 under the unchanged final
+validator. This proves that transition only, not sustained radial qualification.
+
+Production colored solving reads 256-byte control packets for color counts and
+convergence; their synchronization cost is included in tick wall time and GPU
+elapsed timestamps. GPU timeline values include inter-packet host/queue gaps and
+are not isolated kernel busy time. Optional contact and accepted-state verification
+readbacks are separate diagnostics and are not a production display path.
+
+On RTX 4070 Ti SUPER, the roomy reference accepted 3200 ticks each at 512 and 1K
+with no rejection. The 1K measured mean GPU timeline was about 4.87 ms; the 512-body
+mean was about 2.52 ms. The same 96-tick free-moving belt case (317 constraints,
+no impulses) changed from 63.67 ms to 1.15 ms mean; do not generalize that ratio to
+collision-heavy work. Legacy 512/1K cube/belts each pass 768 ticks, including raw
+geometric cross-belt contacts (11 at 512; 6 at 1K).
+
+Native diagnostics distinguish positive impulse occurrences, raw gap<=0 geometric
+contacts and upward velocity reversals. In the roomy reference, sphere responses
+are speculative positive-gap impulses; the measured sphere geometric count was
+zero. They are not relabeled as geometric impacts. The belt tests separately prove
+geometric sphere contacts. P10's speculative-contact model is not claimed to match
+Jolt/Unity trajectories or timing exactly.
+
+A full-population 1K/1080p run admits all bodies before timing: 600 actual
+frames in 4.997 s (120.1 render FPS), minimum/maximum draw population 1000,
+with zero physics rejections. `RUN_G7_RENDER_BENCHMARK.cmd` builds and runs this
+case; the warmup is reported separately from the timed window. Pacing, append continuity/rollback, stale/delayed
+leases, resize/reset/switch/fullscreen/minimize, direct launch and API removal
+pass in six native tests; 28 CPU contracts, eight P10 oracle groups and eight
+native-world groups pass. Raw final-head checks, earlier rejected trials and native
+screenshots are included in the focused handoff. Source/build identities and exact
+case data are recorded in `G7_REFERENCE_MOTION_EVIDENCE.json`.
+
+```shell
+python build_g7_demo.py
+python -m unittest test_g7_native -v
+zig-out/bin/SunderG7.exe --pacing-test
+zig-out/bin/SunderG7.exe --verify 512 2 3200
+zig-out/bin/SunderG7.exe --verify 1000 2 3200
+zig-out/bin/SunderG7.exe --render-bench --frames 600
+```
+
+Scene numbers: 0 cube, 1 belts, 2 gravity trough. Restitution/frictional dense piles,
+arbitrary edited parameters/seeds, big-world performance, physical adapter removal,
+and a complete leak/old-gate campaign remain unqualified. PR #9 stays draft;
+G5/G6/P9 and production-release status do not change.
+
+## Historical headless workloads
 
 `cube`: a cubic **spawning volume**, not a rigid-body cube collider. All
 entities are P10 spheres. The seeded shuffled 3D lattice is filled in successive
@@ -52,7 +148,7 @@ asset path and the build launcher instead of a generic device/admission failure.
 Win32/D3D12 application. Perspective sphere impostors perform analytic ray/sphere
 intersection, write the sphere surface depth, and use lighting and highlights.
 One instanced draw renders the admitted population. The existing pinned ImGui
-Win32/DX12 backends supply the controls. The application starts playing.
+Win32/DX12 backends supply the controls. The application starts playing the gravity trough.
 
 ### Controls
 
@@ -98,7 +194,7 @@ reports native published slots. Logical identities are `(scene epoch, slot, 1)`;
 a scene reset starts a new epoch. Native accepted ticks keep their global clock.
 This avoids capacity migrations and full-state CPU snapshots in the display path.
 
-### Failure diagnosis and separate default envelope
+### Historical failure diagnosis and first native envelope
 
 The historical seed-7 dense radial cube remains an **unsupported stress case**.
 The original 512-body / batch-64 viewer accepts fill tick 8, then rejects the
@@ -121,7 +217,7 @@ in the 1K cube and both belts. These rejected experiments are retained.
 This is a bounded demo envelope, not qualification of arbitrary dense radial
 collapse, edited parameters, arbitrary seeds, or 10K/100K/1M populations.
 
-### Local native measurements and remaining gate
+### Historical first-native measurements and remaining gate
 
 Physical adapter: NVIDIA GeForce RTX 4070 Ti SUPER; driver 32.0.16.1088.
 Four 512-iteration cases (512/1K cube/belts, seed 7) each accepted 768 native

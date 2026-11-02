@@ -35,7 +35,57 @@ Use these labels throughout the document:
 | **Experimental** | A local or branch-specific change needs broader evidence. |
 | **Planned** | A design target. No implementation claim. |
 
-### G7 native graphical application breakpoint (2026-11-02)
+### G7 reference motion and solver breakpoint (2026-11-02)
+
+**Current default:** native sphere rain into a rendered sloped trough, based on
+actual inspection of the user's video. Five real Physics3 planes define floor
+z=-8, .75 slopes and end walls +/-16; the front is a visual cutaway. Smooth
+spheres (.92 restitution, zero friction) fall under -19.62 gravity. The larger
+container is a separately qualified demo envelope; narrower/frictional pile
+failures are preserved, not promoted. Cube/belts remain explicit scene presets.
+
+**Solver contract change:** small connected graphs use a GPU-built active-edge
+coloring and projected Gauss-Seidel with accepted-only sparse warm starts.
+Color members share no body. Inactive constraints re-enter the active set when
+needed; all constraints face the unchanged final KKT/penetration validator.
+There are 17 compute kernels, an 8-byte predication resource, grid coloring/list
+workspace and a bounded cache in free-state scratch. The Jacobi path remains for
+larger/uncolorable graphs. Numerical replay remains distinct from bitwise replay.
+
+`ph3_stage_append` preserves existing accepted rows on GPU while admitting new
+slots transactionally. Failure rolls back all admissions. The lease and result
+ABIs are unchanged. Mandatory 256-byte metadata synchronization is part of the
+production solver cost, not optional diagnostic cost. GPU elapsed timestamps
+include host gaps between command packets; isolated kernel busy time is not
+reported. Optional verification readbacks are outside the production display path.
+
+**Render/pacing:** two accepted GPU snapshots supply render-only interpolation;
+new births and epochs bypass history. No candidate/rejected state feeds graphics.
+The 1/128-s clock is unchanged. High-resolution scheduling and requested/achieved
+rate reporting replace the ineffective saturated speed control. Native pacing
+measures approximately 32/64/128/256 TPS at .25/.5/1/2x on the pacing case. Manual
+UI operation confirms changed native rate and truthful throughput-limit reporting.
+Present counters and timestamp aggregation remain bounded through minimization.
+
+**Local evidence:** RTX 4070 Ti SUPER; 512 and 1K reference cases each accept
+3200 ticks, no rejection. The 1K mean GPU timeline is approximately 4.87 ms. Legacy
+512/1K cube/belt cases pass 768 ticks with actual geometric cross-belt contacts.
+The formerly rejected radial activation now passes tick 9; sustained radial
+compression remains unqualified. Six native G7 tests, 28 CPU contracts, eight
+P10 oracle groups and eight native-world groups pass. Native images confirm
+falling, bouncing and accumulation; a full 1K/1080p test renders 600 frames in
+4.997 s after warmup, with minimum/maximum population 1000.
+See [G7 usage/evidence](G7_DENSE_WORKLOADS.md) and the machine-readable
+`G7_REFERENCE_MOTION_EVIDENCE.json`. Earlier failures and per-case data remain in
+one focused ZIP. No final acceptance predicate or tolerance was weakened.
+
+**Gate boundary:** bounded local demo PASS; PR #9 remains DRAFT / merge NO-GO
+pending independent review. Dense frictional piles, edited seeds/settings, big-world
+performance, physical device loss and a full previous-gate sweep are NOT QUALIFIED.
+This solver change does not inherit the old binary's complete hardware campaign.
+G0-G4 retain their historical scope; G5 deferred, G6 unqualified and P9 unresolved.
+
+### Historical first native graphical application breakpoint (2026-11-02)
 
 **2026-11-02 direct-launch correction:** Runtime assets and evidence resolve from
 `zig-out/bin/SunderG7.exe` to the project root, independently of the invoking
@@ -1534,6 +1584,7 @@ Next action:
 
 | Date | Breakpoint | Record update |
 |---|---|---|
+| 2026-11-02 | G7 reference motion / connected solver / accepted-state smoothing | Native gravity trough, GPU partial admissions, active-colored solver with unchanged final checks, live achieved-rate display. 512/1K reference 3200 ticks and six native tests pass. Dense frictional trials retained; PR draft. |
 | 2026-11-02 | G7 native application / bounded local hardware evidence | Native instanced perspective renderer, accepted GPU lease/copy bridge, cube/belts and invariant witnesses; 512/1K cases and lifecycle pass. Radial stress unsupported; PR #9 draft, acceptance open. G5/G6 unchanged. |
 | 2026-11-02 | P10 hardware evidence audit - bounded correctness GO, final-head integration conditional | 135 checksums and 28 source hashes verified; all 9 gates PASS at ed618f9 on RTX 4070 Ti SUPER. Original evidence retained. No physics changes. Full sweep and CI required on final commit before merge. |
 | 2026-10-31 | P10 native 3D foundation — bounded GO | Added tensor/quaternion 3D GPU sphere/plane dynamics, immutable publication and real delayed-reader proof. Seven native groups, all three stress scales and unchanged full 2D regressions pass. Numerical native validity required; bitwise replay remains unqualified. Formal G6/release remains not qualified. |

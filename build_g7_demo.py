@@ -16,7 +16,7 @@ def main():
     logs.mkdir(parents=True, exist_ok=True)
     revision = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], cwd=ROOT, text=True).strip()
     commands = [[str(sdk()[1]), '-T', profile, '-E', entry, '-Fo', str(OUT / ('g7_' + entry + '.dxil')), 'g7_render.hlsl']
-                for entry, profile in [('sphere_vs', 'vs_6_0'), ('sphere_ps', 'ps_6_0')]]
+                for entry, profile in [('sphere_vs', 'vs_6_0'), ('sphere_ps', 'ps_6_0'), ('container_vs', 'vs_6_0'), ('container_ps', 'ps_6_0')]]
     imgui = ['third_party/imgui/' + x for x in ('imgui.cpp', 'imgui_draw.cpp', 'imgui_tables.cpp', 'imgui_widgets.cpp')]
     commands.append([compiler(), 'build-exe', '-cflags', '-O2', '--', 'physics3.c', 'runtime.c',
                      '-cflags', '-O2', '-std=c++17', '-Wno-nontrivial-memaccess', '-DG7_REVISION="' + revision + '"', '--', 'g7_demo.cpp', *imgui,
@@ -30,7 +30,7 @@ def main():
     identity = dict(commands=commands, sources={p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in files},
                     tools={str(p): hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in [compiler(), sdk()[1]]})
     manifest = logs / 'build.json'
-    outputs = [OUT / p for p in ('SunderG7.exe', 'g7_sphere_vs.dxil', 'g7_sphere_ps.dxil')]
+    outputs = [OUT / p for p in ('SunderG7.exe', 'g7_sphere_vs.dxil', 'g7_sphere_ps.dxil', 'g7_container_vs.dxil', 'g7_container_ps.dxil')]
     if manifest.exists():
         prior = json.loads(manifest.read_text())
         if all(prior.get(k) == v for k, v in identity.items()) and all(p.exists() and prior['outputs'].get(p.name) == hashlib.sha256(p.read_bytes()).hexdigest() for p in outputs):
