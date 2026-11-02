@@ -119,7 +119,7 @@ struct Renderer {
   if(!io.WantCaptureKeyboard){if(ImGui::IsKeyPressed(ImGuiKey_Space))sim->paused=!sim->paused;if(ImGui::IsKeyPressed(ImGuiKey_R))requestReset();if(ImGui::IsKeyPressed(ImGuiKey_F11))toggleFullscreen();if(ImGui::IsKeyPressed(ImGuiKey_H))hud=!hud;if(ImGui::IsKeyPressed(ImGuiKey_Home))camera.reset(displayExtent,displayScene);}
   if(!io.WantCaptureMouse){if(ImGui::IsMouseDragging(0)){camera.yaw-=io.MouseDelta.x*.006f;camera.pitch=std::clamp(camera.pitch+io.MouseDelta.y*.006f,-1.45f,1.45f);}if(ImGui::IsMouseDragging(1)||ImGui::IsMouseDragging(2)){float f=camera.distance*.0015f;camera.target[0]-=cosf(camera.yaw)*io.MouseDelta.x*f;camera.target[1]+=sinf(camera.yaw)*io.MouseDelta.x*f;camera.target[2]+=io.MouseDelta.y*f;}camera.distance=std::clamp(camera.distance*expf(-io.MouseWheel*.12f),2.f,300.f);}
   // Follow is a render-only centroid computed from the accepted GPU snapshot.
-  if(hud){ImGui::SetNextWindowPos({24,24},ImGuiCond_Once);ImGui::SetNextWindowSize({370,0});ImGui::Begin("Sunder / Physics3",nullptr,ImGuiWindowFlags_NoCollapse|ImGuiWindowFlags_AlwaysAutoResize);ImGui::PushItemWidth(205);ImGui::Text("%s",displayScene==2?"Sphere rain / cutaway trough":(displayScene?"Colliding asteroid belts":"The living cube"));ImGui::TextDisabled("%u / %llu bodies admitted",displayActive,(unsigned long long)displayRequested);ImGui::ProgressBar(float(double(displayActive)/double(std::max<uint64_t>(1,displayRequested))),{0,3},"");
+  if(hud){ImGui::SetNextWindowPos({24,24},ImGuiCond_Once);ImGui::SetNextWindowSize({420,720},ImGuiCond_Once);ImGui::Begin("Sunder / Physics3",nullptr,ImGuiWindowFlags_NoCollapse);ImGui::PushItemWidth(205);ImGui::Text("%s",displayScene==2?"Sphere rain / cutaway trough":(displayScene?"Colliding asteroid belts":"The living cube"));ImGui::TextDisabled("%u / %llu bodies admitted",displayActive,(unsigned long long)displayRequested);ImGui::ProgressBar(float(double(displayActive)/double(std::max<uint64_t>(1,displayRequested))),{0,3},"");
    if(ImGui::Button(sim->paused?"Play":"Pause"))sim->paused=!sim->paused;ImGui::SameLine();if(ImGui::Button("Step"))sim->single=true;ImGui::SameLine();if(ImGui::Button("Reset"))requestReset();
    if(ImGui::Combo("Scene",&edit.scene,"Living cube\0Asteroid belts\0Gravity trough (reference)\0")){uint64_t count=edit.count;int selected=edit.scene;edit=G7Config{};edit.count=count;edit.scene=selected;if(selected!=2){edit.radius=.4f;edit.batch=64;edit.spawnHz=8;edit.gravity=0;}requestReset();}
    for(int n:{100,500,1000}){char label[16];snprintf(label,16,n==1000?"1K":"%d",n);if(ImGui::Button(label)){edit.count=n;requestReset();}if(n!=1000)ImGui::SameLine();}
@@ -179,15 +179,79 @@ int main(int argc,char **argv){
    for(int axis=0;axis<3;axis++){double expected=before[axis*sim.scene.capacity]+(before[(axis+3)*sim.scene.capacity]+g[axis]/128.)/128.;if(fabs(after[axis*sim.scene.capacity]-expected)>2e-6)throw std::runtime_error("Birth rewound existing dynamic body");}
    printf("{\"rollback\":true,\"stale_lease_rejected\":true,\"delayed_reader\":true,\"append_preserves_dynamic\":true}\n");
   }else if(argc>1&&strcmp(argv[1],"--pacing-test")==0){
-   sim.config.scene=0;sim.config.count=100;sim.config.batch=100;sim.init();sim.tick();sim.tick();sim.thread=CreateThread(nullptr,0,Simulation::run,&sim,0,nullptr);if(!sim.thread)throw std::runtime_error("Pacing worker failed");double measured[4]={};float rates[4]={.25f,.5f,1,2};
+   sim.config.scene=0;sim.config.count=100;sim.config.batch=100;sim.config.gravity=0;sim.init();sim.tick();sim.tick();sim.thread=CreateThread(nullptr,0,Simulation::run,&sim,0,nullptr);if(!sim.thread)throw std::runtime_error("Pacing worker failed");double measured[4]={};float rates[4]={.25f,.5f,1,2};
    for(int i=0;i<4;i++){sim.speed=rates[i];Sleep(100);AcquireSRWLockExclusive(&sim.lock);unsigned begin=sim.accepted;ReleaseSRWLockExclusive(&sim.lock);double start=now();Sleep(1500);AcquireSRWLockExclusive(&sim.lock);measured[i]=(sim.accepted-begin)/(now()-start);ReleaseSRWLockExclusive(&sim.lock);}
    printf("{\"quarter_tps\":%.3f,\"half_tps\":%.3f,\"one_tps\":%.3f,\"two_tps\":%.3f}\n",measured[0],measured[1],measured[2],measured[3]);if(measured[2]<measured[0]*2.8||measured[3]<measured[1]*2.0)exitCode=2;
-  }else if(argc>1&&strcmp(argv[1],"--verify")==0){sim.config.count=argc>2?atoi(argv[2]):512;sim.config.scene=argc>3?atoi(argv[3]):0;int ticks=argc>4?atoi(argv[4]):512;if(sim.config.scene!=2){sim.config.batch=256;sim.config.radius=.4f;sim.config.gravity=0;}sim.init();unsigned impacts=0,geometric=0,cross=0,maxContacts=0,sphereImpulses=0,planeImpulses=0,geometricSpheres=0,upwardReversals=0;std::vector<float> vz(sim.scene.capacity,0),acceptedState(48*sim.scene.capacity);double gpu=0;std::vector<unsigned char> records(size_t(sim.config.contacts())*128);
+  }else if(argc>1&&strcmp(argv[1],"--verify")==0){sim.config.count=argc>2?atoi(argv[2]):512;sim.config.scene=argc>3?atoi(argv[3]):0;int ticks=argc>4?atoi(argv[4]):512;if(sim.config.scene!=2){sim.config.batch=256;sim.config.radius=.4f;sim.config.gravity=0;}sim.init();unsigned impacts=0,geometric=0,cross=0,maxContacts=0,sphereImpulses=0,planeImpulses=0,geometricSpheres=0,upwardReversals=0;std::vector<float> vz(sim.scene.capacity,0),acceptedState(size_t(48)*sim.scene.capacity);double gpu=0;std::vector<unsigned char> records(size_t(sim.config.contacts())*128);
    for(int i=0;i<ticks;i++){sim.tick();gpu+=sim.result.phases_us[7];maxContacts=std::max(maxContacts,sim.result.contacts);if(sim.result.error)break;if(sim.moving&&sim.result.contacts){if(!ph3_contacts(sim.p,records.data(),sim.result.contacts))throw std::runtime_error("Diagnostic readback failed");for(unsigned k=0;k<sim.result.contacts;k++){auto r=records.data()+k*128;unsigned a,b;double impulse,gap;memcpy(&a,r,4);memcpy(&b,r+4,4);memcpy(&impulse,r+16,8);memcpy(&gap,r+80,8);impacts+=impulse>0;geometric+=gap<=0;sphereImpulses+=impulse>0&&b<sim.scene.capacity;planeImpulses+=impulse>0&&b>=sim.scene.capacity;geometricSpheres+=gap<=0&&b<sim.scene.capacity;if(gap<=0&&a<unsigned(sim.config.count)&&b<unsigned(sim.config.count)&&sim.scene.authored[size_t(38)*sim.scene.capacity+a]!=sim.scene.authored[size_t(38)*sim.scene.capacity+b])cross++;}}if(!ph3_read(sim.p,acceptedState.data()))throw std::runtime_error("Accepted motion diagnostic failed");for(unsigned j=0;j<sim.active;j++){float current=acceptedState[5*sim.scene.capacity+j];if(vz[j]<-.5f&&current>.5f)upwardReversals++;vz[j]=current;}}
-   printf("{\"adapter\":\"%s\",\"count\":%d,\"scene\":%d,\"accepted\":%u,\"rejected\":%u,\"flags\":%u,\"max_constraints\":%u,\"positive_impulses\":%u,\"geometric_contacts\":%u,\"cross_belt_geometric\":%u,\"sphere_impulse_contacts\":%u,\"plane_impulse_contacts\":%u,\"geometric_sphere_contacts\":%u,\"upward_velocity_reversals\":%u,\"normal_ratio\":%.3f,\"tangent_ratio\":%.3f,\"mean_gpu_us\":%.3f,\"committed\":%llu}\n",ph3_adapter(sim.p),sim.config.count,sim.config.scene,sim.accepted,sim.rejected,sim.result.error,maxContacts,impacts,geometric,cross,sphereImpulses,planeImpulses,geometricSpheres,upwardReversals,sim.validation.normal_ratio,sim.validation.tangent_ratio,gpu/std::max(1u,sim.accepted+sim.rejected),(unsigned long long)sim.result.committed);if(sim.rejected&&sim.validation.normal){unsigned char raw[256];ph3_debug_control(sim.p,raw);unsigned a,b;double target,vn,tol,ln;memcpy(&a,raw+84,4);memcpy(&b,raw+88,4);memcpy(&target,raw+96,8);memcpy(&vn,raw+104,8);memcpy(&tol,raw+112,8);memcpy(&ln,raw+120,8);fprintf(stderr,"normal witness a=%u b=%u target=%.17g vn=%.17g tol=%.17g impulse=%.17g\n",a,b,target,vn,tol,ln);}exitCode=sim.rejected?2:0;
+   printf("{\"adapter\":\"%s\",\"count\":%llu,\"scene\":%d,\"accepted\":%u,\"rejected\":%u,\"flags\":%u,\"max_constraints\":%u,\"positive_impulses\":%u,\"geometric_contacts\":%u,\"cross_belt_geometric\":%u,\"sphere_impulse_contacts\":%u,\"plane_impulse_contacts\":%u,\"geometric_sphere_contacts\":%u,\"upward_velocity_reversals\":%u,\"normal_ratio\":%.3f,\"tangent_ratio\":%.3f,\"mean_gpu_us\":%.3f,\"committed\":%llu}\n",ph3_adapter(sim.p),(unsigned long long)sim.config.count,sim.config.scene,sim.accepted,sim.rejected,sim.result.error,maxContacts,impacts,geometric,cross,sphereImpulses,planeImpulses,geometricSpheres,upwardReversals,sim.validation.normal_ratio,sim.validation.tangent_ratio,gpu/std::max(1u,sim.accepted+sim.rejected),(unsigned long long)sim.result.committed);if(sim.rejected&&sim.validation.normal){unsigned char raw[256];ph3_debug_control(sim.p,raw);unsigned a,b;double target,vn,tol,ln;memcpy(&a,raw+84,4);memcpy(&b,raw+88,4);memcpy(&target,raw+96,8);memcpy(&vn,raw+104,8);memcpy(&tol,raw+112,8);memcpy(&ln,raw+120,8);fprintf(stderr,"normal witness a=%u b=%u target=%.17g vn=%.17g tol=%.17g impulse=%.17g\n",a,b,target,vn,tol,ln);}exitCode=sim.rejected?2:0;
   }else{
-   bool benchmark=argc>1&&strcmp(argv[1],"--render-bench")==0;if(benchmark){sim.config.count=1000;sim.config.batch=128;sim.config.spawnHz=4;}sim.init();unsigned warmupAccepted=0;if(benchmark){while(sim.active<unsigned(sim.config.count)){sim.tick();if(sim.fault)throw std::runtime_error("Native benchmark warmup rejected; inspect session evidence");}warmupAccepted=sim.accepted;}SetProcessDPIAware();WNDCLASSW wc={};wc.lpfnWndProc=wndproc;wc.hInstance=GetModuleHandleW(nullptr);wc.lpszClassName=L"SunderG7Native";wc.hCursor=LoadCursorW(nullptr,MAKEINTRESOURCEW(32512));RegisterClassW(&wc);HWND w=CreateWindowExW(0,wc.lpszClassName,L"Sunder G7 - Native 3D",WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,1600,900,nullptr,nullptr,wc.hInstance,nullptr);if(!w)throw std::runtime_error("Win32 window creation failed");view.init(w,sim);graphical=true;renderer=&view;if(benchmark){RECT client={0,0,1920,1080};AdjustWindowRect(&client,WS_OVERLAPPEDWINDOW,FALSE);SetWindowPos(w,nullptr,0,0,client.right-client.left,client.bottom-client.top,SWP_NOZORDER);}ShowWindow(w,SW_SHOW);if(benchmark){view.frame();view.wait();view.renderedFrames=0;view.copiedFrames=0;view.gpuSum=0;view.gpuSampleCount=0;view.lastTimedSerial=view.serial;view.minPopulation=UINT_MAX;view.maxPopulation=0;}sim.thread=CreateThread(nullptr,0,Simulation::run,&sim,0,nullptr);if(!sim.thread)throw std::runtime_error("Physics worker creation failed");MSG msg={};double started=now();int autoFrames=0;for(int i=1;i+1<argc;i++)if(strcmp(argv[i],"--frames")==0)autoFrames=atoi(argv[i+1]);unsigned frames=0;bool uiTest=argc>1&&strcmp(argv[1],"--ui-test")==0;
+   bool benchmark=argc>1&&strcmp(argv[1],"--render-bench")==0;
+   if(benchmark){sim.config.count=1000;sim.config.batch=128;sim.config.spawnHz=4;}
+   auto number=[](const char *s)->uint64_t{
+    if(!s||!*s||*s=='-')throw std::runtime_error("Invalid unsigned numeric argument");
+    errno=0;char *end=nullptr;unsigned long long v=strtoull(s,&end,10);
+    if(errno==ERANGE||!end||*end)throw std::runtime_error(std::string("Invalid/overflowed integer: ")+s);
+    return uint64_t(v);
+   };
+   auto positive32=[&](const char *s)->uint32_t{
+    uint64_t v=number(s);if(!v||v>UINT32_MAX)throw std::runtime_error("Value outside native uint32 representation");return uint32_t(v);
+   };
+   auto decimal=[](const char *s)->float{
+    errno=0;char *end=nullptr;float v=strtof(s,&end);
+    if(errno==ERANGE||!end||*end||!std::isfinite(v))throw std::runtime_error(std::string("Invalid/overflowed float: ")+s);return v;
+   };
+   for(int i=2;i<argc;i++){
+    auto option=std::string(argv[i]);if(option=="--frames"){i++;continue;}
+    if(i+1>=argc)throw std::runtime_error("Missing value for "+option);
+    const char *value=argv[++i];
+    if(option=="--count")sim.config.count=number(value);
+    else if(option=="--batch")sim.config.batch=positive32(value);
+    else if(option=="--contacts")sim.config.contactBudget=number(value);
+    else if(option=="--iterations")sim.config.iterations=positive32(value);
+    else if(option=="--radius")sim.config.radius=decimal(value);
+    else if(option=="--mass")sim.config.mass=decimal(value);
+    else if(option=="--radius-spread")sim.config.radiusSpread=decimal(value);
+    else if(option=="--mass-spread")sim.config.massSpread=decimal(value);
+    else if(option=="--restitution")sim.config.restitution=decimal(value);
+    else if(option=="--friction")sim.config.friction=decimal(value);
+    else if(option=="--gravity-z")sim.config.gravity=decimal(value);
+    else if(option=="--gravity-x")sim.config.gravityX=decimal(value);
+    else if(option=="--gravity-y")sim.config.gravityY=decimal(value);
+    else if(option=="--spawn-hz")sim.config.spawnHz=decimal(value);
+    else if(option=="--cell")sim.config.cell=decimal(value);
+    else if(option=="--initial-vz")sim.config.initialVz=decimal(value);
+    else if(option=="--seed")sim.config.seed=int(positive32(value));
+    else if(option=="--scene")sim.config.scene=int(number(value));
+    else if(option=="--placement-attempts")sim.config.placementAttempts=positive32(value);
+    else throw std::runtime_error("Unknown option "+option);
+   }
+   sim.config.validate();sim.init();unsigned warmupAccepted=0;if(benchmark){while(sim.active<uint32_t(sim.config.count)){sim.tick();if(sim.fault)throw std::runtime_error("Native benchmark warmup rejected; inspect session evidence");}warmupAccepted=sim.accepted;}SetProcessDPIAware();WNDCLASSW wc={};wc.lpfnWndProc=wndproc;wc.hInstance=GetModuleHandleW(nullptr);wc.lpszClassName=L"SunderG7Native";wc.hCursor=LoadCursorW(nullptr,MAKEINTRESOURCEW(32512));RegisterClassW(&wc);HWND w=CreateWindowExW(0,wc.lpszClassName,L"Sunder G7 - Native 3D",WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,1600,900,nullptr,nullptr,wc.hInstance,nullptr);if(!w)throw std::runtime_error("Win32 window creation failed");view.init(w,sim);graphical=true;renderer=&view;if(benchmark){RECT client={0,0,1920,1080};AdjustWindowRect(&client,WS_OVERLAPPEDWINDOW,FALSE);SetWindowPos(w,nullptr,0,0,client.right-client.left,client.bottom-client.top,SWP_NOZORDER);}ShowWindow(w,SW_SHOW);if(benchmark){view.frame();view.wait();view.renderedFrames=0;view.copiedFrames=0;view.gpuSum=0;view.gpuSampleCount=0;view.lastTimedSerial=view.serial;view.minPopulation=UINT_MAX;view.maxPopulation=0;}sim.thread=CreateThread(nullptr,0,Simulation::run,&sim,0,nullptr);if(!sim.thread)throw std::runtime_error("Physics worker creation failed");MSG msg={};double started=now();int autoFrames=0;for(int i=1;i+1<argc;i++)if(strcmp(argv[i],"--frames")==0)autoFrames=atoi(argv[i+1]);unsigned frames=0;bool uiTest=argc>1&&strcmp(argv[1],"--ui-test")==0;
    while(!view.quit){while(PeekMessageW(&msg,nullptr,0,0,PM_REMOVE)){if(msg.message==WM_QUIT)view.quit=true;TranslateMessage(&msg);DispatchMessageW(&msg);}if(view.quit)break;size_t priorFrames=view.renderedFrames;view.frame();if(view.renderedFrames==priorFrames)continue;frames++;
+    if(view.reconfigure){
+     G7Config target=view.edit;G7Scene nextScene;Physics3 *fresh=nullptr;
+     try{
+      nextScene.generate(target);
+      fresh=ph3_open(uint32_t(target.count),target.contacts(),target.iterations,0,"evidence/p10/build");
+      if(!fresh)throw std::runtime_error("Native GPU admission failed; old accepted simulation is still running");
+      auto initial=nextScene.initial(0,false);auto planes=nextScene.planes(target.scene);
+      if(!ph3_seed(fresh,initial.data(),planes.data(),unsigned(planes.size()/4)))throw std::runtime_error("New native context refused the generated scene");
+     }catch(const std::exception &e){
+      if(fresh)ph3_close(fresh);
+      view.admissionError=e.what();view.reconfigure=false;continue;
+     }
+     // The new context is fully admitted before retiring the old renderer/physics.
+     sim.stop=true;if(sim.thread){WaitForSingleObject(sim.thread,INFINITE);CloseHandle(sim.thread);sim.thread=nullptr;}
+     view.close();sim.close();
+     sim.stop=false;sim.reset=false;sim.single=false;sim.paused=false;sim.sample=false;
+     sim.p=fresh;sim.scene=std::move(nextScene);sim.config=target;sim.requested=target;
+     sim.active=sim.spawned=sim.accepted=sim.rejected=0;sim.moving=target.scene==2;
+     sim.fault=false;sim.nextSpawn=0;sim.result={};sim.validation={};sim.error[0]=0;sim.epoch++;
+     view=Renderer{};view.init(w,sim);renderer=&view;
+     sim.thread=CreateThread(nullptr,0,Simulation::run,&sim,0,nullptr);
+     if(!sim.thread)throw std::runtime_error("Reconfigured physics worker creation failed");
+     continue;
+    }
     if(deviceLoss&&frames==90){sim.paused=true;AcquireSRWLockExclusive(&sim.lock);view.wait();Ph3Lease collect={};if(ph3_acquire(sim.p,&collect))ph3_release(sim.p,&collect);ID3D12Device5 *device5=nullptr;HRESULT hr=view.device->QueryInterface(IID_PPV_ARGS(&device5));if(FAILED(hr)){ReleaseSRWLockExclusive(&sim.lock);throw std::runtime_error("Controlled removal interface unavailable");}device5->RemoveDevice();drop(device5);removedForTest=true;ReleaseSRWLockExclusive(&sim.lock);}
     if(uiTest){
      if(frames==30)SetWindowPos(w,nullptr,0,0,1280,720,SWP_NOMOVE|SWP_NOZORDER);
