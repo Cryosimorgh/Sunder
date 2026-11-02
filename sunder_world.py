@@ -187,17 +187,23 @@ class Backend:
             raise WorldError("BACKPRESSURE_OR_DEVICE", "accepted-state readback unavailable")
         return a
 
-    def diagnostic_contact_pairs(self, count: int) -> np.ndarray:
-        """Explicit GPU contact-buffer readback; never part of a hot-loop tick."""
+    def diagnostic_contacts(self, count: int) -> np.ndarray:
+        """Read native records: two body IDs, normal impulse, signed gap.
+
+        Gap <= 0 means overlap/touch; positive gap is a speculative contact.
+        This causes a GPU readback and must not enter hot-loop timings.
+        """
         if not 0 <= count <= self.cfg.contact_capacity:
             raise WorldError("INVALID_COMMAND", "contact count outside configured budget")
+        layout = np.dtype({"names": ["a", "b", "normal_impulse", "gap"],
+                           "formats": ["<u4", "<u4", "<f8", "<f8"],
+                           "offsets": [0, 4, 16, 80], "itemsize": 128})
         if not count:
-            return np.empty((0, 2), dtype=np.uint32)
+            return np.empty(0, dtype=layout)
         raw = C.create_string_buffer(count * 128)
         if not self.dll.ph3_contacts(self.ptr, C.cast(raw, C.c_void_p), count):
             raise WorldError("BACKPRESSURE_OR_DEVICE", "contact diagnostics unavailable")
-        return np.frombuffer(raw, dtype=np.uint32, count=count * 32).reshape(
-            count, 32)[:, :2].copy()
+        return np.frombuffer(raw, dtype=layout, count=count).copy()
 
     def acquire(self) -> NativeLease:
         lease = NativeLease()
@@ -647,13 +653,13 @@ class World:
             snapshot._closed = True
             self._leases.pop(snapshot._lease.serial)
 
-    def diagnostic_contact_pairs(self, count: int) -> np.ndarray:
-        """Sample an accepted tick's GPU contact graph, with full readback overhead."""
+    def diagnostic_contacts(self, count: int) -> np.ndarray:
+        """Sample an accepted tick's native contact records, with readback overhead."""
         with self._lock:
             self._ready()
             if not 0 <= count <= self.config.contact_capacity:
                 raise WorldError("INVALID_COMMAND", "invalid diagnostic contact count")
-            return self._backend.diagnostic_contact_pairs(count)
+            return self._backend.diagnostic_contacts(count)
 
     def grow(self, capacity: int):
         """Resize at an idle boundary; IDs survive, and old context is retained on failure."""
