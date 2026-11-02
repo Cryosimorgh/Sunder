@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "device_tests": true,
+  "allocation_failure_points": 10,
+  "delayed_fence": true,
+  "validation_errors": 0
+}

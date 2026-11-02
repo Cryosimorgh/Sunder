@@ -1,0 +1,2 @@
+["C:\\Manavi\\Sunder\\zig-out\\bin\\playground_gpu_tests.exe"]
+PASS valid impulse, real neighbor momentum transfer, full 100-body integration; stale generation, epoch, tick, oversized dv, NaN and invalid ID reject with bit-identical source rollback; GBV clean

@@ -1,0 +1,583 @@
+{
+  "status": "PASS",
+  "config": {
+    "capacity": 16,
+    "contact_capacity": 64,
+    "iterations": 128,
+    "dt": 0.0078125,
+    "gravity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cell_size": 2.0,
+    "lower": [
+      -512.0,
+      -512.0,
+      -512.0
+    ],
+    "upper": [
+      512.0,
+      512.0,
+      512.0
+    ],
+    "units": "metre-kilogram-second",
+    "shader_dir": "evidence/p10/build",
+    "debug": false,
+    "deadline_ms": 16.0
+  },
+  "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+  "source_provenance": {
+    "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "sha256": {
+      "evidence\\p10\\build\\physics3.dll": "f8c267f94c9794ba91a92de5197cc4ff6dd4d92f563ebfff6e8e193e830c88ba",
+      "physics3.hlsl": "b45431ea5baed9d5e53d21ca50df9a4a455a38750f19ff03bbbdb0f27631ba22",
+      "physics3-schema.json": "2f86c499d5d9bc3de9695b005fc00be0a82abfcb1616b2d01bab3df224aa2d86",
+      "evidence\\p10\\build\\manifest.json": "25946fcbe370d525a0aa80a1ceb89dcb5c2b396aaee6b3d369fcf4b0604cb010"
+    }
+  },
+  "summary": {
+    "accepted": 9,
+    "rejected": 0,
+    "gpu_us": {
+      "samples": 9,
+      "p50": 1151.75,
+      "p95": 1152.5,
+      "p99": 1152.5,
+      "worst": 1152.5
+    },
+    "cpu_production_thread_us": {
+      "samples": 9,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "worst": 0.0
+    },
+    "host_wall_submission_completion_us": {
+      "samples": 9,
+      "p50": 1367.5,
+      "p95": 2007.62,
+      "p99": 2277.444,
+      "worst": 2344.9
+    },
+    "deadline_misses": 0,
+    "gpu_fixed_step_deadline_misses": 0,
+    "host_fixed_step_deadline_misses": 0,
+    "peak_tracked_committed_bytes": 851968,
+    "failures": [],
+    "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+  },
+  "ticks": [
+    {
+      "status": "ACCEPTED",
+      "tick": 1,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1129.0,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 2344.9,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 2,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1151.5,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1383.3,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 3,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1151.5,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1367.5,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 4,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1152.0,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1364.0,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 5,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1151.75,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1368.9,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 6,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1152.5,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1361.5,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 7,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1152.0,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1361.1,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 8,
+      "epoch": 1,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1151.25,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1358.8,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    },
+    {
+      "status": "ACCEPTED",
+      "tick": 9,
+      "epoch": 2,
+      "error_bits": 0,
+      "contacts": 8,
+      "active": 16,
+      "gpu_us": 1152.5,
+      "cpu_us": 0.0,
+      "committed_bytes": 851968,
+      "deadline_miss": false,
+      "cause": "",
+      "wall_us": 1501.7,
+      "gpu_fixed_step_deadline_miss": false,
+      "host_fixed_step_deadline_miss": false
+    }
+  ],
+  "inspections": [
+    {
+      "tick": 1,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.2569531202316284,
+          5.231584964349167e-06,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.0006696428754366934,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -4.307010840420844e-06,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    },
+    {
+      "tick": 2,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.26390624046325684,
+          1.6566686099395156e-05,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.0014508928870782256,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -8.614021680841688e-06,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    },
+    {
+      "tick": 3,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.27085936069488525,
+          3.400530113140121e-05,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.0022321429569274187,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -1.2921032066515181e-05,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    },
+    {
+      "tick": 4,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.27781248092651367,
+          5.754743324359879e-05,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.00301339291036129,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -1.7228043361683376e-05,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    },
+    {
+      "tick": 5,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.2847656011581421,
+          8.719308243598789e-05,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.0037946428637951612,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -2.153505374735687e-05,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    },
+    {
+      "tick": 6,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.2917187213897705,
+          0.0001229422487085685,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.0045758928172290325,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -2.5842064133030362e-05,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    },
+    {
+      "tick": 7,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.2986718416213989,
+          0.00016479492478538305,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.0053571430034935474,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -3.0149074518703856e-05,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    },
+    {
+      "tick": 8,
+      "epoch": 1,
+      "active": 16,
+      "first": {
+        "position": [
+          -0.30562496185302734,
+          0.00021275112521834671,
+          0.0
+        ],
+        "velocity": [
+          -0.89000004529953,
+          0.006138393189758062,
+          0.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          -3.445608672336675e-05,
+          1.0
+        ],
+        "angular_velocity": [
+          0.0,
+          0.0,
+          -0.0011160714784637094
+        ],
+        "force": [
+          0.0,
+          0.10000000149011612,
+          0.0
+        ],
+        "torque": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mass": 1.0,
+        "radius": 0.25,
+        "restitution": 0.800000011920929,
+        "friction": 0.30000001192092896,
+        "static": false,
+        "sleep_frames": 0.0
+      }
+    }
+  ],
+  "workload": "authored independently separated moving sphere pairs; full GPU interaction, not a storage-only scan",
+  "production_release": "NOT QUALIFIED",
+  "replay": {
+    "comparison": {
+      "equal": true,
+      "first_divergence": null,
+      "atol": 2e-05,
+      "rtol": 2e-05
+    },
+    "two_native_runs": true,
+    "cpu_readback_comparison_us": 381066.4,
+    "bitwise": "UNSUPPORTED"
+  }
+}

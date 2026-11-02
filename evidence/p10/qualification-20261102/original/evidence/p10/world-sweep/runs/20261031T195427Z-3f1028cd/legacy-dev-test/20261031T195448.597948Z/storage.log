@@ -1,0 +1,2 @@
+["C:\\Manavi\\Sunder\\zig-out\\bin\\storage.exe", "--n", "32", "--layout", "1", "--steps", "2", "--out", "C:\\Manavi\\Sunder\\dev-test-results\\20261031T195448.597948Z\\storage.json"]
+VERIFIED N=32 layout=1 active=4 steps=2 words=512 coverage=256 committed=720896
