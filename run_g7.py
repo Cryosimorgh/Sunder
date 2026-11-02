@@ -53,8 +53,10 @@ def stats(rows, name):
 
 
 def source_hashes():
-    names = ("g7_scenarios.py", "run_g7.py", "sunder_world.py", "physics3.c",
-             "physics3.h", "physics3.hlsl", "physics3-schema.json", "build_physics3.py")
+    names = ("g7_scenarios.py", "run_g7.py", "run_g7_windows.py",
+             "test_g7_scenarios.py", "RUN_G7_WINDOWS.cmd", "sunder_world.py",
+             "physics3.c", "physics3.h", "physics3.hlsl",
+             "physics3-schema.json", "build_physics3.py")
     return {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest()
             for p in names if (ROOT / p).exists()}
 
