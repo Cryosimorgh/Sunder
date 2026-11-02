@@ -112,6 +112,9 @@ def main(argv=None):
             tasks.append(("p10_native_full", ["run_world_sweep.py", "--full"], 7200))
         for name, command, timeout in tasks:
             before = {p.name for p in (EVIDENCE / "runs").iterdir()} if (EVIDENCE / "runs").is_dir() else set()
+            p10_dir = ROOT / "evidence/p10/world-sweep/runs"
+            p10_before = ({p.name for p in p10_dir.iterdir() if p.is_dir()}
+                          if name == "p10_native_full" and p10_dir.is_dir() else set())
             result = run(name, command, directory, timeout)
             status["tests"].append(result)
             if name == "g7_native_both":
@@ -131,6 +134,19 @@ def main(argv=None):
                             dest.write_bytes(file.read_bytes())
             if name == "p10_native_full":
                 status["p10_native_full"] = result["status"]
+                p10_fresh = ([p for p in p10_dir.iterdir()
+                              if p.is_dir() and p.name not in p10_before]
+                             if p10_dir.is_dir() else [])
+                if len(p10_fresh) != 1:
+                    result["status"] = "FAIL"
+                    result["reason"] = f"expected one fresh original P10 evidence directory; found {len(p10_fresh)}"
+                else:
+                    status["p10_evidence_folder"] = str(p10_fresh[0].relative_to(ROOT))
+                    for file in p10_fresh[0].rglob("*"):
+                        if file.is_file():
+                            dest = directory / "p10-native" / file.relative_to(p10_fresh[0])
+                            dest.parent.mkdir(parents=True, exist_ok=True)
+                            dest.write_bytes(file.read_bytes())
         status["source_and_build_sha256"] = {
             str(f.relative_to(ROOT)): sha(f)
             for f in [ROOT / "physics3.c", ROOT / "physics3.h", ROOT / "physics3.hlsl",
