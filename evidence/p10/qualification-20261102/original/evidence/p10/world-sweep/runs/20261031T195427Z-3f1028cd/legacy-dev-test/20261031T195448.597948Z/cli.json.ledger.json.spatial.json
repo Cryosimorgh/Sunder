@@ -1,0 +1,1 @@
+{"n":32,"capacity":32,"table_slots":64,"scan_elements":64,"output_byte":3200,"contact_indices_byte":8320,"pair_capacity":256,"logical":[768,1280,384,9600,9600],"committed":[65536,65536,65536,65536,65536],"total":327680,"frames":1,"growth_overlap":0,"cell_edge":4.00,"g4_cell_mode":0}

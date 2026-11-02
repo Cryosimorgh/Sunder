@@ -1,10 +1,10 @@
-# GPU Physics Engine — Technical Architecture and Development Record
+# Sunder — Technical Architecture and Development Record
 
-**Project:** [Cryosimorgh/GPU-physics-engine](https://github.com/Cryosimorgh/GPU-physics-engine)  
-**Record date:** 2026-10-31
+**Project:** [Cryosimorgh/Sunder](https://github.com/Cryosimorgh/Sunder)  
+**Record date:** 2026-11-02
 **Document type:** Living engineering record  
 **Style:** Clear technical English, based on ASD-STE100 principles without strict controlled-language limits  
-**Status:** Experimental GPU physics engine. **P10 native 3D foundation: GO within the tested bounded headless envelope.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
+**Status:** Experimental GPU physics engine. **P10 native 3D foundation: GO within the historical bounded tested envelope. P10 general-purpose headless world API: BOUNDED NATIVE CORRECTNESS GO at ed618f9; final-head sweep and CI required before merge.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
 
 > **Update rule:** Update this document in the same change that closes, rejects, or reopens a development breakpoint. Keep prior results and their limitations. Do not turn a local experiment into a released feature by changing its status here.
 
@@ -20,7 +20,7 @@ This repository is an **independent experiment**. It does not depend on Unity or
 
 There are two different development baselines:
 
-- [`main`](https://github.com/Cryosimorgh/GPU-physics-engine/tree/main) stores the original G4 engine snapshot. It does **not** contain the later G5 sweep code or all subsequent optimization experiments.
+- [`main`](https://github.com/Cryosimorgh/Sunder/tree/main) now includes merged P8b pool precision, P9 incomplete evidence (PR #6), and the bounded native 3D P10 foundation. The earlier G4-only main statement was historical and is no longer accurate; G5 optimization research is still not qualified.
 - [`billiards-playable-requalification-20261018`](https://github.com/Cryosimorgh/GPU-physics-engine/tree/billiards-playable-requalification-20261018) stores the later playable billiards, headless test workflow, and revised shaders. Its test and README claims apply to that branch.
 
 G5 results in this record come from **user-supplied local handoff results**, not from a G5 release on `main`. The latest uploaded `results.json` describes a quick, two-sample, cold, one-tick sweep. It explicitly marks `qualification: false`.
@@ -34,6 +34,62 @@ Use these labels throughout the document:
 | **Conditionally accepted** | The scoped tests pass, but at least one exit condition is open. |
 | **Experimental** | A local or branch-specific change needs broader evidence. |
 | **Planned** | A design target. No implementation claim. |
+
+### Application-facing headless world API — P10 bounded native evidence GO (2026-11-02)
+
+**Current audit (2026-11-02):** User hardware run `20261031T195427Z-3f1028cd` passes all nine full-sweep gates at `ed618f9bf7c80bd78f8d73d57f38f7791d3f6dfe`, Windows 11 x64, RTX 4070 Ti SUPER, driver `32.0.16.1088`. ZIP CRC, all 135 checksums, 14 sweep-source and 14 native-build source hashes verify. Eight native world cases, eight native oracle groups, all eight legacy dev-test cases and 10K/100K/1M separated-pair stress PASS. Expected native-world rejections: leased-slot backpressure and injected validation flag 16; recovery PASS. No physics defect or tolerance change indicated. The runner verdict defect found below is corrected. Raw original files: `evidence/p10/qualification-20261102/original/`. [Detailed audit](P10_NATIVE_AUDIT_20261102.json). The hosted failure and preparation-only statements below are historical, superseded by this hardware evidence.
+
+Authored 16/1024 GPU p50/p95/p99/worst are 1151.75/1152.5/1152.5/1152.5 and 3004/3024.6/3030.92/3032.5 microseconds. Host worst is 2344.9/4441.2 microseconds, zero reported deadline misses. Stress GPU medians: 1852.25/7323.25/60727 microseconds; tracked bytes: 16,187,392/155,779,072/1,552,875,520. Three degree-1 samples per size; all three 1M samples exceed the 7.8125 ms step. No sustained, real-time or arbitrary-topology claim. Stress host per-tick timing and allocation-event counts unavailable; CPU thread zeros reflect coarse accounting. Archive omits DLL/DXIL bytes, so output hashes are recorded, not recomputed from it.
+
+**Verified runner correction:** An injected failure in the final `native-stress` gate reproduced exit 0 and `qualified=true` because the failed gate exhausted `unexecuted` and the loop then promoted the verdict to GO. Return immediately on any failed gate, retaining NO-GO in the finalizer. Regression tests cover each of the nine gate positions and the all-pass path; all 21 host/packaging/verdict tests pass. The new regression runs in full-sweep CPU tests and CI. This does not invalidate the uploaded run: its original stress JSON and logs independently pass. No kernel, API, tolerance or solver-budget change. Intermediate reviewer full run `20261102T060628Z-5ad8b2f7` passes all nine gates on `032cffc`; a new exact full sweep must qualify the corrected final commit.
+
+**Integration condition:** Run exact `python run_world_sweep.py --full` on the final documentation/evidence commit, attach immutable results and SHA to PR #8, check CI and compare live PR head before merge. Bounded P10 correctness only. P9 bitwise stays INCOMPLETE; G5 DEFERRED, GPU-02 UNVERIFIED, formal G6 and production release NOT QUALIFIED.
+
+**Implementation proposal:** [P10_WORLD_API.md](P10_WORLD_API.md) describes
+`sunder_world.py`, `headless_demo.py`, `run_world_sweep.py`, the new native
+`ph3_stage`/`ph3_drop_stage` candidate source and host error classifier, and
+`test_sunder_world.py`. The new layer wraps existing D3D12 3D sphere
+simulation; it does not alter the 2D physics kernel or weaken its gates.
+A candidate GPU source is kept separate from accepted snapshot slots until the
+GPU validation/publish fence succeeds. The host generation map is committed
+only alongside the accepted native tick. Fixed-step clock continuity is
+explicitly restored on capacity growth.
+
+Worlds author spheres and expose typed MKS units, bounded capacities, stable
+generation handles, per-body properties, forces/impulses, fixed-step/async
+completion, immutable acquired snapshots, ordered command capture and
+numerical replay comparisons. Native GPU state remains resident on ordinary
+ticks. Input edits and explicit CPU state inspection require full-state
+readbacks. Inert GPU proxies retain unused stable slots; there is no claim of
+efficient sparse-body compaction. An adapter's authoring bounds are not physical
+wall contacts. Replay requires independently accepted physics within tolerance;
+bitwise determinism stays unsupported.
+
+**Native hardware handoff suite (2026-10-31, NOT YET RUN on user machine):**
+`RUN_P10_WINDOWS.cmd` invokes the exact existing
+`run_world_sweep.py --full` command and creates a per-run SHA-256-inventoried ZIP
+using `package_p10_evidence.py`. The consolidated full sweep now includes
+`test_native_world.py` as a mandatory D3D12 world-API gate (handle generation,
+growth, collisions/friction, force/impulse, sleep/wake, three snapshot leases,
+backpressure, rejected candidate rollback and two fresh native replays).
+Existing 16/1K authored, GPU CPU-oracle, pool/rail/device and 10K/100K/1M
+separated-pair stress remain mandatory. Each run has immutable evidence paths,
+driver inventory, source/tool hashes, GPU and host timings, and explicit NOT RUN
+statuses after the first failure. [Instructions](P10_RUN_ON_WINDOWS.md).
+The prior hosted GPU hardware NO-GO remains valid; merely preparing a suite
+does **not** qualify or merge P10. Physical thresholds are unchanged.
+
+**Full-sweep attempt on Windows 2025 hosted runner (2026-10-31, NO-GO):** The exact `python run_world_sweep.py --full` command ran on source commit `510192f` in [Actions run 41230865897](https://github.com/Cryosimorgh/Sunder/actions/runs/41230865897). The 17 host-only unit tests PASS and native Zig/DXC compiles nine shaders and DLL (57.14 s). The first native case, an empty authored world, fails at D3D12 context/admission: the only video adapter is Microsoft Hyper-V Video (driver 10.0.26100.1150). This is an **environment gate**, not verified solver failure or GPU-physics PASS. Fail-fast leaves authored 16/1024, native CPU oracle, leases, numerical replays, legacy pool/rail and 10K/100K/1M stress **NOT RUN**. No new physics timing/driver-performance conclusion is permitted. Original immutable per-run evidence is [Actions artifact 13053607373](https://github.com/Cryosimorgh/Sunder/actions/runs/41230865897/artifacts/13053607373), SHA-256 `874cae88d8970b14457317ade4836f58afca7818e36f72a58c2d1a26b8e9a211`. Persistent provenance summary: [P10_NATIVE_ATTEMPT_20261031.json](P10_NATIVE_ATTEMPT_20261031.json). PR #8 remains draft/unmerged; formal G6 and production release remain unqualified.
+
+**Evidence boundary:** The follow-up native qualification review added fail-closed staging cleanup, early-discard error quarantine, transactional resize host-map preparation, a closing gate for asynchronous teardown, full 3D replay numerical fields and run-isolated evidence (`run_world_sweep.py --full`, per-run immutable JSON/logs, source hashes, GPU driver inventory). An injected async-close test initially failed because the test required BACKPRESSURE even after shutdown had started and CLOSED was correct; the test assertion was repaired without changing physical gates. The extended host test suite and native qualification must be evaluated against the final tested SHA before merge. No fresh D3D12 physics measurements are available. Host contract GitHub Actions PASS (10 Python mocked-backend unit tests; Linux runner `41229876886`, commit `93ea51d`) and Windows compile-only GitHub Actions PASS (9 original compute shaders + DLL + syntax, run `41229757701`, commit `5069f6c`). These checks do **not** execute D3D12 physics or independently validate the GPU result. The implementation was written through a GitHub
+connection in an environment without Windows/D3D12 execution. All new native
+and compatibility gates remain **NOT RUN** in this branch until an independent
+`python run_world_sweep.py --full` executes on supported hardware and commits
+consolidated JSON/log evidence. The Python fake-backend unit suite cannot
+qualify physics. Existing [P10_EVIDENCE.json](P10_EVIDENCE.json) pertains only
+to the earlier merged native 3D foundation and is not a test result for the new
+world adapter. Do not merge this PR without a verified GO. G5 is DEFERRED;
+GPU-02 is UNVERIFIED; formal G6 and production release remain NOT QUALIFIED.
 
 ## 2. System layout
 
@@ -1254,6 +1310,8 @@ Sticky failed contexts, checked bounded teardown and explicit new-scene recreati
 
 **Decision: G6-P8a LOCALIZATION PASS / PHYSICS FAILURE OPEN; FORMAL G6 NOT QUALIFIED.** The candidate branch adds **test-only** first-error diagnostics in previously spare pool-extension bytes; 85 default DXIL files remain unchanged and diagnostic shader binaries are restored in the recorded run. No solver mathematics, KKT thresholds, rollback, or production behavior changed. This review **only updates the living architecture**, not production source. G5 stays **DEFERRED / NOT QUALIFIED** and GPU-02 remains **UNVERIFIED** per decision to move on.
 
+**Historical plan, now completed and merged:** The following P8b next-task instruction was written before the correction in PR #5. It is retained as an evidence chronology, not an outstanding issue. The accepted correction and latest P9 status are recorded below.
+
 **Next task (P8b):** Apply only a **precision-consistency correction** for pool rail gap formation: evaluate all four rail gaps with FP64 subtraction from existing stored FP32 inputs before `poolTarget()`, aligning with the FP64 validation geometry while preserving existing final target precision, equations, KKT tolerance, solver work cap and rollback. Use one bounded nine-shot reproduction and near-boundary tests for each rail, stable persistence/impacts and energy/rolling; compare unchanged control, fault-reproducing diagnostic, and correction. Do **not** suppress the subcode, increase iterations, widen acceptance or run G5 optimization sweeps. Record raw accepted tick/hash history, no regression in non-pool fixtures, and any remaining failures. Only if P8b passes may another small sustained sample be used to establish a limited envelope; P9 host API and P10 release approval remain later decisions.
 
 **Audit evidence:** `G6-P8a-Pool-Validation-20261019.zip`; revision `2db61f69b9dc84e02e8109792110caa1c415149e`. 218 ZIP entries/217 verified payload hashes; bundled offline verifier PASS; 12 exact published Git blob matches; original + control + two diagnostic sequences, all 4,073 state hashes and nine shot ticks identical, IEEE754 gap/residual independently recomputed. Recorded GPU execution is not independent Windows testing.
@@ -1338,7 +1396,11 @@ Next action:
 
 | Date | Breakpoint | Record update |
 |---|---|---|
+| 2026-11-02 | P10 hardware evidence audit - bounded correctness GO, final-head integration conditional | 135 checksums and 28 source hashes verified; all 9 gates PASS at ed618f9 on RTX 4070 Ti SUPER. Original evidence retained. No physics changes. Full sweep and CI required on final commit before merge. |
 | 2026-10-31 | P10 native 3D foundation — bounded GO | Added tensor/quaternion 3D GPU sphere/plane dynamics, immutable publication and real delayed-reader proof. Seven native groups, all three stress scales and unchanged full 2D regressions pass. Numerical native validity required; bitwise replay remains unqualified. Formal G6/release remains not qualified. |
+| 2026-10-31 | P10 full native Windows attempt — NO-GO / no suitable D3D12 compute adapter | Source 510192f, 17 CPU-only PASS, 9 shaders and DLL compiled. Empty authored world fails D3D12 context/admission on Hyper-V Video; 16/1K, native oracle/replay, pool/rail and 10K/100K/1M NOT RUN. Immutable Actions artifact 13053607373, SHA-256 retained; PR #8 unmerged. |
+| 2026-10-31 | P10 PR #8 adversarial qualification follow-up — NO-GO pending hardware GPU | Fail-closed candidate discard and capacity migration safety, async-close tests, replay field coverage and unique run evidence added; no D3D12 hardware qualification or physics performance evidence. Keep PR draft/unmerged. |
+| 2026-10-31 | P10 application-facing headless core branch — NO-GO pending native execution | Staged accepted-state-safe GPU edits, typed world handles, fixed-step async control, leases, ordered numerical replay and CLI regression plan implemented on a dedicated branch. No new Windows/D3D12 run or performance qualification reported. P8b MERGED, P9 INCOMPLETE, G5 deferred, GPU-02 unverified, G6 NOT QUALIFIED. |
 | 2026-10-19 | G6-P8b merged correction / P9 BLOCKED on repeatability | PR #5 merged at e843a42; P8/P8a failed evidence retained. P9 records four functionally passing 30-second sessions, but stops at 1K tick32 repeatability failure; two short traces localize atomic scatter/color-order variation. 8K and remaining lifecycle checks NOT RUN. G5 deferred, GPU-02 unverified, G6 not qualified. |
 | 2026-10-19 | G6-P8a pool KKT failure root cause — LOCALIZATION PASS / PHYSICS NOT FIXED | Verified 217 ZIP payload hashes, 12 pushed Git blob IDs and offline verifier; original P8, unmodified control and two diagnostics have 4,073 identical state hashes each, nine shots, and matching tick-4,072 rejection/rollback. Subcode 1 = ball 7/right rail normal KKT. Independently reproduced FP32 vs FP64 gap difference times 128 exactly equals residual 7.152557373046875e-06 (9.8368× limit). No solver/production fix, G5 deferred, P8 small pool still fails, G6 unqualified. |
 | 2026-10-19 | G6-P8 sustained physics external audit — LIMITED / POOL FAIL | Independently verified 41 ZIP checks, 7 pushed Git blobs and 5,788 raw attempts (5,787 accepted, one shared-error-32 pool rejection). Medium/large 30-wall-second runs accept 884/831 ticks (1,024/8,192 disks in max-16-body islands), with stable tracked memory and checked rollback, but CPU-oracle overhead, GPU drift and 220.17-ms worst tick prohibit real-time claims. Pool 9-shot sequence fails at attempt 4,072; exact subvalidator unknown. G5 deferred, GPU-02 unverified, G6 not qualified. |

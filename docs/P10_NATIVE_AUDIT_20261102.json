@@ -1,0 +1,706 @@
+{
+  "date": "2026-11-02",
+  "decision": "BOUNDED CORRECTNESS GO at ed618f9; fresh final-head sweep and CI required before merge",
+  "tested_commit": "ed618f9bf7c80bd78f8d73d57f38f7791d3f6dfe",
+  "original_archive": "Sunder-P10-20261031T195427Z-3f1028cd-GO-20261031T195732Z-90af2a.zip",
+  "archive_sha256": "9d2c84e3a62c88ac4afe5ee0364c2f785c467d1b6535021688643d700dff2a55",
+  "crc": "PASS",
+  "verified_checksums": 135,
+  "unlisted_or_duplicate_members": 0,
+  "sweep_source_hashes_verified": 14,
+  "native_build_source_hashes_verified": 14,
+  "hardware": [
+    {
+      "Name": "Meta Virtual Monitor",
+      "DriverVersion": "17.12.55.198",
+      "PNPDeviceID": "ROOT\\DISPLAY\\0000"
+    },
+    {
+      "Name": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "DriverVersion": "32.0.16.1088",
+      "PNPDeviceID": "PCI\\VEN_10DE&DEV_2705&SUBSYS_89571043&REV_A1\\4&256A0AA8&0&0008"
+    }
+  ],
+  "original_evidence_root": "evidence/p10/qualification-20261102/original",
+  "gates": [
+    {
+      "name": "cpu-world",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "test_sunder_world",
+        "-q"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 0.7818114999681711,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\cpu-world.log"
+    },
+    {
+      "name": "build",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "build_physics3.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 4.463634500047192,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\build.log"
+    },
+    {
+      "name": "world-empty",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "headless_demo.py",
+        "--capacity",
+        "1",
+        "--bodies",
+        "0",
+        "--steps",
+        "4",
+        "--replay",
+        "--out",
+        "C:\\Manavi\\Sunder\\evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-empty.json"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 0.7579137999564409,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-empty.log",
+      "metrics": {
+        "accepted": 4,
+        "rejected": 0,
+        "gpu_us": {
+          "samples": 4,
+          "p50": 264.375,
+          "p95": 265.35,
+          "p99": 265.47,
+          "worst": 265.5
+        },
+        "cpu_production_thread_us": {
+          "samples": 4,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "worst": 0.0
+        },
+        "host_wall_submission_completion_us": {
+          "samples": 4,
+          "p50": 486.85,
+          "p95": 1339.7849999999996,
+          "p99": 1458.5969999999998,
+          "worst": 1488.3
+        },
+        "deadline_misses": 0,
+        "gpu_fixed_step_deadline_misses": 0,
+        "host_fixed_step_deadline_misses": 0,
+        "peak_tracked_committed_bytes": 851968,
+        "failures": [],
+        "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+      },
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "interaction_class": "authored independently separated moving sphere pairs; full GPU interaction, not a storage-only scan",
+      "replay": {
+        "comparison": {
+          "equal": true,
+          "first_divergence": null,
+          "atol": 2e-05,
+          "rtol": 2e-05
+        },
+        "two_native_runs": true,
+        "cpu_readback_comparison_us": 347447.5,
+        "bitwise": "UNSUPPORTED"
+      },
+      "output": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-empty.json"
+    },
+    {
+      "name": "native-world",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "test_native_world.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 2.0842089999932796,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\native-world.log",
+      "metrics": {
+        "accepted_ticks": 54,
+        "rejected_ticks": 2,
+        "expected_rejections": [
+          {
+            "status": "BACKPRESSURE",
+            "tick": 3,
+            "epoch": 1,
+            "error_bits": 0,
+            "contacts": 0,
+            "active": 1,
+            "gpu_us": 0.0,
+            "cpu_us": 0.0,
+            "committed_bytes": 0,
+            "deadline_miss": false,
+            "cause": "all nonaccepted native snapshot slots are leased",
+            "wall_us": 8.2,
+            "gpu_fixed_step_deadline_miss": false,
+            "host_fixed_step_deadline_miss": false
+          },
+          {
+            "status": "REJECTED",
+            "tick": 1,
+            "epoch": 1,
+            "error_bits": 16,
+            "contacts": 0,
+            "active": 1,
+            "gpu_us": 280.25,
+            "cpu_us": 0.0,
+            "committed_bytes": 851968,
+            "deadline_miss": false,
+            "cause": "GPU rejected candidate: flags 16",
+            "wall_us": 614.0,
+            "gpu_fixed_step_deadline_miss": false,
+            "host_fixed_step_deadline_miss": false
+          }
+        ],
+        "gpu_us": {
+          "count": 54,
+          "p50": 281.75,
+          "p95": 1040.7499999999998,
+          "p99": 1079.5075,
+          "worst": 1086.0
+        },
+        "cpu_thread_us": {
+          "count": 54,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 7343.749999999982,
+          "worst": 15625.0
+        },
+        "submission_completion_wall_us": {
+          "count": 54,
+          "p50": 516.3,
+          "p95": 1705.3449999999998,
+          "p99": 2210.59,
+          "worst": 2224.9
+        },
+        "gpu_dt_misses": 0,
+        "host_dt_misses": 0,
+        "tracked_committed_peak_bytes": 851968,
+        "note": "CPU oracle overhead is not included; independent native solver oracle is a separate gate."
+      },
+      "adapter": [
+        "NVIDIA GeForce RTX 4070 Ti SUPER"
+      ],
+      "cases": [
+        {
+          "name": "authored_lifecycle_growth",
+          "status": "PASS",
+          "wall_seconds": 0.22517570003401488,
+          "details": null
+        },
+        {
+          "name": "gravity_force_impulse",
+          "status": "PASS",
+          "wall_seconds": 0.1609216999495402,
+          "details": null
+        },
+        {
+          "name": "collision_friction",
+          "status": "PASS",
+          "wall_seconds": 0.1635719999903813,
+          "details": null
+        },
+        {
+          "name": "sleep_wake",
+          "status": "PASS",
+          "wall_seconds": 0.2013322999700904,
+          "details": null
+        },
+        {
+          "name": "three_snapshot_backpressure",
+          "status": "PASS",
+          "wall_seconds": 0.1606356999836862,
+          "details": null
+        },
+        {
+          "name": "staged_rejection_and_recovery",
+          "status": "PASS",
+          "wall_seconds": 0.17736480000894517,
+          "details": null
+        },
+        {
+          "name": "invalid_commands_world_isolation",
+          "status": "PASS",
+          "wall_seconds": 0.19466929999180138,
+          "details": null
+        },
+        {
+          "name": "two_independent_native_replays",
+          "status": "PASS",
+          "wall_seconds": 0.5124122999841347,
+          "details": {
+            "two_distinct_native_world_runs": true,
+            "comparison": {
+              "equal": true,
+              "first_divergence": null,
+              "atol": 2e-05,
+              "rtol": 2e-05
+            },
+            "elapsed_including_readback_and_comparison_s": 0.342638700036332,
+            "bitwise_replay": "UNSUPPORTED"
+          }
+        }
+      ],
+      "output": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\native-world.json"
+    },
+    {
+      "name": "world-16",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "headless_demo.py",
+        "--capacity",
+        "16",
+        "--bodies",
+        "16",
+        "--steps",
+        "8",
+        "--replay",
+        "--out",
+        "C:\\Manavi\\Sunder\\evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-16.json"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 0.7613408999750391,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-16.log",
+      "metrics": {
+        "accepted": 9,
+        "rejected": 0,
+        "gpu_us": {
+          "samples": 9,
+          "p50": 1151.75,
+          "p95": 1152.5,
+          "p99": 1152.5,
+          "worst": 1152.5
+        },
+        "cpu_production_thread_us": {
+          "samples": 9,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "worst": 0.0
+        },
+        "host_wall_submission_completion_us": {
+          "samples": 9,
+          "p50": 1367.5,
+          "p95": 2007.62,
+          "p99": 2277.444,
+          "worst": 2344.9
+        },
+        "deadline_misses": 0,
+        "gpu_fixed_step_deadline_misses": 0,
+        "host_fixed_step_deadline_misses": 0,
+        "peak_tracked_committed_bytes": 851968,
+        "failures": [],
+        "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+      },
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "interaction_class": "authored independently separated moving sphere pairs; full GPU interaction, not a storage-only scan",
+      "replay": {
+        "comparison": {
+          "equal": true,
+          "first_divergence": null,
+          "atol": 2e-05,
+          "rtol": 2e-05
+        },
+        "two_native_runs": true,
+        "cpu_readback_comparison_us": 381066.4,
+        "bitwise": "UNSUPPORTED"
+      },
+      "output": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-16.json"
+    },
+    {
+      "name": "world-1024",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "headless_demo.py",
+        "--capacity",
+        "1024",
+        "--bodies",
+        "1024",
+        "--steps",
+        "8",
+        "--replay",
+        "--out",
+        "C:\\Manavi\\Sunder\\evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-1024.json"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 2.0892404000042006,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-1024.log",
+      "metrics": {
+        "accepted": 9,
+        "rejected": 0,
+        "gpu_us": {
+          "samples": 9,
+          "p50": 3004.0,
+          "p95": 3024.6,
+          "p99": 3030.92,
+          "worst": 3032.5
+        },
+        "cpu_production_thread_us": {
+          "samples": 9,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "worst": 0.0
+        },
+        "host_wall_submission_completion_us": {
+          "samples": 9,
+          "p50": 3254.1,
+          "p95": 4026.5999999999995,
+          "p99": 4358.28,
+          "worst": 4441.2
+        },
+        "deadline_misses": 0,
+        "gpu_fixed_step_deadline_misses": 0,
+        "host_fixed_step_deadline_misses": 0,
+        "peak_tracked_committed_bytes": 2555904,
+        "failures": [],
+        "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+      },
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "interaction_class": "authored independently separated moving sphere pairs; full GPU interaction, not a storage-only scan",
+      "replay": {
+        "comparison": {
+          "equal": true,
+          "first_divergence": null,
+          "atol": 2e-05,
+          "rtol": 2e-05
+        },
+        "two_native_runs": true,
+        "cpu_readback_comparison_us": 1619402.6,
+        "bitwise": "UNSUPPORTED"
+      },
+      "output": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\world-1024.json"
+    },
+    {
+      "name": "native-physics",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "test_physics3.py",
+        "--smoke"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 9.79209170001559,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\native-physics.log"
+    },
+    {
+      "name": "legacy-pool-rail",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "dev_test.py",
+        "full"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 161.8348479999695,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\legacy-pool-rail.log",
+      "original_legacy_output": [
+        "dev-test-results\\20261031T195448.597948Z"
+      ]
+    },
+    {
+      "name": "native-stress",
+      "command": [
+        "C:\\Users\\SHIELD SYSTEM\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "test_physics3.py",
+        "--stress",
+        "10000",
+        "100000",
+        "1000000"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "failure": null,
+      "elapsed_wall_s": 2.1456330999499187,
+      "log": "evidence\\p10\\world-sweep\\runs\\20261031T195427Z-3f1028cd\\native-stress.log"
+    }
+  ],
+  "legacy_cases": [
+    {
+      "name": "all",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": 10598,
+      "expected_rejections": 2
+    },
+    {
+      "name": "overhead",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": 40,
+      "expected_rejections": 0
+    },
+    {
+      "name": "cpu",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": null,
+      "expected_rejections": null
+    },
+    {
+      "name": "commands",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": null,
+      "expected_rejections": null
+    },
+    {
+      "name": "cli",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": null,
+      "expected_rejections": null
+    },
+    {
+      "name": "device",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": null,
+      "expected_rejections": null
+    },
+    {
+      "name": "storage",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": null,
+      "expected_rejections": null
+    },
+    {
+      "name": "spatial",
+      "status": "PASS",
+      "returncode": 0,
+      "accepted_ticks": null,
+      "expected_rejections": null
+    }
+  ],
+  "stress": [
+    {
+      "n": 10000,
+      "contacts": 5000,
+      "contacts_per_body": 0.5,
+      "candidate_pairs_tested": 9950,
+      "max_degree": 1,
+      "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "gpu_phase_names": [
+        "prepare",
+        "hash",
+        "narrowphase",
+        "solve_gather",
+        "integrate",
+        "validate",
+        "publish",
+        "total"
+      ],
+      "gpu_phases_us": [
+        [
+          47.0,
+          5.0,
+          38.0,
+          1661.75,
+          40.0,
+          53.25,
+          7.25,
+          1852.25
+        ],
+        [
+          46.25,
+          4.0,
+          38.0,
+          1661.0,
+          38.75,
+          53.25,
+          7.25,
+          1848.5
+        ],
+        [
+          45.5,
+          5.25,
+          36.75,
+          1669.0,
+          40.0,
+          54.25,
+          6.25,
+          1857.0
+        ]
+      ],
+      "gpu_total_median_us": 1852.25,
+      "sample_count": 3,
+      "committed_bytes": 16187392,
+      "energy_before": 5650.000041723252,
+      "energy_after": 3664.285828811783,
+      "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+      "qualification": false,
+      "wall_seconds_including_init_readback_cpu_oracle": 0.2259337999857962
+    },
+    {
+      "n": 100000,
+      "contacts": 50000,
+      "contacts_per_body": 0.5,
+      "candidate_pairs_tested": 99500,
+      "max_degree": 1,
+      "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "gpu_phase_names": [
+        "prepare",
+        "hash",
+        "narrowphase",
+        "solve_gather",
+        "integrate",
+        "validate",
+        "publish",
+        "total"
+      ],
+      "gpu_phases_us": [
+        [
+          241.25,
+          16.5,
+          221.25,
+          6417.5,
+          228.0,
+          171.0,
+          27.75,
+          7323.25
+        ],
+        [
+          242.5,
+          16.25,
+          222.25,
+          6415.5,
+          228.25,
+          170.0,
+          26.5,
+          7321.25
+        ],
+        [
+          243.75,
+          16.5,
+          223.25,
+          6415.5,
+          228.25,
+          170.0,
+          26.5,
+          7323.75
+        ]
+      ],
+      "gpu_total_median_us": 7323.25,
+      "sample_count": 3,
+      "committed_bytes": 155779072,
+      "energy_before": 56500.00041723251,
+      "energy_after": 36642.85828811783,
+      "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+      "qualification": false,
+      "wall_seconds_including_init_readback_cpu_oracle": 0.24397259997203946
+    },
+    {
+      "n": 1000000,
+      "contacts": 500000,
+      "contacts_per_body": 0.5,
+      "candidate_pairs_tested": 995000,
+      "max_degree": 1,
+      "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "gpu_phase_names": [
+        "prepare",
+        "hash",
+        "narrowphase",
+        "solve_gather",
+        "integrate",
+        "validate",
+        "publish",
+        "total"
+      ],
+      "gpu_phases_us": [
+        [
+          2241.5,
+          143.5,
+          1676.25,
+          55512.0,
+          2267.25,
+          1591.25,
+          596.0,
+          64027.75
+        ],
+        [
+          2146.25,
+          139.25,
+          1583.0,
+          52618.5,
+          2144.25,
+          1500.0,
+          595.75,
+          60727.0
+        ],
+        [
+          2147.75,
+          137.25,
+          1586.0,
+          52608.0,
+          2144.25,
+          1500.5,
+          594.75,
+          60718.5
+        ]
+      ],
+      "gpu_total_median_us": 60727.0,
+      "sample_count": 3,
+      "committed_bytes": 1552875520,
+      "energy_before": 565000.0041723251,
+      "energy_after": 366428.5828811783,
+      "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+      "qualification": false,
+      "wall_seconds_including_init_readback_cpu_oracle": 1.405620599980466
+    }
+  ],
+  "verified_defects": [
+    {
+      "file": "run_world_sweep.py",
+      "failure": "Final native-stress failure removed the last unexecuted case, broke out of loop, then overwrote NO-GO with GO and returned 0.",
+      "reproduction": "python -m unittest test_world_sweep -q before fix fails final-stress subtest; injected final failure produced qualified=true and exit 0.",
+      "impact": "Verdict integrity defect; original uploaded stress evidence independently PASS, so uploaded results remain valid."
+    }
+  ],
+  "fixes": [
+    "Return nonzero immediately on any failed gate; finally retains NO-GO and original failure record.",
+    "Regression covers failure at each of nine positions plus all-pass; included in full-sweep CPU gate and CI."
+  ],
+  "adversarial_review": {
+    "growth": "host seed-failure injection preserves old state/clock/handles; native successful growth PASS; actual allocation/device failure not induced",
+    "staging": "native injected validation flag 16 rejects staged candidate, retains accepted state and recovers",
+    "handles": "native remove/recreate, failed candidate generation, cross-world isolation PASS",
+    "async": "host blocked-worker tests cover mutation/growth/acquire rejection and shutdown waits; real GPU fault/overlap not induced",
+    "leases": "native three leased slots yield explicit BACKPRESSURE without publication; recovery PASS",
+    "replay": "independent native contexts and full public field comparison within 2e-5 absolute/relative; no bitwise guarantee"
+  },
+  "limitations": [
+    "Original archive omits DLL/DXIL bytes; output hashes are recorded, not recomputed. Final-head fresh build/full execution required.",
+    "Single hardware adapter; stress is three fresh-state degree-1 samples per scale, not arbitrary connected-world or sustained performance.",
+    "Stress GPU fixed-step deadline misses derived from raw timestamps: 0/3 at 10K, 0/3 at 100K, 3/3 at 1M (dt=1/128). Stress host per-tick timings and allocation-event counts unavailable.",
+    "Coarse Windows CPU thread accounting gives zeros, not zero host work. Host wall and oracle/readback costs are separate.",
+    "P9 bitwise INCOMPLETE; G5 DEFERRED; GPU-02 UNVERIFIED; formal G6 and production release NOT QUALIFIED."
+  ],
+  "reviewer_tests": "PASS 21 host/packaging/verdict tests after fix",
+  "intermediate_native_run": {
+    "commit": "032cffcb2c43054d3eb9453c68f798eecbe8bed2",
+    "run": "20261102T060628Z-5ad8b2f7",
+    "result": "PASS all nine gates, retained as intermediate before runner fix"
+  }
+}

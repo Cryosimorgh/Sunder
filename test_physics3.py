@@ -2,11 +2,11 @@
 No Python contact solver is used to produce the GPU result.
 """
 from pathlib import Path
-import argparse,ctypes as C,hashlib,json,math,struct,time,traceback
+import argparse,ctypes as C,hashlib,json,math,struct,time,traceback,os
 import numpy as np
 R=Path(__file__).resolve().parent
 BUILD=R/'evidence/p10/build'
-E=R/'evidence/p10'
+E=Path(os.environ.get('SUNDER_P10_EVIDENCE_DIR',str(R/'evidence/p10')))
 U=np.finfo(np.float32).eps
 
 class Result(C.Structure):
@@ -15,7 +15,7 @@ class Lease(C.Structure):
     _fields_=[('context',C.c_uint64),('serial',C.c_uint64),('buffer',C.c_uint64),('slot',C.c_uint32),('generation',C.c_uint32)]
 def library():
     dll=C.CDLL(str(BUILD/'physics3.dll'))
-    signatures={'open':([C.c_uint32,C.c_uint32,C.c_uint32,C.c_int,C.c_char_p],C.c_void_p),'close':([C.c_void_p],C.c_int),'seed':([C.c_void_p,C.c_void_p,C.c_void_p,C.c_uint32],C.c_int),'tick':([C.c_void_p,C.c_float,C.c_void_p,C.c_float,C.c_uint32,C.POINTER(Result)],C.c_int),'read':([C.c_void_p,C.c_void_p],C.c_int),'contacts':([C.c_void_p,C.c_void_p,C.c_uint32],C.c_int),'acquire':([C.c_void_p,C.POINTER(Lease)],C.c_int),'release':([C.c_void_p,C.POINTER(Lease)],C.c_int),'reader_test':([C.c_void_p],C.c_int),'adapter':([C.c_void_p],C.c_char_p)}
+    signatures={'open':([C.c_uint32,C.c_uint32,C.c_uint32,C.c_int,C.c_char_p],C.c_void_p),'close':([C.c_void_p],C.c_int),'seed':([C.c_void_p,C.c_void_p,C.c_void_p,C.c_uint32],C.c_int),'stage':([C.c_void_p,C.c_void_p],C.c_int),'drop_stage':([C.c_void_p],C.c_int),'tick':([C.c_void_p,C.c_float,C.c_void_p,C.c_float,C.c_uint32,C.POINTER(Result)],C.c_int),'read':([C.c_void_p,C.c_void_p],C.c_int),'contacts':([C.c_void_p,C.c_void_p,C.c_uint32],C.c_int),'acquire':([C.c_void_p,C.POINTER(Lease)],C.c_int),'release':([C.c_void_p,C.POINTER(Lease)],C.c_int),'reader_test':([C.c_void_p],C.c_int),'adapter':([C.c_void_p],C.c_char_p)}
     for name,(args,ret) in signatures.items():f=getattr(dll,'ph3_'+name);f.argtypes=args;f.restype=ret
     return dll
 DLL=None
@@ -284,6 +284,29 @@ def rejection_and_snapshots():
     a=soa(1)
     with GPU(a) as p:assert DLL.ph3_reader_test(p.ptr),'delayed native GPU snapshot consumer'
 
+
+def transactional_world_edits():
+    # P10 world publication contract: staging never edits an accepted snapshot,
+    # even after a failed tick. Compare bytes, tick IDs, then CPU physics oracle.
+    a=soa(2);a[0]=[-.25,.25];a[3]=[1.,-1.]
+    with GPU(a) as p:
+        before=p.read().tobytes()
+        edited=a.copy();edited[3,0]=1.5
+        assert DLL.ph3_stage(p.ptr,edited.ctypes.data),'stage rejected valid candidate'
+        assert p.read().tobytes()==before,'stage modified accepted state'
+        result=Result();g=np.zeros(3,dtype=np.float32)
+        assert DLL.ph3_tick(p.ptr,np.float32(1/128),g.ctypes.data,np.float32(2.),1,C.byref(result))
+        assert result.error&16 and result.published==0,'injected failure published'
+        assert p.read().tobytes()==before,'rejected tick exposed staged state'
+        assert DLL.ph3_drop_stage(p.ptr),'could not discard rejected candidate'
+        assert DLL.ph3_stage(p.ptr,edited.ctypes.data)
+        assert DLL.ph3_tick(p.ptr,np.float32(1/128),g.ctypes.data,np.float32(2.),0,C.byref(result))
+        assert not result.error and result.published==2 and result.tick==1
+        after=p.read()
+        p.check(edited,after,float(np.float32(1/128)),g,result,2.)
+        p.state=after
+        assert not np.array_equal(after,a),'accepted candidate did not advance'
+
 def native_replay():
     a=soa(4);a[:3]=np.array([[1,1,-1,-1],[1,-1,1,-1],[1,-1,-1,1]])*(.5/math.sqrt(8));a[3:6]=-a[:3]*2
     states=[]
@@ -344,7 +367,7 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--stress',type=int,nargs='*');parser.add_argument('--smoke',action='store_true');args=parser.parse_args()
     E.mkdir(parents=True,exist_ok=True);DLL=library();result={'status':'FAIL','tests':[],'stress':[],'bitwise_replay':'NOT CLAIMED','qualification':False}
     try:
-        cases=[axes,impacts,planes_and_rest,grazing_and_multisphere,rejection_and_snapshots,native_replay,debug_validation]
+        cases=[axes,impacts,planes_and_rest,grazing_and_multisphere,rejection_and_snapshots,transactional_world_edits,native_replay,debug_validation]
         if args.stress is not None:cases=[]
         for case in cases:
             start=time.perf_counter();details=case();result['tests'].append({'name':case.__name__,'status':'PASS','seconds':time.perf_counter()-start,'details':details});print('PASS',case.__name__,flush=True)

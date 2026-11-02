@@ -1,0 +1,185 @@
+{
+  "status": "PASS",
+  "tests": [],
+  "stress": [
+    {
+      "n": 10000,
+      "contacts": 5000,
+      "contacts_per_body": 0.5,
+      "candidate_pairs_tested": 9950,
+      "max_degree": 1,
+      "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "gpu_phase_names": [
+        "prepare",
+        "hash",
+        "narrowphase",
+        "solve_gather",
+        "integrate",
+        "validate",
+        "publish",
+        "total"
+      ],
+      "gpu_phases_us": [
+        [
+          47.0,
+          5.0,
+          38.0,
+          1661.75,
+          40.0,
+          53.25,
+          7.25,
+          1852.25
+        ],
+        [
+          46.25,
+          4.0,
+          38.0,
+          1661.0,
+          38.75,
+          53.25,
+          7.25,
+          1848.5
+        ],
+        [
+          45.5,
+          5.25,
+          36.75,
+          1669.0,
+          40.0,
+          54.25,
+          6.25,
+          1857.0
+        ]
+      ],
+      "gpu_total_median_us": 1852.25,
+      "sample_count": 3,
+      "committed_bytes": 16187392,
+      "energy_before": 5650.000041723252,
+      "energy_after": 3664.285828811783,
+      "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+      "qualification": false,
+      "wall_seconds_including_init_readback_cpu_oracle": 0.2259337999857962
+    },
+    {
+      "n": 100000,
+      "contacts": 50000,
+      "contacts_per_body": 0.5,
+      "candidate_pairs_tested": 99500,
+      "max_degree": 1,
+      "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "gpu_phase_names": [
+        "prepare",
+        "hash",
+        "narrowphase",
+        "solve_gather",
+        "integrate",
+        "validate",
+        "publish",
+        "total"
+      ],
+      "gpu_phases_us": [
+        [
+          241.25,
+          16.5,
+          221.25,
+          6417.5,
+          228.0,
+          171.0,
+          27.75,
+          7323.25
+        ],
+        [
+          242.5,
+          16.25,
+          222.25,
+          6415.5,
+          228.25,
+          170.0,
+          26.5,
+          7321.25
+        ],
+        [
+          243.75,
+          16.5,
+          223.25,
+          6415.5,
+          228.25,
+          170.0,
+          26.5,
+          7323.75
+        ]
+      ],
+      "gpu_total_median_us": 7323.25,
+      "sample_count": 3,
+      "committed_bytes": 155779072,
+      "energy_before": 56500.00041723251,
+      "energy_after": 36642.85828811783,
+      "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+      "qualification": false,
+      "wall_seconds_including_init_readback_cpu_oracle": 0.24397259997203946
+    },
+    {
+      "n": 1000000,
+      "contacts": 500000,
+      "contacts_per_body": 0.5,
+      "candidate_pairs_tested": 995000,
+      "max_degree": 1,
+      "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "gpu_phase_names": [
+        "prepare",
+        "hash",
+        "narrowphase",
+        "solve_gather",
+        "integrate",
+        "validate",
+        "publish",
+        "total"
+      ],
+      "gpu_phases_us": [
+        [
+          2241.5,
+          143.5,
+          1676.25,
+          55512.0,
+          2267.25,
+          1591.25,
+          596.0,
+          64027.75
+        ],
+        [
+          2146.25,
+          139.25,
+          1583.0,
+          52618.5,
+          2144.25,
+          1500.0,
+          595.75,
+          60727.0
+        ],
+        [
+          2147.75,
+          137.25,
+          1586.0,
+          52608.0,
+          2144.25,
+          1500.5,
+          594.75,
+          60718.5
+        ]
+      ],
+      "gpu_total_median_us": 60727.0,
+      "sample_count": 3,
+      "committed_bytes": 1552875520,
+      "energy_before": 565000.0041723251,
+      "energy_after": 366428.5828811783,
+      "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+      "qualification": false,
+      "wall_seconds_including_init_readback_cpu_oracle": 1.405620599980466
+    }
+  ],
+  "bitwise_replay": "NOT CLAIMED",
+  "qualification": false
+}

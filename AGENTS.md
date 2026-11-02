@@ -1,4 +1,4 @@
-# Codex Working Rules — GPU Physics Engine
+# Codex Working Rules — Sunder
 
 Prioritize correct implementation, short feedback cycles, and minimal token usage.
 

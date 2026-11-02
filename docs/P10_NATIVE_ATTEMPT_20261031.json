@@ -1,0 +1,79 @@
+{
+  "schema": "sunder-p10-native-qualification-retained-v1",
+  "observed_at_utc": "2026-10-31T18:46:02.818859+00:00",
+  "source_run_id": "20261031T184500Z-0618f636",
+  "source_commit": "510192f99152b93fdd6c406bf696dbf926adaa28",
+  "pr": 8,
+  "verdict": "NO-GO",
+  "hardware": "Windows-2025Server-10.0.26100-SP0, Microsoft Hyper-V Video, driver 10.0.26100.1150",
+  "native_adapter": "NOT AVAILABLE: ph3_open D3D12 context/admission failed for empty authored scene",
+  "actual_cases": [
+    {
+      "name": "cpu-world",
+      "status": "PASS",
+      "tests": 17,
+      "seconds": 0.3743809999999712
+    },
+    {
+      "name": "build",
+      "status": "PASS",
+      "shaders": 9,
+      "seconds": 57.1393152
+    },
+    {
+      "name": "world-empty",
+      "status": "FAIL",
+      "exit": 1,
+      "seconds": 0.4089385000000334,
+      "error": "WorldError ALLOCATION_OR_DEVICE: D3D12 context/admission failed"
+    }
+  ],
+  "unexecuted": [
+    "world-16",
+    "world-1024",
+    "native-physics",
+    "legacy-pool-rail",
+    "native-stress"
+  ],
+  "measurements": {
+    "accepted_ticks": 0,
+    "gpu_p50_us": null,
+    "gpu_p95_us": null,
+    "gpu_p99_us": null,
+    "gpu_worst_us": null,
+    "host_p50_us": null,
+    "host_p95_us": null,
+    "host_p99_us": null,
+    "host_worst_us": null,
+    "physics_deadline_misses": null,
+    "committed_bytes": null
+  },
+  "cause_classification": "environment/hardware adapter unavailable, not a verified physics code failure",
+  "evidence": {
+    "run": "https://github.com/Cryosimorgh/Sunder/actions/runs/41230865897",
+    "artifact": "https://github.com/Cryosimorgh/Sunder/actions/runs/41230865897/artifacts/13053607373",
+    "artifact_sha256": "874cae88d8970b14457317ade4836f58afca7818e36f72a58c2d1a26b8e9a211",
+    "original_json": "evidence/p10/world-sweep/runs/20261031T184500Z-0618f636/consolidated.json (inside artifact)",
+    "logs": [
+      "evidence/p10/world-sweep/runs/20261031T184500Z-0618f636/cpu-world.log",
+      "evidence/p10/world-sweep/runs/20261031T184500Z-0618f636/build.log",
+      "evidence/p10/world-sweep/runs/20261031T184500Z-0618f636/world-empty.log",
+      "evidence/p10/world-sweep/runs/20261031T184500Z-0618f636/world-empty.json"
+    ],
+    "retention": "GitHub Actions artifacts retained 30 days; download and archive permanent raw evidence before expiry"
+  },
+  "source_sha256": {
+    "physics3.c": "865048de98a55f532140a04c6afd49600741e0ed54fae55daba71362ad581a10",
+    "physics3.h": "e3692db65b80fd45a44459bb1ff8840c4bc27089b2ed4dc24eb469fd871b9162",
+    "physics3.hlsl": "b45431ea5baed9d5e53d21ca50df9a4a455a38750f19ff03bbbdb0f27631ba22",
+    "physics3-schema.json": "2f86c499d5d9bc3de9695b005fc00be0a82abfcb1616b2d01bab3df224aa2d86",
+    "sunder_world.py": "42670d5ef35b81e970bbd4176a1cc4458646d12eeda24e53fe5b552ad2ce0c63",
+    "headless_demo.py": "2265ba3539f0e1edbe679aee58aebb717ceef0f55f087831780b9c03f1ab6b6e",
+    "test_physics3.py": "ecbd384204988594f4df6b46fd5d9514546e40c62a0325af4b4f763e155e96f4",
+    "test_sunder_world.py": "a6a436d05c25b28e372f19054df5faff282686577d71bffc694031b8b8654151",
+    "run_world_sweep.py": "5320381cc5da0eafcc48f8d7c113f0847cac855ba018b53e4b1dce3b9338c344",
+    "build_physics3.py": "e2b477cee0127f7d5a2091ed301e249d1fbf597e7d01083a657f5caa20a59ce0"
+  },
+  "qualification": false,
+  "merge_authorized": false
+}

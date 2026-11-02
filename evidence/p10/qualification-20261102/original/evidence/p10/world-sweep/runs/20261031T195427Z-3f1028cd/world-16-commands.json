@@ -1,0 +1,683 @@
+{
+  "format": "sunder-native-numerical-v1",
+  "world_id": "17ca11a6fac993c704697d1fda8cde1e:1",
+  "configuration": {
+    "capacity": 16,
+    "contact_capacity": 64,
+    "iterations": 128,
+    "dt": 0.0078125,
+    "gravity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cell_size": 2.0,
+    "lower": [
+      -512.0,
+      -512.0,
+      -512.0
+    ],
+    "upper": [
+      512.0,
+      512.0,
+      512.0
+    ],
+    "units": "metre-kilogram-second",
+    "shader_dir": "evidence/p10/build",
+    "debug": false,
+    "deadline_ms": 16.0
+  },
+  "provenance": {
+    "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "sha256": {
+      "evidence\\p10\\build\\physics3.dll": "f8c267f94c9794ba91a92de5197cc4ff6dd4d92f563ebfff6e8e193e830c88ba",
+      "physics3.hlsl": "b45431ea5baed9d5e53d21ca50df9a4a455a38750f19ff03bbbdb0f27631ba22",
+      "physics3-schema.json": "2f86c499d5d9bc3de9695b005fc00be0a82abfcb1616b2d01bab3df224aa2d86",
+      "evidence\\p10\\build\\manifest.json": "25946fcbe370d525a0aa80a1ceb89dcb5c2b396aaee6b3d369fcf4b0604cb010"
+    }
+  },
+  "steps": [
+    {
+      "tick": 1,
+      "commands": [
+        {
+          "op": "create",
+          "handle": {
+            "slot": 0,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              -0.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 1,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              0.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 2,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              3.75,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 3,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              4.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 4,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              7.75,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 5,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              8.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 6,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              11.75,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 7,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              12.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 8,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              15.75,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 9,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              16.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 10,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              19.75,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 11,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              20.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 12,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              23.75,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 13,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              24.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 14,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              27.75,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 15,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              28.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              -1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        },
+        {
+          "op": "force",
+          "handle": {
+            "slot": 0,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "value": [
+            0.0,
+            0.10000000149011612,
+            0.0
+          ]
+        },
+        {
+          "op": "impulse",
+          "handle": {
+            "slot": 1,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "value": [
+            -0.10000000149011612,
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 1,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1129.0,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 2344.9,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 2,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 2,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1151.5,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1383.3,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 3,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 3,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1151.5,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1367.5,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 4,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 4,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1152.0,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1364.0,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 5,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 5,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1151.75,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1368.9,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 6,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 6,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1152.5,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1361.5,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 7,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 7,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1152.0,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1361.1,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 8,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 8,
+        "epoch": 1,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1151.25,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1358.8,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 9,
+      "commands": [
+        {
+          "op": "remove",
+          "handle": {
+            "slot": 0,
+            "generation": 2,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          }
+        },
+        {
+          "op": "create",
+          "handle": {
+            "slot": 0,
+            "generation": 4,
+            "world_id": "17ca11a6fac993c704697d1fda8cde1e:1"
+          },
+          "body": {
+            "position": [
+              -0.25,
+              0.0,
+              0.0
+            ],
+            "velocity": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "mass": 1,
+            "radius": 0.25,
+            "restitution": 0.8,
+            "friction": 0.3,
+            "static": false
+          }
+        }
+      ],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 9,
+        "epoch": 2,
+        "error_bits": 0,
+        "contacts": 8,
+        "active": 16,
+        "gpu_us": 1152.5,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1501.7,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    }
+  ],
+  "bitwise_determinism": "UNSUPPORTED"
+}

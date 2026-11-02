@@ -1,0 +1,122 @@
+{
+  "format": "sunder-native-numerical-v1",
+  "world_id": "0541cb831decaa35711d655aba3f93d5:1",
+  "configuration": {
+    "capacity": 1,
+    "contact_capacity": 64,
+    "iterations": 128,
+    "dt": 0.0078125,
+    "gravity": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cell_size": 2.0,
+    "lower": [
+      -512.0,
+      -512.0,
+      -512.0
+    ],
+    "upper": [
+      512.0,
+      512.0,
+      512.0
+    ],
+    "units": "metre-kilogram-second",
+    "shader_dir": "evidence/p10/build",
+    "debug": false,
+    "deadline_ms": 16.0
+  },
+  "provenance": {
+    "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "sha256": {
+      "evidence\\p10\\build\\physics3.dll": "f8c267f94c9794ba91a92de5197cc4ff6dd4d92f563ebfff6e8e193e830c88ba",
+      "physics3.hlsl": "b45431ea5baed9d5e53d21ca50df9a4a455a38750f19ff03bbbdb0f27631ba22",
+      "physics3-schema.json": "2f86c499d5d9bc3de9695b005fc00be0a82abfcb1616b2d01bab3df224aa2d86",
+      "evidence\\p10\\build\\manifest.json": "25946fcbe370d525a0aa80a1ceb89dcb5c2b396aaee6b3d369fcf4b0604cb010"
+    }
+  },
+  "steps": [
+    {
+      "tick": 1,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 1,
+        "epoch": 0,
+        "error_bits": 0,
+        "contacts": 0,
+        "active": 0,
+        "gpu_us": 265.5,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 1488.3,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 2,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 2,
+        "epoch": 0,
+        "error_bits": 0,
+        "contacts": 0,
+        "active": 0,
+        "gpu_us": 264.5,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 498.2,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 3,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 3,
+        "epoch": 0,
+        "error_bits": 0,
+        "contacts": 0,
+        "active": 0,
+        "gpu_us": 264.25,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 474.6,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    },
+    {
+      "tick": 4,
+      "commands": [],
+      "result": {
+        "status": "ACCEPTED",
+        "tick": 4,
+        "epoch": 0,
+        "error_bits": 0,
+        "contacts": 0,
+        "active": 0,
+        "gpu_us": 264.25,
+        "cpu_us": 0.0,
+        "committed_bytes": 851968,
+        "deadline_miss": false,
+        "cause": "",
+        "wall_us": 475.5,
+        "gpu_fixed_step_deadline_miss": false,
+        "host_fixed_step_deadline_miss": false
+      }
+    }
+  ],
+  "bitwise_determinism": "UNSUPPORTED"
+}

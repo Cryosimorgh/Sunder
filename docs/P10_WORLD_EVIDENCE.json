@@ -1,0 +1,517 @@
+{
+  "date": "2026-11-02",
+  "repository": "Cryosimorgh/Sunder",
+  "branch": "p10-headless-world-api-20261031",
+  "baseline_main": "0eb15233e37a698bc6b28c8916afbcb8d6cbcb8a",
+  "decision": "BOUNDED NATIVE CORRECTNESS GO from audited hardware evidence; corrected runner final-head full sweep and CI required before merge",
+  "historical_native_3d": "Earlier merged P10 native bounded 3D evidence; NOT evidence for the new wrapper",
+  "P8b": "CORRECTED and MERGED in PR #5; historical 4072 tick failure preserved",
+  "P9": "PR #6 MERGED AS EVIDENCE; FAIL/INCOMPLETE for bitwise qualification",
+  "fresh_tests": {
+    "uploaded_full_sweep": "PASS all 9 at ed618f9bf7c80bd78f8d73d57f38f7791d3f6dfe",
+    "reviewer_host_packaging": "PASS 21 host/packaging/runner-verdict tests",
+    "native": "PASS 8 world API cases and 8 native oracle groups",
+    "legacy": "PASS all 8 dev_test cases; 10598 all-case accepted ticks and 2 expected rejections",
+    "stress": "PASS 10K/100K/1M, contacts 5000/50000/500000",
+    "final_head": "Run exact full sweep on final documentation commit; attach SHA/results to PR and verify CI before merge"
+  },
+  "performance": {
+    "world-empty": {
+      "accepted": 4,
+      "rejected": 0,
+      "gpu_us": {
+        "samples": 4,
+        "p50": 264.375,
+        "p95": 265.35,
+        "p99": 265.47,
+        "worst": 265.5
+      },
+      "cpu_production_thread_us": {
+        "samples": 4,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "worst": 0.0
+      },
+      "host_wall_submission_completion_us": {
+        "samples": 4,
+        "p50": 486.85,
+        "p95": 1339.7849999999996,
+        "p99": 1458.5969999999998,
+        "worst": 1488.3
+      },
+      "deadline_misses": 0,
+      "gpu_fixed_step_deadline_misses": 0,
+      "host_fixed_step_deadline_misses": 0,
+      "peak_tracked_committed_bytes": 851968,
+      "failures": [],
+      "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+    },
+    "native-world": {
+      "accepted_ticks": 54,
+      "rejected_ticks": 2,
+      "expected_rejections": [
+        {
+          "status": "BACKPRESSURE",
+          "tick": 3,
+          "epoch": 1,
+          "error_bits": 0,
+          "contacts": 0,
+          "active": 1,
+          "gpu_us": 0.0,
+          "cpu_us": 0.0,
+          "committed_bytes": 0,
+          "deadline_miss": false,
+          "cause": "all nonaccepted native snapshot slots are leased",
+          "wall_us": 8.2,
+          "gpu_fixed_step_deadline_miss": false,
+          "host_fixed_step_deadline_miss": false
+        },
+        {
+          "status": "REJECTED",
+          "tick": 1,
+          "epoch": 1,
+          "error_bits": 16,
+          "contacts": 0,
+          "active": 1,
+          "gpu_us": 280.25,
+          "cpu_us": 0.0,
+          "committed_bytes": 851968,
+          "deadline_miss": false,
+          "cause": "GPU rejected candidate: flags 16",
+          "wall_us": 614.0,
+          "gpu_fixed_step_deadline_miss": false,
+          "host_fixed_step_deadline_miss": false
+        }
+      ],
+      "gpu_us": {
+        "count": 54,
+        "p50": 281.75,
+        "p95": 1040.7499999999998,
+        "p99": 1079.5075,
+        "worst": 1086.0
+      },
+      "cpu_thread_us": {
+        "count": 54,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 7343.749999999982,
+        "worst": 15625.0
+      },
+      "submission_completion_wall_us": {
+        "count": 54,
+        "p50": 516.3,
+        "p95": 1705.3449999999998,
+        "p99": 2210.59,
+        "worst": 2224.9
+      },
+      "gpu_dt_misses": 0,
+      "host_dt_misses": 0,
+      "tracked_committed_peak_bytes": 851968,
+      "note": "CPU oracle overhead is not included; independent native solver oracle is a separate gate."
+    },
+    "world-16": {
+      "accepted": 9,
+      "rejected": 0,
+      "gpu_us": {
+        "samples": 9,
+        "p50": 1151.75,
+        "p95": 1152.5,
+        "p99": 1152.5,
+        "worst": 1152.5
+      },
+      "cpu_production_thread_us": {
+        "samples": 9,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "worst": 0.0
+      },
+      "host_wall_submission_completion_us": {
+        "samples": 9,
+        "p50": 1367.5,
+        "p95": 2007.62,
+        "p99": 2277.444,
+        "worst": 2344.9
+      },
+      "deadline_misses": 0,
+      "gpu_fixed_step_deadline_misses": 0,
+      "host_fixed_step_deadline_misses": 0,
+      "peak_tracked_committed_bytes": 851968,
+      "failures": [],
+      "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+    },
+    "world-1024": {
+      "accepted": 9,
+      "rejected": 0,
+      "gpu_us": {
+        "samples": 9,
+        "p50": 3004.0,
+        "p95": 3024.6,
+        "p99": 3030.92,
+        "worst": 3032.5
+      },
+      "cpu_production_thread_us": {
+        "samples": 9,
+        "p50": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "worst": 0.0
+      },
+      "host_wall_submission_completion_us": {
+        "samples": 9,
+        "p50": 3254.1,
+        "p95": 4026.5999999999995,
+        "p99": 4358.28,
+        "worst": 4441.2
+      },
+      "deadline_misses": 0,
+      "gpu_fixed_step_deadline_misses": 0,
+      "host_fixed_step_deadline_misses": 0,
+      "peak_tracked_committed_bytes": 2555904,
+      "failures": [],
+      "cpu_oracle_overhead_us": "NOT MEASURED / independent native suite separate"
+    },
+    "stress": [
+      {
+        "n": 10000,
+        "contacts": 5000,
+        "contacts_per_body": 0.5,
+        "candidate_pairs_tested": 9950,
+        "max_degree": 1,
+        "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "gpu_phase_names": [
+          "prepare",
+          "hash",
+          "narrowphase",
+          "solve_gather",
+          "integrate",
+          "validate",
+          "publish",
+          "total"
+        ],
+        "gpu_phases_us": [
+          [
+            47.0,
+            5.0,
+            38.0,
+            1661.75,
+            40.0,
+            53.25,
+            7.25,
+            1852.25
+          ],
+          [
+            46.25,
+            4.0,
+            38.0,
+            1661.0,
+            38.75,
+            53.25,
+            7.25,
+            1848.5
+          ],
+          [
+            45.5,
+            5.25,
+            36.75,
+            1669.0,
+            40.0,
+            54.25,
+            6.25,
+            1857.0
+          ]
+        ],
+        "gpu_total_median_us": 1852.25,
+        "sample_count": 3,
+        "committed_bytes": 16187392,
+        "energy_before": 5650.000041723252,
+        "energy_after": 3664.285828811783,
+        "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+        "qualification": false,
+        "wall_seconds_including_init_readback_cpu_oracle": 0.2259337999857962
+      },
+      {
+        "n": 100000,
+        "contacts": 50000,
+        "contacts_per_body": 0.5,
+        "candidate_pairs_tested": 99500,
+        "max_degree": 1,
+        "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "gpu_phase_names": [
+          "prepare",
+          "hash",
+          "narrowphase",
+          "solve_gather",
+          "integrate",
+          "validate",
+          "publish",
+          "total"
+        ],
+        "gpu_phases_us": [
+          [
+            241.25,
+            16.5,
+            221.25,
+            6417.5,
+            228.0,
+            171.0,
+            27.75,
+            7323.25
+          ],
+          [
+            242.5,
+            16.25,
+            222.25,
+            6415.5,
+            228.25,
+            170.0,
+            26.5,
+            7321.25
+          ],
+          [
+            243.75,
+            16.5,
+            223.25,
+            6415.5,
+            228.25,
+            170.0,
+            26.5,
+            7323.75
+          ]
+        ],
+        "gpu_total_median_us": 7323.25,
+        "sample_count": 3,
+        "committed_bytes": 155779072,
+        "energy_before": 56500.00041723251,
+        "energy_after": 36642.85828811783,
+        "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+        "qualification": false,
+        "wall_seconds_including_init_readback_cpu_oracle": 0.24397259997203946
+      },
+      {
+        "n": 1000000,
+        "contacts": 500000,
+        "contacts_per_body": 0.5,
+        "candidate_pairs_tested": 995000,
+        "max_degree": 1,
+        "topology": "N/2 independent 3D moving/frictional two-sphere pairs, separated xyz lattice",
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "gpu_phase_names": [
+          "prepare",
+          "hash",
+          "narrowphase",
+          "solve_gather",
+          "integrate",
+          "validate",
+          "publish",
+          "total"
+        ],
+        "gpu_phases_us": [
+          [
+            2241.5,
+            143.5,
+            1676.25,
+            55512.0,
+            2267.25,
+            1591.25,
+            596.0,
+            64027.75
+          ],
+          [
+            2146.25,
+            139.25,
+            1583.0,
+            52618.5,
+            2144.25,
+            1500.0,
+            595.75,
+            60727.0
+          ],
+          [
+            2147.75,
+            137.25,
+            1586.0,
+            52608.0,
+            2144.25,
+            1500.5,
+            594.75,
+            60718.5
+          ]
+        ],
+        "gpu_total_median_us": 60727.0,
+        "sample_count": 3,
+        "committed_bytes": 1552875520,
+        "energy_before": 565000.0041723251,
+        "energy_after": 366428.5828811783,
+        "independent_validation": "all-body analytical tangential/normal impulse and spin, pair momentum/energy/separation, identities/quaternions and all-object isolation certificate; mandatory GPU KKT checks retained",
+        "qualification": false,
+        "wall_seconds_including_init_readback_cpu_oracle": 1.405620599980466
+      }
+    ]
+  },
+  "workload_categories": {
+    "authored": "empty/16/1024 authored moving/colliding spheres",
+    "legacy": "pool + rail + previous independent oracle",
+    "stress": "separated pair contacts, not dense or large-island authored"
+  },
+  "bounded_regression_command": "python run_world_sweep.py --full (exact, no --skip-stress)",
+  "evidence_produced_by_runner": "evidence/p10/world-sweep/runs/<run-id>/consolidated.json; first top-level evidence/p10/world-sweep/consolidated.json retained",
+  "blockers": [
+    "Final commit must pass exact full native sweep and relevant CI; live PR head must match tested SHA"
+  ],
+  "excluded_features": [
+    "new 3D shape families",
+    "terrain",
+    "joints",
+    "viewer",
+    "general ECS",
+    "sparse GPU compaction"
+  ],
+  "execution_notes": "Uploaded hardware run audited offline; no verified source defect or tolerance change. Hosted failure retained as historical.",
+  "review_20261031": {
+    "verdict": "NO-GO: cannot claim native correctness from Linux container or compile-only hosted CI",
+    "examined": {
+      "transactional_stage": "source reviewed; native D3D12 failure-injection unverified",
+      "stale_handle": "opaque world identity + generation on host",
+      "capacity_growth": "prepare host maps before retiring old context; old-context retirement failure quarantines world",
+      "async_shutdown": "serial worker shutdown waits; mutations blocked while closing",
+      "replay": "inspect full accepted 3D quaternion, forces, materials, spin, mass in first-divergence comparison"
+    },
+    "source_changes": [
+      {
+        "commit": "1b09bee57d66d1972e753fee154c4d6fd1beb4c8",
+        "change": "fail-closed staged candidate discard; quarantine if rollback uncertain"
+      },
+      {
+        "commit": "daebe04227783393595fb38c82f0a738d899e59c",
+        "change": "transactional capacity growth with precomputed host maps and quarantine on failed retirement"
+      },
+      {
+        "commit": "238c32282c4da97850d7f0d666c4ab8790a57a8f",
+        "change": "complete public snapshot/replay numerical fields and closing state"
+      },
+      {
+        "commit": "fbb64c43af00dad766438a7eb54409aecf6db239",
+        "change": "unique immutable evidence run directories, hashes, driver information and earliest failure"
+      },
+      {
+        "commit": "37d742e985360d414e1aecc3e97dbb620d5ebcb3",
+        "change": "separate configurable deadline, GPU fixed dt, and host fixed dt misses"
+      }
+    ],
+    "adversarial_cpu_tests": "Extended host suite includes injected candidate rollback failure, capacity seed failure, held leases, asynchronous mutation, closing and replay quaternion divergence; CI results for latest revision must be checked",
+    "native_runtime_environment": "Linux-only tool container; no functional D3D12 adapter. Hosted Windows build-only CI is not a GPU physics gate.",
+    "evidence_isolation": "Each full sweep writes evidence/p10/world-sweep/runs/<UTC>-<id>/consolidated.json; first-ever top-level consolidated.json is preserved and never overwritten, with run-index.jsonl mapping attempts.",
+    "mandatory_full_command": "python run_world_sweep.py --full",
+    "merge_authorized": false
+  },
+  "real_windows_attempt": {
+    "status": "NO-GO",
+    "source_commit": "510192f99152b93fdd6c406bf696dbf926adaa28",
+    "run_id": "20261031T184500Z-0618f636",
+    "workflow_run": "https://github.com/Cryosimorgh/Sunder/actions/runs/41230865897",
+    "artifact": "https://github.com/Cryosimorgh/Sunder/actions/runs/41230865897/artifacts/13053607373",
+    "artifact_sha256": "874cae88d8970b14457317ade4836f58afca7818e36f72a58c2d1a26b8e9a211",
+    "source_hashes_and_driver": "docs/P10_NATIVE_ATTEMPT_20261031.json",
+    "commands": [
+      "python -m unittest test_sunder_world -q",
+      "python build_physics3.py",
+      "python headless_demo.py --capacity 1 --bodies 0 --steps 4 --replay",
+      "python run_world_sweep.py --full"
+    ],
+    "case_matrix": [
+      [
+        "cpu-world",
+        "PASS",
+        17
+      ],
+      [
+        "build",
+        "PASS",
+        "9 shaders + DLL"
+      ],
+      [
+        "world-empty",
+        "FAIL",
+        "D3D12 context/admission"
+      ],
+      [
+        "world-16",
+        "NOT RUN"
+      ],
+      [
+        "world-1024",
+        "NOT RUN"
+      ],
+      [
+        "native-physics",
+        "NOT RUN"
+      ],
+      [
+        "legacy-pool-rail",
+        "NOT RUN"
+      ],
+      [
+        "native-stress",
+        "NOT RUN"
+      ]
+    ]
+  },
+  "manual_windows_handoff_suite": {
+    "status": "PREPARED / REAL HARDWARE RESULTS NOT YET RECEIVED",
+    "one_click": "RUN_P10_WINDOWS.cmd",
+    "documentation": "docs/P10_RUN_ON_WINDOWS.md",
+    "full_command": "python run_world_sweep.py --full",
+    "new_mandatory_case": "test_native_world.py (8 native D3D12 application-world scenarios; no FakeGPU)",
+    "legacy_cases": "empty/16/1024 authored, native double-precision CPU oracle, full pool/rail/device, 10K/100K/1M separated collision-pair stress",
+    "host_test": "test_p10_packaging.py verifies immutable ZIP manifests and distinct retries",
+    "output": "P10-RESULTS-TO-SEND/Sunder-P10-<run-id>-<GO|NO-GO>-<UTC>-<nonce>.zip",
+    "disposition": "Uploaded hardware run PASS; final-head sweep and CI required before merge"
+  },
+  "historical_20261031_summary": {
+    "decision": "NO-GO: native hardware qualification suite prepared but actual supported-hardware execution unverified; hosted Hyper-V attempt failed admission",
+    "fresh_tests": {
+      "github_action_cpu_world": "PASS: 10 CPU-only host contract tests on Linux runner at commit 93ea51d940b484717c2dcbed57cc67648810a524; run 41229876886 (does not qualify native physics). Further final-HEAD checks to be monitored.",
+      "native_staged_publication": "NOT RUN: Windows runner cannot create D3D12 context",
+      "authored_empty_16_1024": "world-empty FAIL (hardware unavailable), 16 and 1024 NOT RUN",
+      "native_replay_two_runs": "NOT RUN: no native D3D12 adapter",
+      "legacy_pool_rail": "NOT RUN in full-sweep attempt due fail-fast; prior historical evidence remains separate",
+      "stress_10000_100000_1000000": "NOT RUN in full-sweep attempt due fail-fast",
+      "windows_native_compile": "PASS: Zig 0.15.2 built isolated D3D12 DLL and 9 HLSL shaders during full-sweep run 41230865897",
+      "extended_host_adversarial": "PASS: 17/17 CPU-host/mock tests on Windows run 41230865897, source commit 510192f99152b93fdd6c406bf696dbf926adaa28",
+      "native_hardware_full_sweep": "NO-GO: attempted python run_world_sweep.py --full on GitHub-hosted Windows Server 2025; only Microsoft Hyper-V Video (driver 10.0.26100.1150). world-empty cannot create/admit D3D12 context. First failing gate. 16/1024, oracle, legacy and large stress NOT RUN."
+    },
+    "performance": {
+      "gpu_us": {
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "worst": null
+      },
+      "cpu_us": {
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "worst": null
+      },
+      "deadline_misses": null,
+      "committed_bytes": null,
+      "samples": 0,
+      "note": "No GPU tick ran on new world implementation. All new host/GPU percentile values, deadline misses and committed bytes remain unmeasured. Historical baseline is not transferred."
+    },
+    "blockers": [
+      "Hosted Windows machine exposes Microsoft Hyper-V Video only; native ph3_open returns ALLOCATION_OR_DEVICE",
+      "Run exact full native sweep on Windows x64 with a functioning hardware D3D12 adapter; preserve unique evidence directory",
+      "Validate actual GPU staged rejection, independent oracles, snapshot leases, topology/physics and replay twice",
+      "Run legacy pool/rail and 10K/100K/1M collision-bearing independent-pair cases on supported hardware",
+      "Collect real GPU and host timings, misses, committed bytes and failure diagnostics"
+    ],
+    "execution_notes": "Earlier CPU/compilation CI passes and newly added CPU tests are not a substitute for native GPU execution. No new GPU timing, memory or replay measurements are claimed."
+  },
+  "current_audit": "docs/P10_NATIVE_AUDIT_20261102.json",
+  "verified_runner_fix": "Final failed stress gate could incorrectly promote to GO; return immediately on failure. Each gate failure and all-pass regression included in full sweep/CI. Original stress JSON/log independently PASS.",
+  "merge_policy": "Authorize merge only after exact full sweep PASS on final PR SHA, unchanged current head, relevant CI PASS and review requirements checked. Final attestation and retained results in PR #8."
+}

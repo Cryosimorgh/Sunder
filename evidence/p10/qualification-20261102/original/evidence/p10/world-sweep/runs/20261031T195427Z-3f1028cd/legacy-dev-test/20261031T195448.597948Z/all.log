@@ -1,0 +1,18 @@
+["C:\\Manavi\\Sunder\\zig-out\\bin\\pool_tests.exe", "--case", "all"]
+PASS resting rack 10000 actual GPU ticks, exact full state
+PASS head-on e=1: 0, 1
+PASS head-on e=0.6: 0.19999999, 0.8
+PASS oblique independent normal/tangent equations
+PASS rail restitution and tangential material mu=0
+PASS rail restitution and tangential material mu=0.15
+PASS Coulomb rolling resistance: monotonic speed and full mechanical energy, exact rest
+PASS settled zero-contact body sleeps and wakes on a later cue tick
+PASS sliding force and solid-sphere rolling torque equations
+PASS break cascade stopped tick=288 maxContacts=18 maxIsland=15 rail-near-observations=0
+PASS later cue strike wakes sleeping state
+PASS persistent resting contact suppresses bounce and never reapplies restitution
+PASS future-tick and object-ball commands reject; published components AND rolling state unchanged
+PASS shots while moving ignored; explicit sandbox enables them
+PASS near-overlap position correction retained, zero added velocity
+PASS first contact after idle: GPU graph/solver resumes, sleeping bodies wake
+PASS pool analytical suite accepted_ticks=10598 rejected_ticks=2 processed_objects=169568

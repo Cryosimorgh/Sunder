@@ -1,0 +1,31 @@
+name: P10 Windows native build (no GPU qualification)
+on:
+  push:
+    branches:
+      - p10-headless-world-api-20261031
+  pull_request:
+    paths:
+      - 'physics3.c'
+      - 'physics3.h'
+      - 'sunder_world.py'
+      - 'test_native_world.py'
+      - 'package_p10_evidence.py'
+      - 'build_physics3.py'
+      - '.github/workflows/p10-windows-build.yml'
+jobs:
+  windows-native-build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: '0.15.2'
+      - run: python -m pip install numpy
+      - name: Compile native DLL and original HLSL shaders (no execution)
+        run: python build_physics3.py
+      - name: Check Python CLI syntax
+        run: python -m py_compile sunder_world.py headless_demo.py run_world_sweep.py test_physics3.py test_sunder_world.py test_native_world.py package_p10_evidence.py test_p10_packaging.py

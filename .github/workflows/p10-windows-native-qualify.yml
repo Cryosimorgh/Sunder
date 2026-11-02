@@ -1,0 +1,31 @@
+name: P10 Windows native qualification attempt
+on:
+  workflow_dispatch:
+jobs:
+  native-qualify:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: '0.15.2'
+      - name: Install native test dependencies
+        run: python -m pip install numpy
+      - name: Full native qualification (NO mock, NO --skip-stress)
+        run: python run_world_sweep.py --full
+      - name: Preserve original native evidence and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p10-native-qualification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            evidence/p10/world-sweep/
+            evidence/p10/build/manifest.json
+            evidence/p10/build/build-*.log
+            dev-test-results/
+          if-no-files-found: warn
+          retention-days: 30
