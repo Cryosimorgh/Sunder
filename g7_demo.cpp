@@ -44,7 +44,8 @@ struct Simulation {
  std::atomic<bool> sample{false},stop{false},paused{false},reset{false},single{false};std::atomic<float> speed{1};
  G7Config config,requested;G7Scene scene;unsigned active=0,spawned=0,accepted=0,rejected=0,epoch=0;bool moving=false,fault=false;double nextSpawn=0;
  Ph3Result result={};Ph3Validation validation={};double cpuUs=0,hostUs=0,tps=0;unsigned geometric=0,cross=0,island=0,sampleTick=0;char error[256]={};HANDLE thread=nullptr;FILE *log=nullptr;
- void init(){config.validate();p=ph3_open(uint32_t(config.count),config.contacts(),config.iterations,0,"evidence/p10/build");if(!p)throw std::runtime_error("Physics3 device/admission failed: check GPU memory budget and requested body/contact capacities");static std::atomic<unsigned> serial{0};char path[512];SYSTEMTIME time;GetSystemTime(&time);snprintf(path,sizeof(path),"evidence/g7/native-showcase/session-%04u%02u%02u-%02u%02u%02u-%lu-%u.jsonl",time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,(unsigned long)GetCurrentProcessId(),serial++);log=fopen(path,"w");restart();}
+ void openLog(){static std::atomic<unsigned> serial{0};char path[512];SYSTEMTIME time;GetSystemTime(&time);snprintf(path,sizeof(path),"evidence/g7/native-showcase/session-%04u%02u%02u-%02u%02u%02u-%lu-%u.jsonl",time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,(unsigned long)GetCurrentProcessId(),serial++);log=fopen(path,"w");}
+ void init(){config.validate();p=ph3_open(uint32_t(config.count),config.contacts(),config.iterations,0,"evidence/p10/build");if(!p)throw std::runtime_error("Physics3 device/admission failed: check GPU memory budget and requested body/contact capacities");openLog();restart();}
  void restart(){
   config.validate();if(scene.capacity&&scene.capacity!=config.count)throw std::runtime_error("Body capacity change requires a full native renderer/context rebuild");scene.generate(config);auto s=scene.initial(0,false);auto planes=scene.planes(config.scene);
   // All tracked consumer fences must finish before replacing a scene.
@@ -323,7 +324,7 @@ int main(int argc,char **argv){
      sim.stop=false;sim.reset=false;sim.single=false;sim.paused=false;sim.sample=false;
      sim.p=fresh;sim.scene=std::move(nextScene);sim.config=target;sim.requested=target;
      sim.active=sim.spawned=sim.accepted=sim.rejected=0;sim.moving=target.scene==2;
-     sim.fault=false;sim.nextSpawn=0;sim.result={};sim.validation={};sim.error[0]=0;sim.epoch++;
+     sim.fault=false;sim.nextSpawn=0;sim.result={};sim.validation={};sim.error[0]=0;sim.epoch++;sim.openLog();
      float keepFov=view.fovY,keepNear=view.nearClip,keepFar=view.farClip;
      uint32_t keepWidth=view.desiredWidth,keepHeight=view.desiredHeight;
      view=Renderer{};view.fovY=view.editFov=keepFov;view.nearClip=view.editNear=keepNear;view.farClip=view.editFar=keepFar;
