@@ -1,5 +1,23 @@
 # Sunder — GPU Physics
 
+## Native 3D visual benchmark — type exact values in the window
+
+On Windows, double-click **LaunchBenchmark.bat** (or
+**RUN_G7_VISUAL_BENCHMARK.cmd**) to open the interactive Sunder G7 3D window.
+The top-left panel has editable **Ball count**, **Spawn batch**,
+**Contact budget**, and **Solver iterations** text fields. Click a field,
+press Ctrl+A, type the exact value, then press Enter or click
+**APPLY TYPED VALUES**. All additional physics and scene values under
+**Scene settings** are also editable numeric fields; the same Apply action
+commits them. The scene is reset or safely re-created when required.
+Actual GPU buffer and physics constraints still apply; the UI does not
+artificially cap population at preset sizes.
+
+**RUN_G7_RENDER_BENCHMARK.cmd** is a separate automated 600-frame test;
+it is not the editable interactive UI. The original G4 independent-table
+benchmark remains available through **LaunchBenchmarkLegacy.bat**.
+For details see [visual benchmark controls](docs/G7_SCALABLE_BENCHMARK.md).
+
 ## P10 headless world API (feature branch; native qualification pending)
 
 The application-facing Python API is in [`sunder_world.py`](sunder_world.py),

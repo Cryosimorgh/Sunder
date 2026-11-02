@@ -4,11 +4,15 @@ on:
     paths:
       - g7_scene.h
       - test_g7_scene.cpp
+      - g7_ui_numbers.h
+      - test_g7_ui_numbers.cpp
       - .github/workflows/g7-scene-cpu.yml
   pull_request:
     paths:
       - g7_scene.h
       - test_g7_scene.cpp
+      - g7_ui_numbers.h
+      - test_g7_ui_numbers.cpp
       - .github/workflows/g7-scene-cpu.yml
 jobs:
   scene-cpu:
@@ -19,3 +23,7 @@ jobs:
         run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic test_g7_scene.cpp -o /tmp/test_g7_scene
       - name: Check dynamic scene generation and numeric boundaries
         run: /tmp/test_g7_scene
+      - name: Compile and check typed numeric field parsing
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic test_g7_ui_numbers.cpp -o /tmp/test_g7_ui_numbers
+          /tmp/test_g7_ui_numbers

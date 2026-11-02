@@ -1,10 +1,4 @@
 @echo off
-setlocal
-pushd "%~dp0"
-set "BENCH_EXE=%~dp0GPUPhysicsBench.exe"
-if not exist "%BENCH_EXE%" set "BENCH_EXE=%~dp0zig-out\bin\GPUPhysicsBench.exe"
-"%BENCH_EXE%" %*
-set "BENCH_EXIT=%errorlevel%"
-popd
-if not "%BENCH_EXIT%"=="0" echo GPU Physics Bench exited with error %BENCH_EXIT%.
-exit /b %BENCH_EXIT%
+rem Open the interactive 3D visual benchmark with type-in controls, not the old fixed-population G4 benchmark.
+call "%~dp0RUN_G7_VISUAL_BENCHMARK.cmd" %*
+exit /b %errorlevel%
