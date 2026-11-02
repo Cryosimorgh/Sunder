@@ -4,7 +4,7 @@
 **Record date:** 2026-11-02
 **Document type:** Living engineering record  
 **Style:** Clear technical English, based on ASD-STE100 principles without strict controlled-language limits  
-**Status:** Experimental GPU physics engine. **P10 native 3D foundation: GO within the historical bounded tested envelope. P10 general-purpose headless world API: BOUNDED NATIVE CORRECTNESS GO at ed618f9; final-head sweep and CI required before merge.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
+**Status:** G7 cube-volume and colliding toroidal-belt benchmarks IMPLEMENTED ON BRANCH; native dense-workload qualification NOT RUN / NO-GO. **P10 native 3D foundation: GO within the historical bounded tested envelope. P10 general-purpose headless world API: BOUNDED NATIVE CORRECTNESS GO at ed618f9; final-head sweep and CI required before merge.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
 
 > **Update rule:** Update this document in the same change that closes, rejects, or reopens a development breakpoint. Keep prior results and their limitations. Do not turn a local experiment into a released feature by changing its status here.
 
@@ -34,6 +34,56 @@ Use these labels throughout the document:
 | **Conditionally accepted** | The scoped tests pass, but at least one exit condition is open. |
 | **Experimental** | A local or branch-specific change needs broader evidence. |
 | **Planned** | A design target. No implementation claim. |
+
+### G7 implementation breakpoint — experimental, NOT QUALIFIED (2026-11-02)
+
+**Branch:** `g7-dense-dynamic-collision-workloads-20261102`, based on merged
+P10 main `8a5385b11ef108be7e5e530a12ce133152ea0896`.
+The branch adds `g7_scenarios.py`, `run_g7.py`,
+`run_g7_windows.py`, `RUN_G7_WINDOWS.cmd`,
+`test_g7_scenarios.py`, `.github/workflows/g7-cpu-contracts.yml`,
+and [G7 workload instructions](G7_DENSE_WORKLOADS.md). A small
+`sunder_world.py` adapter change exposes optional native `ph3_contacts`
+readback (128-byte contact records) plus measured candidate staging and
+native host submission/completion, candidate count and maximum degree per
+tick. The D3D12 physics kernel, configured P10 iterations and acceptance
+thresholds, and old planar physics source are **unchanged**.
+
+The cubic spawning volume authors 3D spheres on a seeded nonoverlapping
+lattice, fills exactly the configured capacity in accepted per-tick batches,
+then activates inward compression. The second scene authors two disjoint
+seeded 3D toroidal clouds that counter-rotate and close along opposite x
+directions. No cube collider, CPU contact solver, N-body gravity, general
+renderer or precomputed contact pairs have been introduced.
+Sparse P10 slots still use inert placeholders. CPU scene authorship and
+structural edits remain separate from GPU simulation timing.
+
+Instrumented native contact readbacks distinguish overlapping/impulsive
+contacts from speculative constraints. The sampled graph gives connected
+components, largest island, degree, cross-belt edges and contact churn.
+It is a **diagnostic path**, not a normal production tick, and contact
+sampling cadence can miss the absolute peak. Native per-tick counters,
+GPU/host percentiles, fixed-step misses, driver/adapter, recorded hashes,
+active/attempted body counts and error causes are emitted. The Windows
+runner attempts all required 1K/10K/100K workloads with independent native
+worlds and existing P10 full gates; it creates a unique, checksum-inventoried
+failure-inclusive ZIP. Above 100K requires explicit opt-in and memory
+admission. CPU scene tests and CI do **not** validate the D3D12 physics.
+
+**Current evidence:** Code is committed to this dedicated branch, but
+physical Windows GPU execution and adversarial correctness review are
+**NOT RUN** in the authoring environment. No measured G7 performance or
+large-island GO is claimed, no 1M arbitrary-connected qualification, and
+no P9 bitwise, G5 or production-release promotion. Keep the PR draft until
+an exact tested SHA, full native accepted runs, genuine cross-belt
+overlaps/impulses, dense multi-body islands, unchanged P10 physical gates,
+full required-vs-executed matrix and independent reviewer audit are present.
+
+**2026-11-02 change log:** Created G7 CPU-authoring and native benchmark
+evidence interface on the dedicated branch; preserved old physics/kernel
+code and thresholds. Open risks: 100K dense contact budget/admission,
+P10 speed-envelope rejections, biased diagnostic sampling, GPU budget
+limits, and unexecuted hardware qualification. Decision: **G7 NO-GO**.
 
 ### Application-facing headless world API — P10 bounded native evidence GO (2026-11-02)
 
