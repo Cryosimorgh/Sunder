@@ -180,7 +180,11 @@ def case(spec, args, directory, repeat):
             raise RuntimeError("NOT RUN: real Windows x64 D3D12 is required")
         params, stream = generate(spec)
         report["scene_parameters"] = params
-        candidate_budget = args.contact_budget if args.contact_budget else max(128, 4 * spec.bodies)
+        # Dense native candidate graphs require a genuinely sufficient
+        # contact budget. Never lower population or silently clip contacts.
+        budget_factor = {"isolated": 2, "moderate": 12, "dense": 24}[spec.preset]
+        candidate_budget = (args.contact_budget if args.contact_budget
+                            else max(128, budget_factor * spec.bodies))
         capacity = spec.bodies
         estimate = capacity * 1500 + candidate_budget * 128 + 16 * 1024 * 1024
         report["conservative_admission_estimate_bytes"] = estimate
