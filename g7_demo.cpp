@@ -56,7 +56,7 @@ struct Simulation {
   unsigned next=active;bool activate=false;
   if(active<unsigned(config.count)&&(config.scene!=2||accepted/128.>=nextSpawn)){next=std::min(unsigned(config.count),active+config.batch);auto s=scene.initial(next,config.scene==2);if(!(config.scene==2?ph3_stage_append(p,s.data(),active,next):ph3_stage(p,s.data())))throw std::runtime_error("Spawn stage failed");spawned=next;nextSpawn=accepted/128.+1/config.spawnHz;}
   else if(active==unsigned(config.count)&&!moving){auto s=scene.initial(active,true);if(!ph3_stage(p,s.data()))throw std::runtime_error("Activation stage failed");activate=true;}
-  float gravity[3]={config.gravityX,config.gravityY,moving?config.gravity:0};FILETIME ct,et,k0,u0,k1,u1;GetThreadTimes(GetCurrentThread(),&ct,&et,&k0,&u0);double begin=now();
+  float gravity[3]={config.gravityX,config.gravityY,moving?(config.scene==2?config.gravity:config.gravityOther):0};FILETIME ct,et,k0,u0,k1,u1;GetThreadTimes(GetCurrentThread(),&ct,&et,&k0,&u0);double begin=now();
   if(!ph3_tick(p,1.f/128,gravity,(config.cell>0?config.cell:(config.scene==2?2.5f:1.f)),0,&result))throw std::runtime_error("Native host/device tick failed");
   hostUs=(now()-begin)*1e6;GetThreadTimes(GetCurrentThread(),&ct,&et,&k1,&u1);auto ft=[](FILETIME f){return (uint64_t(f.dwHighDateTime)<<32)|f.dwLowDateTime;};cpuUs=double(ft(k1)+ft(u1)-ft(k0)-ft(u0))*.1;ph3_validation(p,&validation);
   if(result.error){rejected++;fault=true;paused=true;ph3_drop_stage(p);snprintf(error,sizeof(error),"GPU rejected candidate: flags %u",result.error);}
@@ -125,7 +125,7 @@ struct Renderer {
    for(int n:{100,500,1000}){char label[16];snprintf(label,16,n==1000?"1K":"%d",n);if(ImGui::Button(label)){edit.count=n;requestReset();}if(n!=1000)ImGui::SameLine();}
    ImGui::InputScalar("Bodies (exact)",ImGuiDataType_U64,&edit.count);ImGui::InputScalar("Spawn batch",ImGuiDataType_U32,&edit.batch);ImGui::InputFloat("Spawn / second",&edit.spawnHz,0,0,"%.4g");ImGui::TextDisabled("No preset cap; hardware, resources and GPU addressability still apply.");
    float speed=sim->speed;if(ImGui::InputFloat("Playback multiplier",&speed,0,0,"%.3g")&&std::isfinite(speed)&&speed>0)sim->speed=speed;ImGui::Text("Actual %.2fx / %.0f ticks per second",sim->paused?0:tps/128,sim->paused?0:tps);if(!sim->paused&&tps>0&&tps/128+.15<speed)ImGui::TextColored({1,.74f,.35f,1},"Physics throughput limits playback");
-   if(ImGui::CollapsingHeader("Scene settings")){ImGui::InputInt("Seed",&edit.seed);ImGui::Combo("Density",&edit.density,"Open\0Compact\0");ImGui::InputFloat("Radius",&edit.radius);ImGui::InputFloat("Mass",&edit.mass);ImGui::InputFloat("Radius spread",&edit.radiusSpread);ImGui::InputFloat("Mass spread",&edit.massSpread);ImGui::InputFloat("Restitution (-1=preset)",&edit.restitution);ImGui::InputFloat("Friction (-1=preset)",&edit.friction);ImGui::InputFloat("Gravity X",&edit.gravityX);ImGui::InputFloat("Gravity Y",&edit.gravityY);ImGui::InputFloat("Gravity Z",&edit.gravity);ImGui::InputFloat("Initial rain speed Z",&edit.initialVz);
+   if(ImGui::CollapsingHeader("Scene settings")){ImGui::InputInt("Seed",&edit.seed);ImGui::Combo("Density",&edit.density,"Open\0Compact\0");ImGui::InputFloat("Radius",&edit.radius);ImGui::InputFloat("Mass",&edit.mass);ImGui::InputFloat("Radius spread",&edit.radiusSpread);ImGui::InputFloat("Mass spread",&edit.massSpread);ImGui::InputFloat("Restitution (-1=preset)",&edit.restitution);ImGui::InputFloat("Friction (-1=preset)",&edit.friction);ImGui::InputFloat("Gravity X",&edit.gravityX);ImGui::InputFloat("Gravity Y",&edit.gravityY);ImGui::InputFloat("Gravity Z (rain)",&edit.gravity);ImGui::InputFloat("Gravity Z (cube/belts)",&edit.gravityOther);ImGui::InputFloat("Initial rain speed Z",&edit.initialVz);
    ImGui::InputFloat("Cube speed",&edit.cubeSpeed);ImGui::InputFloat("Belt closing speed",&edit.beltClosingSpeed);
    ImGui::InputFloat("Belt spin",&edit.beltSpin);ImGui::InputFloat("Belt major radius (0=auto)",&edit.beltMajorRadius);
    ImGui::InputFloat("Belt minor radius (0=auto)",&edit.beltMinorRadius);
@@ -270,6 +270,7 @@ int main(int argc,char **argv){
     else if(option=="--restitution")sim.config.restitution=decimal(value);
     else if(option=="--friction")sim.config.friction=decimal(value);
     else if(option=="--gravity-z")sim.config.gravity=decimal(value);
+    else if(option=="--gravity-other-z")sim.config.gravityOther=decimal(value);
     else if(option=="--gravity-x")sim.config.gravityX=decimal(value);
     else if(option=="--gravity-y")sim.config.gravityY=decimal(value);
     else if(option=="--spawn-hz")sim.config.spawnHz=decimal(value);
