@@ -1,6 +1,33 @@
 # Experimental G7 scalable native benchmark (PR #11)
 
-This is an unmerged experimental implementation, not a new qualification approval. The existing G7 512/1K numerical acceptance record remains unchanged. Large native populations are **NOT QUALIFIED**.
+This implementation is available in the repository, but does not constitute a new GPU runtime qualification approval. The existing G7 512/1K numerical acceptance record remains unchanged. Large native populations are **NOT QUALIFIED**.
+
+## Interactive visual mode (type values directly)
+
+Double-click **LaunchBenchmark.bat** or **RUN_G7_VISUAL_BENCHMARK.cmd**.
+This opens the native G7 3D visual window, not the automated CLI-only
+render benchmark. In the top-left "Sunder / Physics3" panel, use the
+four prominent text-entry boxes:
+
+- **Ball count** — exact integer; no preset-size slider restriction.
+- **Spawn batch** — number per native admission event.
+- **Contact budget (0=auto)** — exact contact allocation request.
+- **Solver iterations** — numeric value passed to the native solver.
+
+Click any box and press Ctrl+A to replace the existing number; paste or
+type a new value. **Press Enter or click APPLY TYPED VALUES** to apply.
+The normal scene geometry, materials, gravity, spawn rate, and camera fields
+are directly editable in the same window. Scene settings are expanded by
+default; use the same Apply action to commit those settings. Invalid values
+produce an in-window error and keep the previous valid scene intact.
+
+Changing capacity rebuilds the GPU physics and render resources; applying
+scene-only changes resets the scene to the edited conditions. Preset buttons
+remain shortcuts and do not limit the values you may type.
+
+RUN_G7_RENDER_BENCHMARK.cmd still runs the automated 600-frame test.
+The original fixed-fixture G4 UI is preserved under
+LaunchBenchmarkLegacy.bat, and is **not** the configurable G7 visual benchmark.
 
 ## Directly editable controls
 
