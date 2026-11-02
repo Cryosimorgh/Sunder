@@ -169,7 +169,6 @@
     "test_g7_native.py": "636adc2de3206404a91e87a3b22bdfaedba7056c11152c9b2cb57b6a6361dd1a"
   },
   "evidence_sha256": {
-    "build.json": "a93058bc8dabc30cef7330bedd360c51f2abb5d96ff35e127793248f92e26f50",
     "clean-launch.log": "12f06ee2d98f5d0d2b1fb68677241e1e541e03e716ef30a3f43229f9e6f2a706",
     "contracts.log": "4fff2bb34cdf4f0cec905ef5806019a681d9f101e4ef4e15058873fb17235490",
     "final-1000-0.json": "470eaa1a984238da8e4be833010288ba8c63a96a107c292a0efb1b30775f5cfc",
@@ -186,5 +185,7 @@
     "render-final-1080p-1k.json": "5ae3d5700b655d7a20e9dfdb2dde27e202b98c807adc55ac580083f365cb8ff7",
     "reproduced-failure.json": "d2cd48838058bd4d23e4bf27b0576c25d3e61569b4dcd22dc1f9b16aea23c9b0",
     "visual.stdout": "e82bec48d48d138358b71457c958d517392d7709c6186e084d5c877d13a3d6d2"
-  }
+  },
+  "artifact_identity_note": "Sustained measurements predate the source commit and use the recorded source identities; the shader EOF was normalized without a semantic change. The final code commit 515a90c was rebuilt and its three native G7 tests passed. The handoff includes that build manifest separately; the pre-commit manifest was overwritten by this intentional rebuild.",
+  "final_code_commit": "515a90c857cbeded5ae91a2c35473d49deefdbd2"
 }
