@@ -30,6 +30,10 @@ class SceneSpec:
     closing_speed: float = 16.0
     spin_speed: float = 0.055
     counter_rotate: bool = True
+    radius_spread: float = .03
+    mass_spread: float = .10
+    velocity_field: str = "inward"
+    perturbation: float | None = None
 
     def __post_init__(self):
         if self.scenario not in ("cube", "belts"):
@@ -47,6 +51,13 @@ class SceneSpec:
         if self.cube_size is not None and (not math.isfinite(self.cube_size)
                                            or self.cube_size <= 0):
             raise SceneAdmissionError("invalid cube size")
+        if not 0 <= self.radius_spread <= .08 or not 0 <= self.mass_spread <= .5:
+            raise SceneAdmissionError("radius/mass distribution spread exceeds safe authored bounds")
+        if self.velocity_field not in ("inward", "swirl", "funnel"):
+            raise SceneAdmissionError("invalid cube velocity field")
+        if self.perturbation is not None and (not math.isfinite(self.perturbation)
+                                              or not 0 <= self.perturbation <= .2):
+            raise SceneAdmissionError("invalid controlled belt perturbation")
 
 
 @dataclass(frozen=True)
@@ -70,24 +81,30 @@ def scene_parameters(spec: SceneSpec) -> dict:
             raise SceneAdmissionError("cube exceeds authored [-512,512] bounds")
         return {"side": side, "pitch": spacing, "cube_size": size,
                 "compression_speed": {"isolated": 0.0, "moderate": 5.0, "dense": 12.0}[spec.preset],
-                "jitter_fraction": 0.01, "geometry": "cubic spawning volume of sphere bodies"}
+                "jitter_fraction": 0.01, "velocity_field": spec.velocity_field,
+                "radius_spread": spec.radius_spread, "mass_spread": spec.mass_spread,
+                "geometry": "cubic spawning volume of sphere bodies"}
     scale = (spec.bodies / 1000.) ** (1. / 3.)
     major = 7.0 * scale
     minor = 2.4 * scale
     center = minor + 1.8 * spec.radius
     if major + minor + spec.radius >= 512 or center + minor + spec.radius >= 512:
         raise SceneAdmissionError("torus exceeds P10 authored [-512,512] bounds")
+    perturb = spec.perturbation if spec.perturbation is not None else {
+        "isolated": 0., "moderate": .015, "dense": .05}[spec.preset]
     return {"major_radius": major, "minor_radius": minor,
             "centers": [[-center, 0, 0], [center, 0, 0]],
             "center_separation": 2 * center, "closing_speed": spec.closing_speed,
             "spin_speed": spec.spin_speed, "counter_rotate": spec.counter_rotate,
+            "perturbation": perturb, "radius_spread": spec.radius_spread,
+            "mass_spread": spec.mass_spread,
             "geometry": "two distinct toroidal 3D clouds of sphere bodies",
             "self_gravity": False, "initial_cross_belt_gap": 2 * center - 2 * minor}
 
 
 def _body(spec: SceneSpec, rng: random.Random, pos, vel):
-    radius = spec.radius * rng.uniform(.97, 1.03)
-    mass = spec.mass * rng.uniform(.9, 1.1)
+    radius = spec.radius * rng.uniform(1. - spec.radius_spread, 1. + spec.radius_spread)
+    mass = spec.mass * rng.uniform(1. - spec.mass_spread, 1. + spec.mass_spread)
     return Body(position=tuple(pos), velocity=tuple(vel), radius=radius, mass=mass,
                 restitution=.65, friction=.30)
 
@@ -107,6 +124,12 @@ def _cube(spec: SceneSpec, params: dict):
         vel = tuple((-speed * a / norm if norm else 0.) for a in pos)
         if spec.preset == "isolated":
             vel = (0., 0., 0.)
+        elif spec.velocity_field == "swirl":
+            vel = (vel[0] - .2*speed*pos[1]/max(norm, 1e-9),
+                   vel[1] + .2*speed*pos[0]/max(norm, 1e-9), vel[2])
+        elif spec.velocity_field == "funnel":
+            vel = (vel[0], vel[1],
+                   -speed * .4 * (1. if pos[2] >= 0 else -1.))
         yield Particle(_body(spec, rng, pos, vel))
 
 
@@ -131,7 +154,7 @@ class _Clearance:
 
 def _belts(spec: SceneSpec, params: dict):
     rng = random.Random(spec.seed)
-    clearance = _Clearance(2.06 * spec.radius)
+    clearance = _Clearance(2 * (1. + spec.radius_spread) * spec.radius)
     each = ((spec.bodies + 1) // 2, spec.bodies // 2)
     for belt, target in enumerate(each):
         accepted, attempts = 0, 0
@@ -151,8 +174,10 @@ def _belts(spec: SceneSpec, params: dict):
             sign = 1. if belt == 0 else -1.
             rotation = 1. if belt == 0 or not spec.counter_rotate else -1.
             spin = spec.spin_speed * rotation
-            velocity = (sign * spec.closing_speed,
-                        -spin * pos[2], spin * pos[1])
+            perturb = params["perturbation"] * spec.closing_speed
+            velocity = (sign * spec.closing_speed + rng.uniform(-perturb, perturb),
+                        -spin * pos[2] + rng.uniform(-perturb, perturb),
+                        spin * pos[1] + rng.uniform(-perturb, perturb))
             body = _body(spec, rng, pos, velocity)
             if clearance.insert(body):
                 accepted += 1
