@@ -1,7 +1,6 @@
 """G7 packaging/visual geometry contracts. Never qualifies native D3D12."""
 from __future__ import annotations
 
-from contextlib import ExitStack
 import hashlib
 from pathlib import Path
 import tempfile
@@ -37,7 +36,7 @@ class G7PackagingTests(unittest.TestCase):
                 key = "g7-native/belts-1000-r0/case.json"
                 self.assertIn(key, paths)
                 self.assertIn("p10-native/logs/native.log", paths)
-                self.assertFalse(any("\\\\" in name for name in paths))
+                self.assertFalse(any(chr(92) in name for name in paths))
                 import json
                 manifest = json.loads(z.read("MANIFEST.json"))
                 self.assertEqual(
