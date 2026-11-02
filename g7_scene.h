@@ -21,6 +21,9 @@ struct G7Config {
  float radius=.30f, mass=1, radiusSpread=.03f, massSpread=.1f;
  float gravity=-19.62f, gravityX=0, gravityY=0, spawnHz=4;
  float restitution=-1, friction=-1, initialVz=-7, cell=0; // -1/0: per-scene native defaults
+ float cubeSpeed=.7f, beltClosingSpeed=.6f, beltSpin=.025f;
+ float beltMajorRadius=0, beltMinorRadius=0; // zero = scale with population
+ float emitterWidthX=36, emitterWidthY=24, emitterHeight=28;
  uint32_t contacts() const {
   uint64_t desired=contactBudget;
   if(!desired) {
@@ -39,10 +42,13 @@ struct G7Config {
   auto finite=[](float x){return std::isfinite(x);};
   if(!finite(radius)||!finite(radiusSpread)||!finite(mass)||!finite(massSpread)||
      !finite(gravity)||!finite(gravityX)||!finite(gravityY)||!finite(spawnHz)||
-     !finite(restitution)||!finite(friction)||!finite(initialVz)||!finite(cell))
+     !finite(restitution)||!finite(friction)||!finite(initialVz)||!finite(cell)||
+     !finite(cubeSpeed)||!finite(beltClosingSpeed)||!finite(beltSpin)||
+     !finite(beltMajorRadius)||!finite(beltMinorRadius)||!finite(emitterWidthX)||
+     !finite(emitterWidthY)||!finite(emitterHeight))
    throw std::runtime_error("Scene settings must be finite numbers");
   if(radius<=0||radiusSpread<0||radiusSpread>=1||mass<=0||massSpread<0||massSpread>=1||
-     (restitution<0&&restitution!=-1)||restitution>1||(friction<0&&friction!=-1)||spawnHz<=0||cell<0)
+     (restitution<0&&restitution!=-1)||restitution>1||(friction<0&&friction!=-1)||spawnHz<=0||cell<0||beltMajorRadius<0||beltMinorRadius<0||emitterWidthX<=0||emitterWidthY<=0)
    throw std::runtime_error("Invalid physical parameter: radius/mass/cell/rate must be positive, spread in [0,1), restitution in [0,1], friction >=0");
   contacts();
  }
@@ -82,7 +88,7 @@ struct G7Scene {
   uint32_t side=uint32_t(std::ceil(std::cbrt(double(c.count))));
   while(uint64_t(side)*side*side<c.count)++side;
   float pitch=c.radius*(c.density==0?2.8f:2.3f),half=(side-1)*pitch*.5f;
-  float scale=std::cbrt(float(c.count)/1000),major=7*scale*(c.density==0?1.15f:1),minor=2.4f*scale*(c.density==0?1.15f:1),center=minor+1.8f*c.radius;
+  float scale=std::cbrt(float(c.count)/1000),major=c.beltMajorRadius>0?c.beltMajorRadius:7*scale*(c.density==0?1.15f:1),minor=c.beltMinorRadius>0?c.beltMinorRadius:2.4f*scale*(c.density==0?1.15f:1),center=minor+1.8f*c.radius;
   extent=c.scene==2?24:(c.scene?major+minor+1:half+2);
   // Cell hashing replaces the old O(N^2) torus-placement scan.
   float cellWidth=2*c.radius*(1+c.radiusSpread)+.00001f;
@@ -95,12 +101,12 @@ struct G7Scene {
    if(c.scene==2){
     uint32_t columns=uint32_t(std::ceil(std::sqrt(double(c.batch)))),emitter=i%c.batch;
     float middle=(columns-1)*.5f;
-    float dx=(emitter%columns-middle)*std::max(.95f,36.f*(c.density==0?1.15f:1)/std::max(1u,columns-1));
-    float dy=(emitter/columns-middle)*std::max(.95f,24.f*(c.density==0?1.15f:1)/std::max(1u,columns-1));
-    body(authored,i,dx,dy,28+(i/c.batch%2)*.05f,(random()-.5f)*.4f,(random()-.5f)*.4f,c.initialVz,r,m,0,materialR,materialMu);
+    float dx=(emitter%columns-middle)*(c.emitterWidthX*(c.density==0?1.15f:1)/std::max(1u,columns-1));
+    float dy=(emitter/columns-middle)*(c.emitterWidthY*(c.density==0?1.15f:1)/std::max(1u,columns-1));
+    body(authored,i,dx,dy,c.emitterHeight+(i/c.batch%2)*.05f,(random()-.5f)*.4f,(random()-.5f)*.4f,c.initialVz,r,m,0,materialR,materialMu);
    }else if(c.scene==0){
     uint32_t x=i%side,y=(i/side)%side,z=uint32_t(uint64_t(i)/(uint64_t(side)*side));
-    body(authored,i,x*pitch-half,y*pitch-half,z*pitch-half,x%2?-.7f:.7f,0,0,r,m,0,materialR,materialMu);
+    body(authored,i,x*pitch-half,y*pitch-half,z*pitch-half,x%2?-c.cubeSpeed:c.cubeSpeed,0,0,r,m,0,materialR,materialMu);
    }else{
     int belt=i>=uint32_t((c.count+1)/2);
     bool found=false;
@@ -117,8 +123,8 @@ struct G7Scene {
       }
      }
      if(found){
-      float spin=belt?-.025f:.025f;
-      body(authored,i,x,y,z,belt?-.6f:.6f,-spin*z,spin*y,r,m,belt,materialR,materialMu);
+      float spin=belt?-c.beltSpin:c.beltSpin;
+      body(authored,i,x,y,z,belt?-c.beltClosingSpeed:c.beltClosingSpeed,-spin*z,spin*y,r,m,belt,materialR,materialMu);
       occupied[key].push_back(i);
      }
     }
