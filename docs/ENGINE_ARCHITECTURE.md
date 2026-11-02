@@ -56,7 +56,7 @@ tick after full acceptance. This holds under nonzero gravity and enables
 inward, swirl or funnel velocity fields. The second scene authors two disjoint
 seeded 3D toroidal clouds that counter-rotate and close along opposite x
 directions. No cube collider, CPU contact solver, N-body gravity, general
-renderer or precomputed contact pairs have been introduced.
+GPU renderer or precomputed contact pairs have been introduced.
 Sparse P10 slots still use inert placeholders. CPU scene authorship and
 structural edits remain separate from GPU simulation timing.
 
@@ -78,14 +78,32 @@ worlds and existing P10 full gates; it creates a unique, checksum-inventoried
 failure-inclusive ZIP. Above 100K requires explicit opt-in and memory
 admission. CPU scene tests and CI do **not** validate the D3D12 physics.
 
-**Current evidence:** Code is committed to this dedicated branch, but
-physical Windows GPU execution and adversarial correctness review are
-**NOT RUN** in the authoring environment. No measured G7 performance or
+**Current evidence:** The user reported one G7 Windows full-suite attempt:
+`build_physics3`, G7 CPU scene contracts and P10 CPU contracts PASS;
+`g7_native_both` and `p10_native_full` FAIL. The original logs have
+not yet been supplied or audited. The first ZIP package attempt also failed
+because archive keys used Windows path separators, so no verified handoff
+was produced. The following focused branch correction uses explicit POSIX
+archive members, streamed SHA-256 verification and a repackage-only option
+(`python run_g7_windows.py --package-existing latest`). A cross-platform
+synthetic failing-run archive regression passes in CPU CI. No new native
+hardware qualification was executed by this author. No measured G7 performance or
 large-island GO is claimed, no 1M arbitrary-connected qualification, and
 no P9 bitwise, G5 or production-release promotion. Keep the PR draft until
 an exact tested SHA, full native accepted runs, genuine cross-belt
 overlaps/impulses, dense multi-body islands, unchanged P10 physical gates,
 full required-vs-executed matrix and independent reviewer audit are present.
+
+**Visual demo follow-up (2026-11-02):** Implemented `g7_visual_demo.py`
+and `LAUNCH_G7_DEMO.cmd` as a real interactive display of native
+accepted GPU sphere positions. User controls switch between the cubic
+spawning volume and the two toroidal belts, orbit/zoom, pause/play, density,
+body capacity and batch size. On every displayed frame, `World.acquire()`
+performs an explicit GPU readback and Tkinter paints projected 3D spheres.
+This is **GUI demonstration evidence**, not an efficient GPU renderer,
+and its host wall/readback times must not be mixed with headless hot-loop
+latency. Native sphere contacts are still computed by P10 D3D12, never by a
+new CPU solver. GUI acceptance on user's Windows adapter is pending.
 
 **2026-11-02 change log:** Created G7 CPU-authoring and native benchmark
 evidence interface on the dedicated branch; hardened temporary static fill
