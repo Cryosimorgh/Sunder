@@ -37,6 +37,14 @@ Use these labels throughout the document:
 
 ### G7 native graphical application breakpoint (2026-11-02)
 
+**2026-11-02 direct-launch correction:** Runtime assets and evidence resolve from
+`zig-out/bin/SunderG7.exe` to the project root, independently of the invoking
+working directory. Missing shader assets receive a specific build instruction.
+The reported 600-frame benchmark failure from `zig-out/bin` reproduced before
+the fix (exit 1) and passes afterward (600 frames at 1920x1080, exit 0). Five
+native tests pass, including unrelated-directory launch, lifecycle, rejection
+rollback and controlled API removal. Physics policy and qualification are unchanged.
+
 Primary entry: `LAUNCH_G7_CAPABILITIES_DEMO.cmd`; the old demo CMD redirects
 there. `g7_demo.cpp`, `g7_scene.h`, and `g7_render.hlsl` replace the primary
 Tkinter display with Win32/D3D12 perspective sphere impostors, analytic surface

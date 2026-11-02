@@ -21,6 +21,19 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND,UINT,WPARAM,LP
 template<class T> static void drop(T*&p){if(p){p->Release();p=nullptr;}}
 static void check(HRESULT h){if(FAILED(h)){char b[100];snprintf(b,sizeof(b),"D3D12 operation failed: 0x%08lx",(unsigned long)h);throw std::runtime_error(b);}}
 static double now(){LARGE_INTEGER q,f;QueryPerformanceCounter(&q);QueryPerformanceFrequency(&f);return double(q.QuadPart)/f.QuadPart;}
+// All runtime assets and evidence belong to this checkout, regardless of the
+// shell/shortcut working directory. The supported executable lives in zig-out/bin.
+static void projectDirectory(){
+ wchar_t module[32768];DWORD length=GetModuleFileNameW(nullptr,module,32768);
+ if(!length||length>=32768)throw std::runtime_error("Cannot resolve SunderG7 executable location");
+ std::wstring directory(module,length);auto slash=directory.find_last_of(L"\\/");
+ if(slash==std::wstring::npos)throw std::runtime_error("Cannot resolve SunderG7 executable directory");
+ directory.resize(slash);directory+=L"\\..\\..";
+ if(!SetCurrentDirectoryW(directory.c_str()))throw std::runtime_error("Cannot open Sunder project directory relative to zig-out/bin/SunderG7.exe");
+ const char *entries[]={"clear","prepare","hash","contacts","solve","gather","integrate","validate","publish"};
+ for(auto entry:entries){char path[128];snprintf(path,sizeof(path),"evidence/p10/build/p3_%s.dxil",entry);DWORD attr=GetFileAttributesA(path);if(attr==INVALID_FILE_ATTRIBUTES||(attr&FILE_ATTRIBUTE_DIRECTORY))throw std::runtime_error(std::string("Missing Physics3 shader: ")+path+". Run LAUNCH_G7_CAPABILITIES_DEMO.cmd to build project assets.");}
+ for(auto path:{"zig-out/bin/g7_sphere_vs.dxil","zig-out/bin/g7_sphere_ps.dxil"}){DWORD attr=GetFileAttributesA(path);if(attr==INVALID_FILE_ATTRIBUTES||(attr&FILE_ATTRIBUTE_DIRECTORY))throw std::runtime_error(std::string("Missing rendering shader: ")+path+". Run LAUNCH_G7_CAPABILITIES_DEMO.cmd to build project assets.");}
+}
 struct Simulation {
  Physics3 *p=nullptr;SRWLOCK lock=SRWLOCK_INIT,requestLock=SRWLOCK_INIT;
  std::atomic<bool> sample{false},stop{false},paused{false},reset{false},single{false};std::atomic<float> speed{1};
@@ -139,6 +152,7 @@ static LRESULT CALLBACK wndproc(HWND w,UINT m,WPARAM a,LPARAM b){if(ImGui::GetCu
 int main(int argc,char **argv){
  Simulation sim;Renderer view;bool graphical=false;bool deviceLoss=argc>1&&strcmp(argv[1],"--device-loss-test")==0,removedForTest=false;int exitCode=0;
  try{
+  projectDirectory();
   if(argc>1&&strcmp(argv[1],"--self-test")==0){
    sim.init();Ph3Lease lease={};if(!ph3_acquire(sim.p,&lease)||!ph3_native_resource(sim.p,&lease))throw std::runtime_error("Valid lease resource unavailable");
    if(ph3_close(sim.p))throw std::runtime_error("Closed context with outstanding lease");

@@ -43,6 +43,11 @@ native executable. The launcher builds missing or changed dependencies using
 source/tool/output hashes. It then starts `zig-out/bin/SunderG7.exe`.
 Build logs are in `evidence/g7/native-showcase/`.
 
+Direct execution from `zig-out/bin` or another working directory is supported.
+The executable resolves the project root from its own location, then loads the
+physics/render shaders and writes evidence there. Missing shaders report the
+asset path and the build launcher instead of a generic device/admission failure.
+
 `g7_demo.cpp`, `g7_scene.h`, and `g7_render.hlsl` implement a dedicated
 Win32/D3D12 application. Perspective sphere impostors perform analytic ray/sphere
 intersection, write the sphere surface depth, and use lighting and highlights.
