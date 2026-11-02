@@ -32,6 +32,18 @@ int main(){
  c.radiusSpread=.03f;c.restitution=1.1f;assert(rejects(c));
  c.restitution=-1;c.friction=-.1f;assert(rejects(c));
  c.friction=-1;c.contactBudget=G7_MAX_CONTACT_SLOTS+1;assert(rejects(c));
+ G7Config editable;editable.count=32;editable.batch=4;editable.scene=2;
+ editable.emitterWidthX=100;editable.emitterWidthY=50;editable.emitterHeight=91;
+ editable.initialVz=-12;editable.restitution=.25f;editable.friction=.75f;
+ editable.iterations=50000; // representation is not capped to historical 4096
+ editable.validate();
+ G7Scene changed;changed.generate(editable);
+ assert(std::fabs(changed.at(changed.authored,0,0)+50)<.001f);
+ assert(std::fabs(changed.at(changed.authored,0,1)-50)<.001f);
+ assert(std::fabs(changed.at(changed.authored,2,0)-91)<.001f);
+ assert(std::fabs(changed.at(changed.authored,5,0)+12)<.001f);
+ assert(std::fabs(changed.at(changed.authored,21,0)-.25f)<.001f);
+ assert(std::fabs(changed.at(changed.authored,22,0)-.75f)<.001f);
  G7Config torus;torus.scene=1;torus.count=120;torus.batch=60;torus.gravity=0;
  G7Scene a,b;a.generate(torus);b.generate(torus);
  assert(a.authored==b.authored);
