@@ -80,3 +80,7 @@ int s_predicate_zero(StorageDevice *s,uint64_t handle,uint64_t offset){if(!s_act
 
 #include "publication-runtime.inc"
 #include "resource-claims.inc"
+
+/* Borrowed native handles: consumer must hold a read claim and track its fence. */
+void *s_native_device(StorageDevice *s){return s_active(s)?s->g.device:NULL;}
+void *s_native_read_resource(StorageDevice *s,uint64_t h){Buffer *b=buffer(s,h);return s_active(s)&&b&&!b->retired&&b->read_claims&&b->state==D3D12_RESOURCE_STATE_COMMON?b->p:NULL;}

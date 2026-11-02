@@ -33,27 +33,138 @@ bodies; >100K (including 1M) requires `--allow-large`, an adequate
 `--max-committed-mib` admission budget, and native hardware success. No
 unexecuted scale is claimed.
 
-## Visual capabilities demo (new)
+## Native 3D capabilities application (2026-11-02)
 
-Double-click `LAUNCH_G7_DEMO.cmd` on Windows. It builds the native
-`physics3.dll` if absent and opens `g7_visual_demo.py` (standard Python
-`tkinter` + NumPy). Select **cube** or **belts**, density, a seeded
-body count (1–3000), and cube spawn batch. Press Play or Pause,
-drag to orbit the 3D camera, and use the scroll wheel to zoom.
-Cube mode shows an outlined cubic **spawn volume** containing active
-spheres; belt mode draws separate blue/orange toroidal clouds with
-opposing native velocities. The right panel reports active/capacity,
-GPU contacts and candidates, max contact degree, GPU/host tick times,
-staging time, and committed memory.
+Double-click `LAUNCH_G7_CAPABILITIES_DEMO.cmd` on Windows x64.
+`LAUNCH_G7_DEMO.cmd` is a compatibility alias for the same native application.
+Prerequisites: Python 3.12, Zig 0.15.2 on PATH, and the Windows SDK with DXC,
+D3D12 headers and libraries. NumPy is needed for the Python tests, not the
+native executable. The launcher builds missing or changed dependencies using
+source/tool/output hashes. It then starts `zig-out/bin/SunderG7.exe`.
+Build logs are in `evidence/g7/native-showcase/`.
 
-The visualization is **not** a GPU renderer and **not** a benchmark.
-It uses CPU Tk Canvas to draw snapshots explicitly read back from the
-native D3D12 sphere solver. The readback overhead is displayed and
-must not be included in production GPU benchmark timings. The viewer
-never substitutes a CPU physics simulation. A native GPU rejection
-stops playback and displays the native error instead of claiming
-success. Higher populations belong in the headless benchmark, not
-in interactive Canvas rendering.
+`g7_demo.cpp`, `g7_scene.h`, and `g7_render.hlsl` implement a dedicated
+Win32/D3D12 application. Perspective sphere impostors perform analytic ray/sphere
+intersection, write the sphere surface depth, and use lighting and highlights.
+One instanced draw renders the admitted population. The existing pinned ImGui
+Win32/DX12 backends supply the controls. The application starts playing.
+
+### Controls
+
+- Left drag: orbit; right or middle drag: pan; wheel: zoom; Home: camera reset.
+- Space: play/pause; R: reset; F11: borderless fullscreen; H: cinematic HUD toggle.
+- Scene selection switches between the living cube and separated blue/orange
+  toroidal belts. Both fill in deterministic batches before activation.
+- 100, 500 and 1K presets, body count, batch, spawn frequency, seed, density,
+  radius/mass variation and gravity are available. Settings apply on Reset.
+- Playback changes fixed-step scheduling; physics dt stays exactly 1/128 s.
+  Step requests one native tick. Follow cloud uses the accepted GPU centroid
+  for rendering only. High quality changes the specular shading.
+- Native diagnostics distinguish FPS, native GPU tick, tick wall time and
+  OS thread CPU time. Thread CPU measurements have OS timer resolution.
+  They show admitted/requested bodies, rejected admissions, accepted/rejected
+  ticks, constraints, candidates, degree, allocation memory, adapter/driver,
+  seed/revision, decoded rejection bits and accepted-snapshot display status.
+- Sample contact topology explicitly reads the last successful contact buffer.
+  Geometric contacts use raw gap <= 0; the largest island and cross-belt edges
+  use those actual geometric edges only. Sampling adds overhead. Trails and
+  contact flash effects are not implemented.
+
+### Accepted-state ownership
+
+The physics worker and renderer serialize all Physics3 calls with an SRW lock.
+The render thread tries the lock without waiting for a physics tick. On success,
+it acquires an accepted `Ph3Lease`, validates the native resource through the
+small internal bridge in `g7_native.h`, and records a GPU-to-GPU copy into its
+own immutable display buffer. It tracks the graphics completion fence before
+submission and releases the lease after submission. The producer's read claim
+survives until the fence completes. COMMON buffer promotion/decay on the DIRECT
+consumer queue avoids changing the producer's recorded resource state. The
+renderer waits for its previous frame before reusing its snapshot/allocator.
+If physics is busy it renders the previous completed GPU snapshot. There is
+no per-frame CPU body readback or interpolated collision outcome. Reset waits
+for outstanding leases; rejected ticks retain the previous admissions and GPU
+state. The native delayed-reader and rejection rollback checks exercise this.
+Signal/wait failures quarantine unfenced work rather than free in-flight data.
+
+The native solver has 1,000 fixed slots, including static parked unused slots.
+Only admitted slots are drawn and counted as active bodies. The UI separately
+reports native published slots. Logical identities are `(scene epoch, slot, 1)`;
+a scene reset starts a new epoch. Native accepted ticks keep their global clock.
+This avoids capacity migrations and full-state CPU snapshots in the display path.
+
+### Failure diagnosis and separate default envelope
+
+The historical seed-7 dense radial cube remains an **unsupported stress case**.
+The original 512-body / batch-64 viewer accepts fill tick 8, then rejects the
+first dynamic tick with flags 12, 6,220 constraints and maximum degree 32.
+New diagnostic witnesses identify normal/tangent KKT failure and penetration:
+normal residual/tolerance up to 14,059x, tangent up to 31,057x and penetration
+0.003741 units in the diagnostic reproduction. Counts are partial because
+validation remains fail-closed. Initial spacing is non-overlapping, admission
+and contact capacity are adequate, and activation applies the intended field.
+Slower radial compression still rejects later. More iterations alone are not
+claimed to qualify that original workload.
+
+The separately identified native default uses aligned opposing x waves in a
+3D cube, radius +/-3%, mass +/-10%, speed 0.7, pitch 2.3 radii; the belts use
+closing speed 0.6 and opposite angular rates 0.025. Cell size is 1.0, contact
+capacity 12,000, and the **application** solver budget is 512 iterations. The
+headless engine defaults, solver equations, acceptance expressions and all
+physics tolerances are unchanged. At 128 iterations late KKT failures occurred
+in the 1K cube and both belts. These rejected experiments are retained.
+This is a bounded demo envelope, not qualification of arbitrary dense radial
+collapse, edited parameters, arbitrary seeds, or 10K/100K/1M populations.
+
+### Local native measurements and remaining gate
+
+Physical adapter: NVIDIA GeForce RTX 4070 Ti SUPER; driver 32.0.16.1088.
+Four 512-iteration cases (512/1K cube/belts, seed 7) each accepted 768 native
+ticks with zero rejections in the initial bounded run. Cross-belt geometric
+contacts were 16 (512) and 12 (1K), with positive native impulses in both.
+Native physics memory was 4,653,056 bytes, separately from rendering allocations.
+The final repeated run and raw per-tick logs accompany the focused handoff.
+
+A 1K / 1920x1080 render run measured 600 frames in 10.210 seconds, 58.77 render
+FPS and mean 60.8 microseconds GPU render time including the GPU snapshot copy.
+Native physics averaged roughly 49-56 milliseconds per tick in sampled headless
+runs. Contact readbacks are diagnostics outside native GPU tick timestamps.
+The application slows simulated time when the hardware cannot sustain 128 ticks/s;
+it never enlarges dt or drops rejected ticks. Rendering FPS is not physics TPS
+or an OS-confirmed displayed-frame/latency measurement. This is local evidence
+with other user applications running, not an exclusive-adapter benchmark.
+
+28 CPU contracts, eight P10 native oracle groups, eight native-world acceptance
+groups, and three native G7 lifetime/lifecycle/controlled-removal tests passed.
+Lifecycle coverage includes scene resets/switches, resize, fullscreen, camera
+changes, pause/step, minimize/restore, repeated executable launches, stale lease
+rejection, delayed GPU readers, and byte-for-byte rejected-tick rollback.
+Controlled `ID3D12Device5::RemoveDevice` is an API fault test; physical adapter
+removal, long leak campaigns and independent final-head acceptance are **NOT RUN**.
+The visual reference URL could not be fetched (online throttling); no reference
+video match is claimed. PR #9 remains **draft / NO-GO for merge** pending review
+of this bounded native evidence and final user visual acceptance. G5/G6 and
+release qualification do not change.
+
+Reproduce the targeted checks:
+
+```shell
+python build_g7_demo.py
+python reproduce_g7_failure.py
+python -m unittest test_g7_scenarios test_g7_infrastructure test_sunder_world test_world_sweep test_g7_native -v
+python test_physics3.py --smoke
+python test_native_world.py
+zig-out/bin/SunderG7.exe --verify 512 0 768
+zig-out/bin/SunderG7.exe --verify 512 1 768
+zig-out/bin/SunderG7.exe --verify 1000 0 768
+zig-out/bin/SunderG7.exe --verify 1000 1 768
+zig-out/bin/SunderG7.exe --render-bench --frames 600
+```
+
+Scene 0 is cube; scene 1 is belts. Verification reads contact records explicitly
+for native impact evidence. It is not the production render timing path.
+The old `g7_visual_demo.py` remains a Tkinter diagnostic only; launch it manually
+with Python if needed. It is no longer the primary capabilities demo.
 
 ## Reproduce
 
@@ -154,8 +265,8 @@ Native correctness must be independently reviewed before merging.
 
 ## Known limitations and required follow-up
 
-1. Native D3D12 qualification and complete 1K/10K/100K performance tables
-   have **not** been measured in this authoring environment.
+1. Local 512/1K native demo measurements are recorded above. Full headless
+   1K/10K/100K qualification and final acceptance remain unmeasured.
 2. G7 samples are explicit GPU contact-buffer diagnostics. They can add
    GPU readback overhead between ticks; diagnostic GPU readback and CPU graph
 processing are reported separately. Do not conflate sampled cadence
@@ -167,7 +278,8 @@ processing are reported separately. Do not conflate sampled cadence
    exceeds GPU memory/contact budgets. Conservative admission estimates are
    not measured allocations.
 5. The accepted P10 sphere model has no N-body gravitational attraction;
-   no renderer, shape change or general optimizer is added.
+   no shape change or general optimizer is added. The native renderer above
+   is separate from this headless benchmark.
 
 Follow with the uploaded **Prompt 2 — Adversarial native Windows qualification
 and final PR gate** on exactly the tested PR head. Keep the PR draft if any

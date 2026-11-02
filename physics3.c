@@ -6,7 +6,7 @@
 #include <limits.h>
 typedef struct Lease3 {Ph3Lease value;void *fence;uint64_t completion;int release;} Lease3;
 struct Physics3 {
- StorageDevice *d;uint32_t n,capacity,iterations,buckets,planes,tick,generation,accepted,seeded,fixed_dt,pending,last_host_error;
+ Ph3Validation validation;StorageDevice *d;uint32_t n,capacity,iterations,buckets,planes,tick,generation,accepted,seeded,fixed_dt,pending,last_host_error;
  uint64_t context,serial,slots[3],slot_serial[3],trial,grid,contacts,control,free_state,plane,readback,upload,edit;
  uint64_t state_bytes,grid_bytes,contact_bytes,read_bytes;Lease3 leases[32];
 };
@@ -99,7 +99,7 @@ int ph3_tick(Physics3 *p,float dt,const float *gravity,float cell,uint32_t injec
  int ok=dispatch3(p,0,p->buckets>p->n?p->buckets:p->n,h,k)&&dispatch3(p,1,p->n,h,k)&&s_stamp(p->d,1)&&dispatch3(p,2,p->n,h,k)&&s_stamp(p->d,2)&&dispatch3(p,3,p->n,h,k)&&s_stamp(p->d,3);
  for(unsigned it=0;ok&&it<p->iterations;it++)ok=dispatch3(p,4,p->capacity,h,k)&&dispatch3(p,5,p->n,h,k);
  ok=ok&&s_stamp(p->d,4)&&dispatch3(p,6,p->n,h,k)&&s_stamp(p->d,5)&&dispatch3(p,7,p->capacity>p->n?p->capacity:p->n,h,k)&&s_stamp(p->d,6)&&dispatch3(p,8,p->n,h,k)&&s_transition(p->d,p->slots[out],5)&&s_stamp(p->d,7)&&s_transition(p->d,p->control,1)&&s_copy(p->d,p->readback,p->control,256)&&s_transition(p->d,p->control,0)&&s_submit(p->d,8)&&s_wait(p->d);
- if(!ok){s_abort(p->d);return 0;}const uint32_t *header=s_map(p->d,p->readback,256);if(!header)return 0;r->error=header[0];r->contacts=header[1];r->published=header[2];r->max_degree=header[5];r->candidates=header[6];r->awake=header[7];s_unmap(p->d,p->readback,0);
+ if(!ok){s_abort(p->d);return 0;}const uint32_t *header=s_map(p->d,p->readback,256);if(!header)return 0;r->error=header[0];r->contacts=header[1];r->published=header[2];r->max_degree=header[5];r->candidates=header[6];r->awake=header[7];p->validation.normal=header[8];p->validation.tangent=header[9];p->validation.penetration=header[10];memcpy(&p->validation.normal_ratio,header+13,12);s_unmap(p->d,p->readback,0);
  double q[8];if(!s_times_count(p->d,q,8)||s_errors(p->d))return 0;for(unsigned i=0;i<7;i++)r->phases_us[i]=q[i+1]-q[i];r->phases_us[7]=q[7]-q[0];Memory m;if(!s_memory(p->d,&m))return 0;r->committed=m.committed;
  if(!r->error){if(r->published!=p->n)return 0;p->accepted=out;p->pending=0;p->fixed_dt=bits(dt);p->generation++;p->slot_serial[out]=++p->serial;p->tick++;}else if(r->published)return 0;r->generation=p->generation;r->tick=p->tick;p->last_host_error=0;return 1;
 }
@@ -120,3 +120,10 @@ int ph3_reader_test(Physics3 *p){
  float gravity[3]={0};Ph3Result r;if(!ph3_tick(p,1.f/128,gravity,2,0,&r)||r.error||!find(p,&lease))return 0;
  uint64_t actual;if(!s_test_reader_finish(reader,&actual)||actual!=expected)return 0;collect(p);return !find(p,&lease);
 }
+
+int ph3_validation(Physics3 *p,Ph3Validation *v){if(!p||!v)return 0;*v=p->validation;return 1;}
+
+extern void *s_native_device(StorageDevice*);
+extern void *s_native_read_resource(StorageDevice*,uint64_t);
+void *ph3_native_device(Physics3 *p){return p?s_native_device(p->d):NULL;}
+void *ph3_native_resource(Physics3 *p,const Ph3Lease *v){Lease3 *l=find(p,v);return l&&!l->release?s_native_read_resource(p->d,v->buffer):NULL;}

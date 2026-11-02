@@ -45,3 +45,7 @@ PH3_API int ph3_track(Physics3*,const Ph3Lease*,void *native_fence,uint64_t);
 PH3_API int ph3_release(Physics3*,const Ph3Lease*);
 PH3_API int ph3_reader_test(Physics3*);
 PH3_API const char *ph3_adapter(Physics3*);
+
+/* First validation witnesses; counts may be partial after fail-closed early exit. */
+typedef struct Ph3Validation {uint32_t normal,tangent,penetration;float normal_ratio,tangent_ratio,max_penetration;} Ph3Validation;
+PH3_API int ph3_validation(Physics3*,Ph3Validation*);

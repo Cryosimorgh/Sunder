@@ -37,3 +37,7 @@ dist/GPUPhysicsBilliards-Windows-x64.zip*
 .dev-test-cache/
 dev-test-results/
 zig-out/bin/dev_cpu_tests.exe
+
+# Native G7 incremental outputs
+zig-out/bin/SunderG7.exe
+zig-out/bin/physics3.lib

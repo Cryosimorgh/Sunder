@@ -1,0 +1,190 @@
+{
+  "date": "2026-11-02",
+  "status": "BOUNDED_LOCAL_NATIVE_PASS; DRAFT / NO-GO_FOR_MERGE",
+  "base_revision": "be5bf707c29952181398ce2a638ffab42be1eda0",
+  "tested_source": "local implementation with SHA-256 identities below; compiled display label is base revision",
+  "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+  "driver": "32.0.16.1088",
+  "solver": {
+    "dt": 0.0078125,
+    "cell": 1.0,
+    "iterations": 512,
+    "slots": 1000,
+    "contact_capacity": 12000,
+    "seed": 7,
+    "acceptance_tolerances": "UNCHANGED"
+  },
+  "original_failure": {
+    "status": "REJECTED",
+    "tick": 8,
+    "active": 512,
+    "error_bits": 12,
+    "contacts": 6220,
+    "max_degree": 32,
+    "gpu_us": 62186.0,
+    "attempt": 9,
+    "accepted_bytes_unchanged": true,
+    "witnesses": {
+      "normal": 4,
+      "tangent": 4,
+      "penetration": 2,
+      "normal_ratio": 14059.443359375,
+      "tangent_ratio": 31056.62890625,
+      "max_penetration": 0.0037410131189972162
+    },
+    "qualification": "UNSUPPORTED RADIAL STRESS; separate native default required"
+  },
+  "cases": [
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 1000,
+      "scene": 0,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 2700,
+      "positive_impulses": 1579,
+      "geometric_contacts": 5091,
+      "cross_belt_geometric": 0,
+      "mean_gpu_us": 56279.807,
+      "committed": 4653056
+    },
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 1000,
+      "scene": 1,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 1887,
+      "positive_impulses": 6689,
+      "geometric_contacts": 91,
+      "cross_belt_geometric": 12,
+      "mean_gpu_us": 55098.691,
+      "committed": 4653056
+    },
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 512,
+      "scene": 0,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 1344,
+      "positive_impulses": 716,
+      "geometric_contacts": 913,
+      "cross_belt_geometric": 0,
+      "mean_gpu_us": 53343.187,
+      "committed": 4653056
+    },
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 512,
+      "scene": 1,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 795,
+      "positive_impulses": 2707,
+      "geometric_contacts": 51,
+      "cross_belt_geometric": 16,
+      "mean_gpu_us": 54704.591,
+      "committed": 4653056
+    }
+  ],
+  "render": {
+    "mean_gpu_render_us": 60.838,
+    "gpu_snapshot_copies": 95,
+    "render_frames": 600,
+    "seconds": 10.21,
+    "last_gpu_render_us": 35.84,
+    "render_fps": 58.767,
+    "width": 1920,
+    "height": 1080,
+    "scene_epochs": 1
+  },
+  "interactive": {
+    "mean_gpu_render_us": 18.853,
+    "gpu_snapshot_copies": 2586,
+    "render_frames": 10063,
+    "seconds": 100.981,
+    "last_gpu_render_us": 18.432,
+    "render_fps": 99.652,
+    "width": 1584,
+    "height": 861,
+    "scene_epochs": 2
+  },
+  "checks": {
+    "cpu_contracts": {
+      "passed": 28
+    },
+    "p10_oracle_groups": {
+      "passed": 8
+    },
+    "native_world_groups": {
+      "passed": 8
+    },
+    "g7_native_tests": {
+      "passed": 3
+    },
+    "clean_source_launch": "PASS: 36 dependency source files; zero prebuilt shaders or executables",
+    "incremental_launcher": "PASS: output hashes reused; bad scene admission propagates exit 1",
+    "rejection_rollback": "PASS: byte-for-byte original stress and injected rejection",
+    "visual_evidence": [
+      "cube-native.png",
+      "belts-native.png",
+      "native-diagnostics.png"
+    ]
+  },
+  "not_run": [
+    "physical adapter removal",
+    "long-duration leak campaign",
+    "full 10K/100K/1M G7 qualification",
+    "arbitrary edited parameters/seeds",
+    "independent final-head review and user visual acceptance"
+  ],
+  "limitations": [
+    "Original radial-collapse stress remains unsupported",
+    "512 application iterations improve convergence but native physics remains about 18-20 ticks/s in sampled verification",
+    "Trails/contact flash effects not implemented",
+    "No OS displayed-frame or input latency qualification",
+    "Other user GPU applications were running"
+  ],
+  "source_sha256": {
+    ".gitignore": "3082a844aee76928d62b91f4b7975a02266306e5fb843d400fa737da26d34c5e",
+    "LAUNCH_G7_CAPABILITIES_DEMO.cmd": "63d1b0f9315e9d088ebffb3a7c55a4331f2200353a3c6c56eaea4d43592f794b",
+    "LAUNCH_G7_DEMO.cmd": "436348622347efc27e4627c8e17ab8f2393bc5331ede19e24512a1f8cc851d0c",
+    "build_g7_demo.py": "e59e3f09821891961a645479e88c8cb79fdcb75d0ac14067eaf99adab7cf0836",
+    "docs/ENGINE_ARCHITECTURE.md": "cb45fd25595ca0cf493eddec5e74c3a1008f5bbe49138b25e56764fc13fee720",
+    "docs/G7_DENSE_WORKLOADS.md": "ca42058ab171eadaaa83c8cc7750c8d3ba96abc1625245a3415abc715910b984",
+    "g7_demo.cpp": "bf60cf3a378e95c5d5fa537be595c0fe7203ebf9cbbc4afa9b379901cd697cec",
+    "g7_native.h": "66c699851affbcb4614ff72bc26a5cc47672c2e8289929f4923fab0554844f19",
+    "g7_render.hlsl": "5289b2d6741962c41796f182a5194096a9a3b41663f0da051ae57e53de705d46",
+    "g7_scene.h": "2c5d03c89f967cb491dc8d2db87f699ca3493ce12c306182ec0238da25094ae0",
+    "physics3.c": "afca71a0e8341eb6b8d1b2bdfde2a61034d5d92ffa0eee36f7444725272aa0d7",
+    "physics3.h": "02895b3b1bd536a1c52251494e07a86c95d7a11685b89f97362a7c584af5d2cf",
+    "physics3.hlsl": "433532bf020a682b3fb9ce76857805569658f318a8073ff4f20c5d6f9088685a",
+    "reproduce_g7_failure.py": "51242e0aef9bc0df2f9d56af52e17e2d191f8fc0872567ef408635a361408eeb",
+    "runtime.c": "d8281492e7afa6372ecffb0c07631383df1a964b542f00ceee8823f2a83577d0",
+    "test_g7_native.py": "636adc2de3206404a91e87a3b22bdfaedba7056c11152c9b2cb57b6a6361dd1a"
+  },
+  "evidence_sha256": {
+    "build.json": "a93058bc8dabc30cef7330bedd360c51f2abb5d96ff35e127793248f92e26f50",
+    "clean-launch.log": "12f06ee2d98f5d0d2b1fb68677241e1e541e03e716ef30a3f43229f9e6f2a706",
+    "contracts.log": "4fff2bb34cdf4f0cec905ef5806019a681d9f101e4ef4e15058873fb17235490",
+    "final-1000-0.json": "470eaa1a984238da8e4be833010288ba8c63a96a107c292a0efb1b30775f5cfc",
+    "final-1000-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-1000-1.json": "8e3f441ae44cd53f0d4ba9f6ad377f33160e13ee81d222e941ed71bb2bb294f3",
+    "final-1000-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-512-0.json": "bda54f791cc3300e896f0fcb5e4f4f71807c6680013419e78b223789a72f1258",
+    "final-512-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-512-1.json": "5cf4ec0b3e385217e97de9671b1d505d349e7032c996ec39ee84f0da1ab6b1dd",
+    "final-512-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-tests.log": "7b8e9f15361b5619cfa39a0a4b22b252bce46d3bc2e2994fa50f21a76437e63e",
+    "native-world.log": "e83b61008a41792ce2746e27f5a1a50fada034b36614269d55c9ccc7bc54b548",
+    "p10.log": "7dcce638b9a9c50937788195ac1850db652959e04c85bc44d95a809e586e8443",
+    "render-final-1080p-1k.json": "5ae3d5700b655d7a20e9dfdb2dde27e202b98c807adc55ac580083f365cb8ff7",
+    "reproduced-failure.json": "d2cd48838058bd4d23e4bf27b0576c25d3e61569b4dcd22dc1f9b16aea23c9b0",
+    "visual.stdout": "e82bec48d48d138358b71457c958d517392d7709c6186e084d5c877d13a3d6d2"
+  }
+}
