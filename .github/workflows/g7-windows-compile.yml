@@ -1,0 +1,39 @@
+name: G7 native Windows compile (no GPU qualification)
+on:
+  push:
+    paths:
+      - g7_demo.cpp
+      - g7_scene.h
+      - g7_render.hlsl
+      - physics3.c
+      - physics3.h
+      - build_g7_demo.py
+      - .github/workflows/g7-windows-compile.yml
+  pull_request:
+    paths:
+      - g7_demo.cpp
+      - g7_scene.h
+      - g7_render.hlsl
+      - physics3.c
+      - physics3.h
+      - build_g7_demo.py
+      - .github/workflows/g7-windows-compile.yml
+jobs:
+  windows-g7-compile:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: '0.15.2'
+      - run: python -m pip install numpy
+      - name: Compile G7 C++ renderer and D3D12 physics shaders
+        run: python build_g7_demo.py
+      - name: Check generated native executable
+        shell: pwsh
+        run: |
+          if (-not (Test-Path zig-out/bin/SunderG7.exe)) { throw "G7 binary missing" }
+          Write-Output "G7 compiled. Native GPU execution and render correctness NOT QUALIFIED."

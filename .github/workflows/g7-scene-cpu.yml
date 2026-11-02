@@ -1,0 +1,21 @@
+name: G7 scalable scene contracts
+on:
+  push:
+    paths:
+      - g7_scene.h
+      - test_g7_scene.cpp
+      - .github/workflows/g7-scene-cpu.yml
+  pull_request:
+    paths:
+      - g7_scene.h
+      - test_g7_scene.cpp
+      - .github/workflows/g7-scene-cpu.yml
+jobs:
+  scene-cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build standalone scene contract
+        run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic test_g7_scene.cpp -o /tmp/test_g7_scene
+      - name: Check dynamic scene generation and numeric boundaries
+        run: /tmp/test_g7_scene

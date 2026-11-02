@@ -15,7 +15,8 @@ static void collect(Physics3 *p){for(int i=0;i<32;i++){Lease3 *l=&p->leases[i];i
 static int leased(Physics3 *p,unsigned slot){for(int i=0;i<32;i++)if(p->leases[i].value.serial&&p->leases[i].value.slot==slot)return 1;return 0;}
 int ph3_close(Physics3 *p){if(!p)return 1;collect(p);for(int i=0;i<32;i++)if(p->leases[i].value.serial)return 0;if(!s_drain(p->d,1000))return 0;uint64_t h[]={p->slots[0],p->slots[1],p->slots[2],p->trial,p->grid,p->contacts,p->control,p->free_state,p->plane,p->readback,p->upload,p->edit,p->convergence};for(unsigned i=0;i<sizeof(h)/sizeof(h[0]);i++)if(h[i]&&!s_retire(p->d,h[i]))return 0;s_collect(p->d);if(!s_try_close(&p->d,1000))return 0;free(p);return 1;}
 Physics3 *ph3_open(uint32_t n,uint32_t cap,uint32_t it,int debug,const char *dir){
- if(!n||n>1000000||!cap||cap>16000000||!it||it>4096||!dir)return NULL;
+ /* These bounds follow the 32-bit raw-buffer offsets and 4 GiB resource limit, not benchmark presets. */
+ if(!n||!cap||!it||!dir||192ull*n+256>0x100000000ull||128ull*cap+256>0x100000000ull)return NULL;
  Physics3 *p=calloc(1,sizeof(*p));if(!p)return NULL;p->d=s_open(debug);if(!p->d){free(p);return NULL;}if(!s_spatial_features(p->d))goto fail;
  p->n=n;p->capacity=cap;p->iterations=it;p->context=s_unique_id();p->buckets=1;while(p->buckets<2*n)p->buckets*=2;
  if(n<=4096){p->cache_capacity=1;while(p->cache_capacity<2ull*cap&&p->cache_capacity<131072)p->cache_capacity*=2;}
