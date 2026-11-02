@@ -259,9 +259,14 @@ def case(spec, args, directory, repeat):
                 if sample:
                     diagnostic_start = time.perf_counter_ns()
                     contacts = world.diagnostic_contacts(result.contacts)
+                    readback_us = (time.perf_counter_ns() - diagnostic_start) / 1000
+                    topology_start = time.perf_counter_ns()
                     shape, prior = topology(contacts, body_belts, result.active, prior)
-                    sample_us = (time.perf_counter_ns() - diagnostic_start) / 1000
-                    shape.update(frame=frame, accepted_tick=result.tick, readback_and_topology_us=sample_us,
+                    topology_us = (time.perf_counter_ns() - topology_start) / 1000
+                    shape.update(frame=frame, accepted_tick=result.tick,
+                                 native_contact_readback_us=readback_us,
+                                 cpu_topology_us=topology_us,
+                                 readback_and_topology_us=readback_us+topology_us,
                                  after_full_ticks=max(0, result.tick-report.get("fill_tick", total)),
                                  churn_is_consecutive_tick=(last_sample_tick == frame-1))
                     samples.append(shape)
