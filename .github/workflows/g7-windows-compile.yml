@@ -4,6 +4,7 @@ on:
     paths:
       - g7_demo.cpp
       - g7_scene.h
+      - g7_ui_numbers.h
       - g7_render.hlsl
       - physics3.c
       - physics3.h
@@ -13,6 +14,7 @@ on:
     paths:
       - g7_demo.cpp
       - g7_scene.h
+      - g7_ui_numbers.h
       - g7_render.hlsl
       - physics3.c
       - physics3.h
