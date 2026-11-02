@@ -33,6 +33,28 @@ bodies; >100K (including 1M) requires `--allow-large`, an adequate
 `--max-committed-mib` admission budget, and native hardware success. No
 unexecuted scale is claimed.
 
+## Visual capabilities demo (new)
+
+Double-click `LAUNCH_G7_DEMO.cmd` on Windows. It builds the native
+`physics3.dll` if absent and opens `g7_visual_demo.py` (standard Python
+`tkinter` + NumPy). Select **cube** or **belts**, density, a seeded
+body count (1–3000), and cube spawn batch. Press Play or Pause,
+drag to orbit the 3D camera, and use the scroll wheel to zoom.
+Cube mode shows an outlined cubic **spawn volume** containing active
+spheres; belt mode draws separate blue/orange toroidal clouds with
+opposing native velocities. The right panel reports active/capacity,
+GPU contacts and candidates, max contact degree, GPU/host tick times,
+staging time, and committed memory.
+
+The visualization is **not** a GPU renderer and **not** a benchmark.
+It uses CPU Tk Canvas to draw snapshots explicitly read back from the
+native D3D12 sphere solver. The readback overhead is displayed and
+must not be included in production GPU benchmark timings. The viewer
+never substitutes a CPU physics simulation. A native GPU rejection
+stops playback and displays the native error instead of claiming
+success. Higher populations belong in the headless benchmark, not
+in interactive Canvas rendering.
+
 ## Reproduce
 
 On Linux (scene and host contracts **only**):
@@ -52,7 +74,23 @@ RUN_G7_WINDOWS.cmd --full
 Full is the default mode; it calls `build_physics3.py`, the G7 and existing
 P10 host tests, `run_g7.py --scenario both --full`, and the existing
 `run_world_sweep.py --full` native correctness gate. At least two fresh
-native instances are used per G7 case. The launcher always tries to create
+native instances are used per G7 case. If a prior run failed *only* while verifying the handoff ZIP, do
+**not** repeat the costly native benchmark. Preserve the entire original
+`evidence/g7/launcher/<run-id>/` directory and run:
+
+```powershell
+python run_g7_windows.py --package-existing latest
+```
+
+This selects the newest existing launcher run, preserves original
+case-level GPU/P10 failure logs, writes a **new uniquely named**
+`G7-RESULTS-TO-SEND/*.zip`, and verifies each member against a
+SHA-256 manifest with platform-independent POSIX archive paths. You may
+instead supply an explicit prior launcher directory after
+`--package-existing`. This is an archive-only recovery, **not** a
+test rerun or changed qualification verdict.
+
+The launcher always tries to create
 **one new unique** `G7-RESULTS-TO-SEND/Sunder-G7-*.zip`, including failure
 logs. If Python itself is missing, the CMD creates a minimal failure ZIP
 via PowerShell. Do not overwrite or discard original failures.
