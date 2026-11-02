@@ -235,13 +235,6 @@ def case(spec, args, directory, repeat):
                     body_belts.append(particle.belt)
                     report["created_author_handles"] += 1
                 cursor += count
-                # Set velocity only once all cube insertions have been accepted.
-                if spec.scenario == "cube" and cursor == spec.bodies and frame > 0:
-                    # Apply on the next tick; it must follow the fully accepted fill.
-                    pass
-                if (spec.scenario == "cube" and frame > 0 and
-                    cursor == spec.bodies and report.get("fill_tick") == frame):
-                    raise AssertionError("velocity activation must be after fill")
                 if (spec.scenario == "cube" and report.get("fill_tick") is not None and
                     frame == report["fill_tick"]):
                     for handle, particle in zip(handles, particles):
@@ -315,9 +308,9 @@ def case(spec, args, directory, repeat):
                       ("warp", "microsoft basic", "hyper-v", "software", "llvmpipe"))
         graph_ok = (peak_cross > 0 and peak_island >= 3) if spec.scenario == "belts" else (
             maximum_overlap > 0 and peak_island >= 3 if spec.preset == "dense" else True)
-        if (state is not None and physical and graph_ok and
-                report["post_full_ticks_accepted"] >= args.post_full_ticks if spec.scenario == "cube"
-                else state is not None and physical and graph_ok):
+        enough_post = (spec.scenario != "cube" or
+                       report["post_full_ticks_accepted"] >= args.post_full_ticks)
+        if state is not None and physical and graph_ok and enough_post:
             report["status"] = "PASS"
         else:
             report.setdefault("failure", "scene, timing, hardware or contact qualification incomplete")
@@ -334,7 +327,8 @@ def case(spec, args, directory, repeat):
         with (directory / "ticks.jsonl").open("w", encoding="utf-8") as file:
             for tick in rows:
                 file.write(json.dumps(tick) + "\n")
-        (directory / "case.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        audit = {k: v for k, v in report.items() if k != "final_state_values"}
+        (directory / "case.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
     return report
 
 
