@@ -151,21 +151,21 @@ struct Renderer {
    enter|=ImGui::InputText("Spawn batch",typedBatch,sizeof(typedBatch),typeFlags);
    enter|=ImGui::InputText("Contact budget (0=auto)",typedContacts,sizeof(typedContacts),typeFlags);
    enter|=ImGui::InputText("Solver iterations",typedIterations,sizeof(typedIterations),typeFlags);
-   ImGui::InputFloat("Spawn / second",&edit.spawnHz,0,0,"%.6g");
+   ImGui::InputFloat("Spawn / second",&edit.spawnHz,0,0,"%.9g");
    if(enter||ImGui::Button("APPLY TYPED VALUES"))applyTyped();
    if(!typedError.empty())ImGui::TextWrapped("Input rejected: %s",typedError.c_str());
    ImGui::TextDisabled("Values take effect when applied. Native resource/physics limits still apply.");
-   float speed=sim->speed;if(ImGui::InputFloat("Playback multiplier",&speed,0,0,"%.3g")&&std::isfinite(speed)&&speed>0)sim->speed=speed;ImGui::Text("Actual %.2fx / %.0f ticks per second",sim->paused?0:tps/128,sim->paused?0:tps);if(!sim->paused&&tps>0&&tps/128+.15<speed)ImGui::TextColored({1,.74f,.35f,1},"Physics throughput limits playback");
-   if(ImGui::CollapsingHeader("Scene settings",ImGuiTreeNodeFlags_DefaultOpen)){ImGui::InputInt("Seed",&edit.seed);ImGui::Combo("Density",&edit.density,"Open\0Compact\0");ImGui::InputFloat("Radius",&edit.radius);ImGui::InputFloat("Mass",&edit.mass);ImGui::InputFloat("Radius spread",&edit.radiusSpread);ImGui::InputFloat("Mass spread",&edit.massSpread);ImGui::InputFloat("Restitution (-1=preset)",&edit.restitution);ImGui::InputFloat("Friction (-1=preset)",&edit.friction);ImGui::InputFloat("Gravity X",&edit.gravityX);ImGui::InputFloat("Gravity Y",&edit.gravityY);ImGui::InputFloat("Gravity Z (rain)",&edit.gravity);ImGui::InputFloat("Gravity Z (cube/belts)",&edit.gravityOther);ImGui::InputFloat("Initial rain speed Z",&edit.initialVz);
-   ImGui::InputFloat("Cube speed",&edit.cubeSpeed);ImGui::InputFloat("Belt closing speed",&edit.beltClosingSpeed);
-   ImGui::InputFloat("Belt spin",&edit.beltSpin);ImGui::InputFloat("Belt major radius (0=auto)",&edit.beltMajorRadius);
-   ImGui::InputFloat("Belt minor radius (0=auto)",&edit.beltMinorRadius);
-   ImGui::InputFloat("Emitter width X",&edit.emitterWidthX);ImGui::InputFloat("Emitter width Y",&edit.emitterWidthY);
-   ImGui::InputFloat("Emitter height Z",&edit.emitterHeight);
-   ImGui::InputFloat("Cell size (0=auto)",&edit.cell);ImGui::InputScalar("Torus placement attempts",ImGuiDataType_U32,&edit.placementAttempts);ImGui::TextWrapped("Use APPLY TYPED VALUES above to commit edits; native capacity changes rebuild the context.");}
+   float speed=sim->speed;if(ImGui::InputFloat("Playback multiplier",&speed,0,0,"%.9g")&&std::isfinite(speed)&&speed>0)sim->speed=speed;ImGui::Text("Actual %.2fx / %.0f ticks per second",sim->paused?0:tps/128,sim->paused?0:tps);if(!sim->paused&&tps>0&&tps/128+.15<speed)ImGui::TextColored({1,.74f,.35f,1},"Physics throughput limits playback");
+   if(ImGui::CollapsingHeader("Scene settings",ImGuiTreeNodeFlags_DefaultOpen)){ImGui::InputInt("Seed",&edit.seed);ImGui::Combo("Density",&edit.density,"Open\0Compact\0");ImGui::InputFloat("Radius",&edit.radius,0,0,"%.9g");ImGui::InputFloat("Mass",&edit.mass,0,0,"%.9g");ImGui::InputFloat("Radius spread",&edit.radiusSpread,0,0,"%.9g");ImGui::InputFloat("Mass spread",&edit.massSpread,0,0,"%.9g");ImGui::InputFloat("Restitution (-1=preset)",&edit.restitution,0,0,"%.9g");ImGui::InputFloat("Friction (-1=preset)",&edit.friction,0,0,"%.9g");ImGui::InputFloat("Gravity X",&edit.gravityX,0,0,"%.9g");ImGui::InputFloat("Gravity Y",&edit.gravityY,0,0,"%.9g");ImGui::InputFloat("Gravity Z (rain)",&edit.gravity,0,0,"%.9g");ImGui::InputFloat("Gravity Z (cube/belts)",&edit.gravityOther,0,0,"%.9g");ImGui::InputFloat("Initial rain speed Z",&edit.initialVz,0,0,"%.9g");
+   ImGui::InputFloat("Cube speed",&edit.cubeSpeed,0,0,"%.9g");ImGui::InputFloat("Belt closing speed",&edit.beltClosingSpeed,0,0,"%.9g");
+   ImGui::InputFloat("Belt spin",&edit.beltSpin,0,0,"%.9g");ImGui::InputFloat("Belt major radius (0=auto)",&edit.beltMajorRadius,0,0,"%.9g");
+   ImGui::InputFloat("Belt minor radius (0=auto)",&edit.beltMinorRadius,0,0,"%.9g");
+   ImGui::InputFloat("Emitter width X",&edit.emitterWidthX,0,0,"%.9g");ImGui::InputFloat("Emitter width Y",&edit.emitterWidthY,0,0,"%.9g");
+   ImGui::InputFloat("Emitter height Z",&edit.emitterHeight,0,0,"%.9g");
+   ImGui::InputFloat("Cell size (0=auto)",&edit.cell,0,0,"%.9g");ImGui::InputScalar("Torus placement attempts",ImGuiDataType_U32,&edit.placementAttempts);ImGui::TextWrapped("Use APPLY TYPED VALUES above to commit edits; native capacity changes rebuild the context.");}
    if(ImGui::CollapsingHeader("Camera and output")){
-    ImGui::InputFloat("Vertical FOV (degrees)",&editFov);
-    ImGui::InputFloat("Near clip",&editNear);ImGui::InputFloat("Far clip",&editFar);
+    ImGui::InputFloat("Vertical FOV (degrees)",&editFov,0,0,"%.9g");
+    ImGui::InputFloat("Near clip",&editNear,0,0,"%.9g");ImGui::InputFloat("Far clip",&editFar,0,0,"%.9g");
     if(ImGui::Button("Apply projection")){
      if(std::isfinite(editFov)&&editFov>0&&editFov<180&&std::isfinite(editNear)&&editNear>0&&std::isfinite(editFar)&&editFar>editNear){fovY=editFov;nearClip=editNear;farClip=editFar;admissionError.clear();}
      else admissionError="Projection requires 0 < FOV < 180 and 0 < near < far";
