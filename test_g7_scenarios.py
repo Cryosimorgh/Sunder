@@ -75,13 +75,15 @@ class G7SceneTests(unittest.TestCase):
         for i, (x,y,g,imp) in enumerate(((0,1,-.1,1.), (1,2,-.1,1.),
                                          (3,4,.5,0.), (2,3,.5,2.))):
             a[i] = (x,y,g,imp)
-        result, edges = topology(a, [0,0,1,1,1], 5, None)
+        result, edges = topology(a, [0,0,1,0,1], 5, None)
         self.assertEqual(result["observed_edges"], 3)
         self.assertEqual(result["overlapping_contacts"], 2)
         self.assertEqual(result["cross_belt_edges"], 1)
+        self.assertEqual(result["cross_belt_positive_impulse_edges"], 2)
+        # A speculative positive-gap impulse is not proof of geometric impact.
         self.assertEqual(result["largest_island"], 4)
         self.assertNotIn((3,4), edges)
-        churn, _ = topology(a, [0,0,1,1,1], 5, edges)
+        churn, _ = topology(a, [0,0,1,0,1], 5, edges)
         self.assertEqual(churn["contact_churn_since_previous_sample"], 0)
 
     def test_cube_staged_static_then_dynamic_activation_host_contract(self):
