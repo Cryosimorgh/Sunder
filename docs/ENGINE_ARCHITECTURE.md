@@ -50,8 +50,10 @@ tick. The D3D12 physics kernel, configured P10 iterations and acceptance
 thresholds, and old planar physics source are **unchanged**.
 
 The cubic spawning volume authors 3D spheres on a seeded nonoverlapping
-lattice, fills exactly the configured capacity in accepted per-tick batches,
-then activates inward compression. The second scene authors two disjoint
+lattice, fills exactly the configured capacity in accepted per-tick batches
+as active temporary static spheres, then changes all bodies to dynamic on the
+tick after full acceptance. This holds under nonzero gravity and enables
+inward, swirl or funnel velocity fields. The second scene authors two disjoint
 seeded 3D toroidal clouds that counter-rotate and close along opposite x
 directions. No cube collider, CPU contact solver, N-body gravity, general
 renderer or precomputed contact pairs have been introduced.
@@ -59,12 +61,18 @@ Sparse P10 slots still use inert placeholders. CPU scene authorship and
 structural edits remain separate from GPU simulation timing.
 
 Instrumented native contact readbacks distinguish overlapping/impulsive
-contacts from speculative constraints. The sampled graph gives connected
+contacts from speculative constraints. A positive-gap normal impulse never
+counts as proved cross-belt geometric overlap. The sampled graph gives connected
 components, largest island, degree, cross-belt edges and contact churn.
 It is a **diagnostic path**, not a normal production tick, and contact
-sampling cadence can miss the absolute peak. Native per-tick counters,
-GPU/host percentiles, fixed-step misses, driver/adapter, recorded hashes,
-active/attempted body counts and error causes are emitted. The Windows
+sampling cadence can miss the absolute peak. Preset-dependent explicit
+contact budgets are used to avoid pretending sparse separated-pair memory
+budgets qualify dense contact topology. Native per-tick counters,
+seven actual GPU-stage timing distributions, GPU/host percentiles,
+separate diagnostic readback and host graph times, fixed-step misses,
+driver/adapter, recorded hashes, active/attempted body counts, rejected
+creation counts and error causes are emitted. Sample-inferred pre-impact,
+first contact, peak and post-impact phases use distinct CSV/JSON records. The Windows
 runner attempts all required 1K/10K/100K workloads with independent native
 worlds and existing P10 full gates; it creates a unique, checksum-inventoried
 failure-inclusive ZIP. Above 100K requires explicit opt-in and memory
@@ -80,8 +88,11 @@ overlaps/impulses, dense multi-body islands, unchanged P10 physical gates,
 full required-vs-executed matrix and independent reviewer audit are present.
 
 **2026-11-02 change log:** Created G7 CPU-authoring and native benchmark
-evidence interface on the dedicated branch; preserved old physics/kernel
-code and thresholds. Open risks: 100K dense contact budget/admission,
+evidence interface on the dedicated branch; hardened temporary static fill
+against gravitational drift; separated positive-gap impulses from geometric
+cross-belt impact evidence; instrumented all seven native GPU phases; retained
+full P10 native raw evidence in the unique G7 handoff. Preserved old
+physics/kernel code and thresholds. Open risks: 100K dense contact budget/admission,
 P10 speed-envelope rejections, biased diagnostic sampling, GPU budget
 limits, and unexecuted hardware qualification. Decision: **G7 NO-GO**.
 
