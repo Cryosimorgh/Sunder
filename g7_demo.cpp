@@ -8,6 +8,12 @@
 #include <algorithm>
 #include <atomic>
 #include <string>
+#include <cstdint>
+#include <cerrno>
+#include <limits>
+#include <cmath>
+#include <stdexcept>
+#include <utility>
 #include "g7_native.h"
 #include "g7_scene.h"
 #include "third_party/imgui/imgui.h"
@@ -38,9 +44,9 @@ struct Simulation {
  std::atomic<bool> sample{false},stop{false},paused{false},reset{false},single{false};std::atomic<float> speed{1};
  G7Config config,requested;G7Scene scene;unsigned active=0,spawned=0,accepted=0,rejected=0,epoch=0;bool moving=false,fault=false;double nextSpawn=0;
  Ph3Result result={};Ph3Validation validation={};double cpuUs=0,hostUs=0,tps=0;unsigned geometric=0,cross=0,island=0,sampleTick=0;char error[256]={};HANDLE thread=nullptr;FILE *log=nullptr;
- void init(){p=ph3_open(G7Scene::capacity,65536,1024,0,"evidence/p10/build");if(!p)throw std::runtime_error("Physics3 device/admission failed");char path[512];SYSTEMTIME time;GetSystemTime(&time);snprintf(path,sizeof(path),"evidence/g7/native-showcase/session-%04u%02u%02u-%02u%02u%02u-%lu.jsonl",time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,(unsigned long)GetCurrentProcessId());log=fopen(path,"w");restart();}
+ void init(){config.validate();p=ph3_open(uint32_t(config.count),config.contacts(),config.iterations,0,"evidence/p10/build");if(!p)throw std::runtime_error("Physics3 device/admission failed: check GPU memory budget and requested body/contact capacities");char path[512];SYSTEMTIME time;GetSystemTime(&time);snprintf(path,sizeof(path),"evidence/g7/native-showcase/session-%04u%02u%02u-%02u%02u%02u-%lu.jsonl",time.wYear,time.wMonth,time.wDay,time.wHour,time.wMinute,time.wSecond,(unsigned long)GetCurrentProcessId());log=fopen(path,"w");restart();}
  void restart(){
-  scene.generate(config);auto s=scene.initial(0,false);auto planes=scene.planes(config.scene);
+  config.validate();if(scene.capacity&&scene.capacity!=config.count)throw std::runtime_error("Body capacity change requires a full native renderer/context rebuild");scene.generate(config);auto s=scene.initial(0,false);auto planes=scene.planes(config.scene);
   // All tracked consumer fences must finish before replacing a scene.
   bool seeded=false;for(int i=0;i<100&&!seeded;i++){seeded=ph3_seed(p,s.data(),planes.data(),unsigned(planes.size()/4))!=0;if(!seeded)Sleep(1);}
   if(!seeded)throw std::runtime_error("Reset blocked by GPU lease/device; last accepted display retained");
@@ -48,10 +54,10 @@ struct Simulation {
  }
  void tick(){
   unsigned next=active;bool activate=false;
-  if(active<unsigned(config.count)&&(config.scene!=2||accepted/128.>=nextSpawn)){next=std::min(unsigned(config.count),active+unsigned(config.batch));auto s=scene.initial(next,config.scene==2);if(!(config.scene==2?ph3_stage_append(p,s.data(),active,next):ph3_stage(p,s.data())))throw std::runtime_error("Spawn stage failed");spawned=next;nextSpawn=accepted/128.+1/std::max(1.f,config.spawnHz);}
+  if(active<unsigned(config.count)&&(config.scene!=2||accepted/128.>=nextSpawn)){next=std::min(unsigned(config.count),active+config.batch);auto s=scene.initial(next,config.scene==2);if(!(config.scene==2?ph3_stage_append(p,s.data(),active,next):ph3_stage(p,s.data())))throw std::runtime_error("Spawn stage failed");spawned=next;nextSpawn=accepted/128.+1/config.spawnHz;}
   else if(active==unsigned(config.count)&&!moving){auto s=scene.initial(active,true);if(!ph3_stage(p,s.data()))throw std::runtime_error("Activation stage failed");activate=true;}
-  float gravity[3]={0,0,moving&&config.scene==2?config.gravity:0};FILETIME ct,et,k0,u0,k1,u1;GetThreadTimes(GetCurrentThread(),&ct,&et,&k0,&u0);double begin=now();
-  if(!ph3_tick(p,1.f/128,gravity,config.scene==2?2.5f:1.f,0,&result))throw std::runtime_error("Native host/device tick failed");
+  float gravity[3]={config.gravityX,config.gravityY,moving?config.gravity:0};FILETIME ct,et,k0,u0,k1,u1;GetThreadTimes(GetCurrentThread(),&ct,&et,&k0,&u0);double begin=now();
+  if(!ph3_tick(p,1.f/128,gravity,(config.cell>0?config.cell:(config.scene==2?2.5f:1.f)),0,&result))throw std::runtime_error("Native host/device tick failed");
   hostUs=(now()-begin)*1e6;GetThreadTimes(GetCurrentThread(),&ct,&et,&k1,&u1);auto ft=[](FILETIME f){return (uint64_t(f.dwHighDateTime)<<32)|f.dwLowDateTime;};cpuUs=double(ft(k1)+ft(u1)-ft(k0)-ft(u0))*.1;ph3_validation(p,&validation);
   if(result.error){rejected++;fault=true;paused=true;ph3_drop_stage(p);snprintf(error,sizeof(error),"GPU rejected candidate: flags %u",result.error);}
   else {active=next;accepted++;if(activate)moving=true;}
@@ -59,11 +65,11 @@ struct Simulation {
  }
  void sampleContacts(){
   if(!accepted||result.error||!active)return;
-  std::vector<unsigned char> raw(128*result.contacts);if(result.contacts&&!ph3_contacts(p,raw.data(),result.contacts))throw std::runtime_error("Contact diagnostic readback failed");
+  std::vector<unsigned char> raw(size_t(128)*result.contacts);if(result.contacts&&!ph3_contacts(p,raw.data(),result.contacts))throw std::runtime_error("Contact diagnostic readback failed");
   std::vector<unsigned> parent(active),sizes(active,1);for(unsigned i=0;i<active;i++)parent[i]=i;
   auto root=[&](unsigned i){while(parent[i]!=i){parent[i]=parent[parent[i]];i=parent[i];}return i;};
   geometric=cross=0;island=1;
-  for(unsigned k=0;k<result.contacts;k++){unsigned a,b;double gap;auto r=raw.data()+128*k;memcpy(&a,r,4);memcpy(&b,r+4,4);memcpy(&gap,r+80,8);if(a>=active||b>=active||gap>0)continue;geometric++;cross+=scene.authored[38*1000+a]!=scene.authored[38*1000+b];unsigned x=root(a),y=root(b);if(x!=y){parent[y]=x;sizes[x]+=sizes[y];island=std::max(island,sizes[x]);}}
+  for(unsigned k=0;k<result.contacts;k++){unsigned a,b;double gap;auto r=raw.data()+128*k;memcpy(&a,r,4);memcpy(&b,r+4,4);memcpy(&gap,r+80,8);if(a>=active||b>=active||gap>0)continue;geometric++;cross+=scene.authored[size_t(38)*scene.capacity+a]!=scene.authored[size_t(38)*scene.capacity+b];unsigned x=root(a),y=root(b);if(x!=y){parent[y]=x;sizes[x]+=sizes[y];island=std::max(island,sizes[x]);}}
   sampleTick=result.tick;
  }
  static DWORD WINAPI run(void *arg){auto&s=*(Simulation*)arg;double due=now(),start=now();unsigned ticks=0;HANDLE timer=CreateWaitableTimerExW(nullptr,nullptr,2,TIMER_ALL_ACCESS);if(!timer)timer=CreateWaitableTimerW(nullptr,FALSE,nullptr);
@@ -73,7 +79,7 @@ struct Simulation {
    bool step=s.single.exchange(false);double t=now();
    if(!s.fault&&((!s.paused&&t>=due)||step)){
     AcquireSRWLockExclusive(&s.lock);try{s.tick();ticks++;}catch(const std::exception&e){s.fault=true;s.paused=true;snprintf(s.error,sizeof(s.error),"%s",e.what());}if(now()-start>=.5){s.tps=ticks/(now()-start);ticks=0;start=now();}ReleaseSRWLockExclusive(&s.lock);
-    double interval=s.config.scene!=2&&s.active<unsigned(s.config.count)?1/std::max(1.f,s.config.spawnHz):(1./128)/s.speed.load();due=std::max(due+interval,t);
+    double interval=s.config.scene!=2&&s.active<unsigned(s.config.count)?1/s.config.spawnHz:(1./128)/s.speed.load();due=std::max(due+interval,t);
    }
    double remaining=due-now();if(s.paused||s.fault)Sleep(2);else if(remaining>0&&timer){LARGE_INTEGER duration;duration.QuadPart=-std::max<LONGLONG>(1,LONGLONG(remaining*1e7));SetWaitableTimer(timer,&duration,0,nullptr,nullptr,FALSE);WaitForSingleObject(timer,20);}else SwitchToThread();
   }if(timer)CloseHandle(timer);return 0;
@@ -98,7 +104,7 @@ struct Renderer {
   IDXGIFactory4 *factory=nullptr;IDXGISwapChain1 *sc=nullptr;check(CreateDXGIFactory2(0,IID_PPV_ARGS(&factory)));DXGI_SWAP_CHAIN_DESC1 d={};d.Width=1600;d.Height=900;d.Format=DXGI_FORMAT_B8G8R8A8_UNORM;d.SampleDesc.Count=1;d.BufferUsage=DXGI_USAGE_RENDER_TARGET_OUTPUT;d.BufferCount=3;d.SwapEffect=DXGI_SWAP_EFFECT_FLIP_DISCARD;check(factory->CreateSwapChainForHwnd(queue,w,&d,nullptr,nullptr,&sc));check(sc->QueryInterface(IID_PPV_ARGS(&swap)));factory->MakeWindowAssociation(w,DXGI_MWA_NO_ALT_ENTER);IDXGIAdapter1 *adapter=nullptr;if(SUCCEEDED(factory->EnumAdapterByLuid(device->GetAdapterLuid(),IID_PPV_ARGS(&adapter)))){LARGE_INTEGER version={};if(SUCCEEDED(adapter->CheckInterfaceSupport(__uuidof(IDXGIDevice),&version)))snprintf(driver,sizeof(driver),"%u.%u.%u.%u",HIWORD(version.HighPart),LOWORD(version.HighPart),HIWORD(version.LowPart),LOWORD(version.LowPart));drop(adapter);}drop(sc);drop(factory);
   D3D12_DESCRIPTOR_HEAP_DESC hd={};hd.Type=D3D12_DESCRIPTOR_HEAP_TYPE_RTV;hd.NumDescriptors=3;check(device->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&rtv)));stride=device->GetDescriptorHandleIncrementSize(hd.Type);hd.Type=D3D12_DESCRIPTOR_HEAP_TYPE_DSV;hd.NumDescriptors=1;check(device->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&dsv)));hd.Type=D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;hd.Flags=D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;check(device->CreateDescriptorHeap(&hd,IID_PPV_ARGS(&gui)));
   check(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,IID_PPV_ARGS(&allocator)));check(device->CreateCommandList(0,D3D12_COMMAND_LIST_TYPE_DIRECT,allocator,nullptr,IID_PPV_ARGS(&list)));check(list->Close());check(device->CreateFence(0,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&fence)));event=CreateEventW(nullptr,FALSE,FALSE,nullptr);
-  snapshot=buffer(192*G7Scene::capacity,D3D12_HEAP_TYPE_DEFAULT);previousSnapshot=buffer(192*G7Scene::capacity,D3D12_HEAP_TYPE_DEFAULT);timestampRead=buffer(16,D3D12_HEAP_TYPE_READBACK);D3D12_QUERY_HEAP_DESC query={D3D12_QUERY_HEAP_TYPE_TIMESTAMP,2,0};check(device->CreateQueryHeap(&query,IID_PPV_ARGS(&queries)));
+  snapshot=buffer(192ull*s.scene.capacity,D3D12_HEAP_TYPE_DEFAULT);previousSnapshot=buffer(192ull*s.scene.capacity,D3D12_HEAP_TYPE_DEFAULT);timestampRead=buffer(16,D3D12_HEAP_TYPE_READBACK);D3D12_QUERY_HEAP_DESC query={D3D12_QUERY_HEAP_TYPE_TIMESTAMP,2,0};check(device->CreateQueryHeap(&query,IID_PPV_ARGS(&queries)));
   D3D12_ROOT_PARAMETER rp[3]={};rp[0].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[0].ShaderVisibility=D3D12_SHADER_VISIBILITY_VERTEX;rp[1].ParameterType=D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;rp[1].Constants.Num32BitValues=sizeof(Constants)/4;
   rp[2].ParameterType=D3D12_ROOT_PARAMETER_TYPE_SRV;rp[2].Descriptor.ShaderRegister=1;rp[2].ShaderVisibility=D3D12_SHADER_VISIBILITY_VERTEX;D3D12_ROOT_SIGNATURE_DESC rd={3,rp,0,nullptr,D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT};ID3DBlob *blob=nullptr,*err=nullptr;check(D3D12SerializeRootSignature(&rd,D3D_ROOT_SIGNATURE_VERSION_1,&blob,&err));drop(err);check(device->CreateRootSignature(0,blob->GetBufferPointer(),blob->GetBufferSize(),IID_PPV_ARGS(&root)));drop(blob);
   auto shader=[](const wchar_t*path){ID3DBlob *b=nullptr;check(D3DReadFileToBlob(path,&b));return b;};auto vs=shader(L"zig-out/bin/g7_sphere_vs.dxil"),ps=shader(L"zig-out/bin/g7_sphere_ps.dxil");D3D12_GRAPHICS_PIPELINE_STATE_DESC pd={};pd.pRootSignature=root;pd.VS={vs->GetBufferPointer(),vs->GetBufferSize()};pd.PS={ps->GetBufferPointer(),ps->GetBufferSize()};pd.BlendState.RenderTarget[0].RenderTargetWriteMask=D3D12_COLOR_WRITE_ENABLE_ALL;pd.SampleMask=UINT_MAX;pd.RasterizerState.FillMode=D3D12_FILL_MODE_SOLID;pd.RasterizerState.CullMode=D3D12_CULL_MODE_NONE;pd.RasterizerState.DepthClipEnable=TRUE;pd.DepthStencilState.DepthEnable=TRUE;pd.DepthStencilState.DepthWriteMask=D3D12_DEPTH_WRITE_MASK_ALL;pd.DepthStencilState.DepthFunc=D3D12_COMPARISON_FUNC_LESS;pd.PrimitiveTopologyType=D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;pd.NumRenderTargets=1;pd.RTVFormats[0]=DXGI_FORMAT_B8G8R8A8_UNORM;pd.DSVFormat=DXGI_FORMAT_D32_FLOAT;pd.SampleDesc.Count=1;check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&pipeline)));drop(vs);drop(ps);vs=shader(L"zig-out/bin/g7_container_vs.dxil");ps=shader(L"zig-out/bin/g7_container_ps.dxil");pd.VS={vs->GetBufferPointer(),vs->GetBufferSize()};pd.PS={ps->GetBufferPointer(),ps->GetBufferSize()};check(device->CreateGraphicsPipelineState(&pd,IID_PPV_ARGS(&containerPipeline)));drop(vs);drop(ps);
