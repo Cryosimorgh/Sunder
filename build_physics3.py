@@ -5,7 +5,7 @@ from windows_sdk import sdk,headers,compiler
 from dev_test import dependencies
 R=Path(__file__).resolve().parent
 OUT=R/'evidence/p10/build'
-ENTRIES=['clear','prepare','hash','contacts','solve','gather','integrate','validate','publish']
+ENTRIES=['clear','prepare','hash','contacts','solve','gather','integrate','validate','publish','converge_clear','converge_check','converge_finish','cache_clear','cache_publish','color','colored_solve','color_prepare']
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
     dxc=sdk()[1]
@@ -26,5 +26,5 @@ def main():
         if p.returncode:raise RuntimeError(f'{cmd[0]} exit {p.returncode}: {p.stdout[-1500:]}{p.stderr[-1500:]}')
     result=dict(identity,outputs={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in OUT.iterdir() if p.suffix in ['.dll','.dxil']})
     (OUT/'manifest.json').write_text(json.dumps(result,indent=2))
-    print('PASS native3D build: 9 shaders and isolated runtime DLL')
+    print('PASS native3D build: 17 shaders and isolated runtime DLL')
 if __name__=='__main__':main()

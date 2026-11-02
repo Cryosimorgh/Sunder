@@ -104,6 +104,11 @@ class TickResult:
     wall_us: float = 0.
     gpu_fixed_step_deadline_miss: bool = False
     host_fixed_step_deadline_miss: bool = False
+    gpu_candidates: int = 0
+    gpu_max_degree: int = 0
+    candidate_stage_us: float = 0.
+    native_submit_completion_us: float = 0.
+    gpu_passes_us: tuple[float, ...] = ()
 
 
 class NativeResult(C.Structure):
@@ -134,6 +139,7 @@ class Backend:
             "resume_clock": ([C.c_void_p, C.c_uint32, C.c_float], C.c_int),
             "tick": ([C.c_void_p, C.c_float, C.c_void_p, C.c_float, C.c_uint32, C.POINTER(NativeResult)], C.c_int),
             "read": ([C.c_void_p, C.c_void_p], C.c_int),
+            "contacts": ([C.c_void_p, C.c_void_p, C.c_uint32], C.c_int),
             "acquire": ([C.c_void_p, C.POINTER(NativeLease)], C.c_int),
             "release": ([C.c_void_p, C.POINTER(NativeLease)], C.c_int),
             "adapter": ([C.c_void_p], C.c_char_p),
@@ -181,6 +187,24 @@ class Backend:
         if not self.dll.ph3_read(self.ptr, a.ctypes.data):
             raise WorldError("BACKPRESSURE_OR_DEVICE", "accepted-state readback unavailable")
         return a
+
+    def diagnostic_contacts(self, count: int) -> np.ndarray:
+        """Read native records: two body IDs, normal impulse, signed gap.
+
+        Gap <= 0 means overlap/touch; positive gap is a speculative contact.
+        This causes a GPU readback and must not enter hot-loop timings.
+        """
+        if not 0 <= count <= self.cfg.contact_capacity:
+            raise WorldError("INVALID_COMMAND", "contact count outside configured budget")
+        layout = np.dtype({"names": ["a", "b", "normal_impulse", "gap"],
+                           "formats": ["<u4", "<u4", "<f8", "<f8"],
+                           "offsets": [0, 4, 16, 80], "itemsize": 128})
+        if not count:
+            return np.empty(0, dtype=layout)
+        raw = C.create_string_buffer(count * 128)
+        if not self.dll.ph3_contacts(self.ptr, C.cast(raw, C.c_void_p), count):
+            raise WorldError("BACKPRESSURE_OR_DEVICE", "contact diagnostics unavailable")
+        return np.frombuffer(raw, dtype=layout, count=count).copy()
 
     def acquire(self) -> NativeLease:
         lease = NativeLease()
@@ -507,10 +531,20 @@ class World:
         cause = ""
         discard_ok = True
         needs_discard = candidate is not None
+        stage_us = 0.
+        native_us = 0.
         try:
             if candidate is not None:
-                self._backend.stage(candidate)
-            ok, r = self._backend.tick()
+                stage_start = time.perf_counter_ns()
+                try:
+                    self._backend.stage(candidate)
+                finally:
+                    stage_us = (time.perf_counter_ns() - stage_start) / 1000
+            native_start = time.perf_counter_ns()
+            try:
+                ok, r = self._backend.tick()
+            finally:
+                native_us = (time.perf_counter_ns() - native_start) / 1000
             if not ok:
                 cause = "native host/device submission failure"
             elif r.error:
@@ -563,7 +597,9 @@ class World:
                                 wall_us > self.config.deadline_ms * 1000, cause,
                                 wall_us,
                                 float(r.phases_us[7]) > self.config.dt * 1_000_000,
-                                wall_us > self.config.dt * 1_000_000)
+                                wall_us > self.config.dt * 1_000_000,
+                                int(r.candidates), int(r.max_degree), stage_us, native_us,
+                                tuple(float(r.phases_us[i]) for i in range(7)))
             self._history.append({"tick": self.tick_id, "commands": commands,
                                   "result": asdict(report)})
             self._clear_staging()
@@ -618,6 +654,14 @@ class World:
             self._backend.release(snapshot._lease)
             snapshot._closed = True
             self._leases.pop(snapshot._lease.serial)
+
+    def diagnostic_contacts(self, count: int) -> np.ndarray:
+        """Sample an accepted tick's native contact records, with readback overhead."""
+        with self._lock:
+            self._ready()
+            if not 0 <= count <= self.config.contact_capacity:
+                raise WorldError("INVALID_COMMAND", "invalid diagnostic contact count")
+            return self._backend.diagnostic_contacts(count)
 
     def grow(self, capacity: int):
         """Resize at an idle boundary; IDs survive, and old context is retained on failure."""

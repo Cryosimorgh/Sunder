@@ -1,0 +1,583 @@
+{
+  "date": "2026-11-02",
+  "status": "BOUNDED_LOCAL_REFERENCE_DEFAULT_PASS; PR_DRAFT / NO_GO_FOR_MERGE",
+  "project_directory": "C:\\Manavi\\Sunder",
+  "base_revision": "24500694f20f02c3e65649e9ac26473ebccac193",
+  "reference": "https://www.youtube.com/shorts/CuH6zqWkCtc?feature=share",
+  "reference_inspection": "Direct browser playback: sphere rain, V-shaped sloped container, bouncing and accumulation. Qualitative inspiration; no Jolt/Unity trajectory or throughput parity claim.",
+  "default": {
+    "scene": 2,
+    "count": 512,
+    "capacity": 1000,
+    "batch": 32,
+    "batches_per_simulated_second": 4,
+    "seed": 7,
+    "dt": 0.0078125,
+    "gravity_z": -19.62,
+    "radius": 0.3,
+    "radius_spread": 0.03,
+    "mass": 1,
+    "mass_spread": 0.1,
+    "restitution": 0.92,
+    "friction": 0,
+    "cell": 2.5,
+    "contact_capacity": 65536,
+    "max_solver_sweeps": 1024,
+    "floor_z": -8,
+    "end_walls_y": [
+      -16,
+      16
+    ],
+    "slope": 0.75,
+    "visible_top_x": [
+      -24,
+      24
+    ],
+    "visible_top_z": 6,
+    "spawn_z": 28,
+    "spawn_vz": -7,
+    "render_front_boundary": "cutaway; physics retains five planes"
+  },
+  "solver": "17 compute kernels; validated sparse warm starts; GPU active-edge coloring + projected Gauss-Seidel for bounded graphs; Jacobi fallback; original final validator and tolerances retained",
+  "production_cost_boundary": "Colored solver includes 256-byte metadata synchronization; GPU elapsed timestamps include host/queue gaps between packets. Diagnostic contacts and full-state reads are only in verification, outside the production display path.",
+  "rendering": "Two GPU copies of accepted SoA states; render-only interpolation; no full body CPU readback per displayed frame; scene epochs and births bypass history.",
+  "reference_cases": [
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 512,
+      "scene": 2,
+      "accepted": 3200,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 3881,
+      "positive_impulses": 24902,
+      "geometric_contacts": 1117,
+      "cross_belt_geometric": 0,
+      "sphere_impulse_contacts": 9725,
+      "plane_impulse_contacts": 15177,
+      "geometric_sphere_contacts": 0,
+      "upward_velocity_reversals": 13290,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "mean_gpu_us": 2519.332,
+      "committed": 27131904
+    },
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 1000,
+      "scene": 2,
+      "accepted": 3200,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 21881,
+      "positive_impulses": 83860,
+      "geometric_contacts": 2994,
+      "cross_belt_geometric": 0,
+      "sphere_impulse_contacts": 49761,
+      "plane_impulse_contacts": 34099,
+      "geometric_sphere_contacts": 0,
+      "upward_velocity_reversals": 36265,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "mean_gpu_us": 4868.992,
+      "committed": 27131904
+    }
+  ],
+  "legacy_cases": [
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 1000,
+      "scene": 0,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 2700,
+      "positive_impulses": 2330,
+      "geometric_contacts": 4915,
+      "cross_belt_geometric": 0,
+      "sphere_impulse_contacts": 2330,
+      "plane_impulse_contacts": 0,
+      "geometric_sphere_contacts": 4915,
+      "upward_velocity_reversals": 0,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "mean_gpu_us": 1463.606,
+      "committed": 27131904
+    },
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 1000,
+      "scene": 1,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 1889,
+      "positive_impulses": 6658,
+      "geometric_contacts": 96,
+      "cross_belt_geometric": 6,
+      "sphere_impulse_contacts": 6658,
+      "plane_impulse_contacts": 0,
+      "geometric_sphere_contacts": 96,
+      "upward_velocity_reversals": 0,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "mean_gpu_us": 3662.708,
+      "committed": 27131904
+    },
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 512,
+      "scene": 0,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 1344,
+      "positive_impulses": 722,
+      "geometric_contacts": 913,
+      "cross_belt_geometric": 0,
+      "sphere_impulse_contacts": 722,
+      "plane_impulse_contacts": 0,
+      "geometric_sphere_contacts": 913,
+      "upward_velocity_reversals": 0,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "mean_gpu_us": 1126.709,
+      "committed": 27131904
+    },
+    {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 512,
+      "scene": 1,
+      "accepted": 768,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 794,
+      "positive_impulses": 2666,
+      "geometric_contacts": 40,
+      "cross_belt_geometric": 11,
+      "sphere_impulse_contacts": 2666,
+      "plane_impulse_contacts": 0,
+      "geometric_sphere_contacts": 40,
+      "upward_velocity_reversals": 0,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "mean_gpu_us": 2649.35,
+      "committed": 27131904
+    }
+  ],
+  "same_authored_free_motion_case": {
+    "before": {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 512,
+      "scene": 1,
+      "accepted": 96,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 317,
+      "positive_impulses": 0,
+      "geometric_contacts": 0,
+      "cross_belt_geometric": 0,
+      "mean_gpu_us": 63665.557,
+      "committed": 4653056
+    },
+    "after": {
+      "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "count": 512,
+      "scene": 1,
+      "accepted": 96,
+      "rejected": 0,
+      "flags": 0,
+      "max_constraints": 317,
+      "positive_impulses": 0,
+      "geometric_contacts": 0,
+      "cross_belt_geometric": 0,
+      "sphere_impulse_contacts": 0,
+      "plane_impulse_contacts": 0,
+      "geometric_sphere_contacts": 0,
+      "upward_velocity_reversals": 0,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "mean_gpu_us": 1149.638,
+      "committed": 27131904
+    },
+    "note": "96 accepted ticks, radius .4, seed 7, same 317 constraints, no impulses. Shows removal of unnecessary iterations; not a collision-heavy speedup claim. Contact storage/budget increased in the new application."
+  },
+  "pacing": {
+    "quarter_tps": 31.996,
+    "half_tps": 63.648,
+    "one_tps": 127.722,
+    "two_tps": 256.014
+  },
+  "manual_ui_pacing": {
+    "slow_requested": 0.2,
+    "slow_actual": 0.2,
+    "slow_tps": 26,
+    "fast_requested": 2.0,
+    "fast_actual": 1.36,
+    "fast_tps": 174,
+    "throughput_limit_visible": true
+  },
+  "full_population_render": {
+    "mean_gpu_render_us": 27.131,
+    "gpu_snapshot_copies": 392,
+    "render_frames": 600,
+    "seconds": 4.997,
+    "last_gpu_render_us": 21.504,
+    "render_fps": 120.068,
+    "width": 1920,
+    "height": 1080,
+    "scene_epochs": 1,
+    "physics_accepted": 865,
+    "physics_rejected": 0,
+    "warmup_accepted": 225,
+    "min_population": 1000,
+    "max_population": 1000
+  },
+  "interactive_visual_session": {
+    "mean_gpu_render_us": 17.067,
+    "gpu_snapshot_copies": 12842,
+    "render_frames": 122747,
+    "seconds": 1022.943,
+    "last_gpu_render_us": 14.336,
+    "render_fps": 119.994,
+    "width": 1584,
+    "height": 861,
+    "scene_epochs": 3,
+    "physics_accepted": 20364,
+    "physics_rejected": 0
+  },
+  "radial_activation_probe": {
+    "status": "ACCEPTED",
+    "tick": 9,
+    "active": 512,
+    "error_bits": 0,
+    "contacts": 6220,
+    "max_degree": 32,
+    "gpu_us": 10603.0,
+    "attempt": 9,
+    "accepted_bytes_unchanged": null,
+    "witnesses": {
+      "normal": 0,
+      "tangent": 0,
+      "penetration": 0,
+      "normal_ratio": 0.0,
+      "tangent_ratio": 0.0,
+      "max_penetration": 0.0
+    },
+    "qualification": "ACTIVATION PROBE ONLY; sustained radial stress remains unqualified",
+    "original_baseline_reproduced": false
+  },
+  "acceptance_policy_proof": {
+    "base": "2450069",
+    "final_validator_identical_except_diagnostic_witnesses": true,
+    "tolerance_function_identical": true,
+    "validator_sha256_without_new_diagnostics": "4b5fe71f464bb02bb7600c53661b8b4d6084a9ce938976923ca244f22ce573c7",
+    "solver_algorithm_changed": "validated sparse warm start + active-edge colored projected Gauss-Seidel; Jacobi fallback",
+    "physics_dt": 0.0078125
+  },
+  "checks": {
+    "cpu_contracts": {
+      "passed": 28
+    },
+    "p10_native_oracle_groups": {
+      "passed": 8
+    },
+    "native_world_groups": {
+      "passed": 8
+    },
+    "g7_native_tests": {
+      "passed": 6,
+      "includes": [
+        "fixed-dt playback scaling",
+        "full-1K measured render window",
+        "GPU append continuity and rejection rollback",
+        "stale/delayed leases",
+        "window lifecycle",
+        "unrelated-directory launch",
+        "controlled API device removal"
+      ]
+    }
+  },
+  "failures_retained": [
+    {
+      "file": "trough-1k-final.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 1000,
+        "scene": 2,
+        "accepted": 2371,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 41505,
+        "positive_impulses": 526282,
+        "geometric_contacts": 38595,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 1.839,
+        "tangent_ratio": 0.0,
+        "mean_gpu_us": 29880.922,
+        "committed": 27131904
+      }
+    },
+    {
+      "file": "trough-1k.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 1000,
+        "scene": 2,
+        "accepted": 196,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 2279,
+        "positive_impulses": 1588,
+        "geometric_contacts": 53,
+        "cross_belt_geometric": 0,
+        "mean_gpu_us": 11439.378,
+        "committed": 9764864
+      }
+    },
+    {
+      "file": "trough-512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 196,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 1218,
+        "positive_impulses": 1399,
+        "geometric_contacts": 49,
+        "cross_belt_geometric": 0,
+        "mean_gpu_us": 11228.011,
+        "committed": 9764864
+      }
+    },
+    {
+      "file": "trough-active512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 2008,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 8200,
+        "positive_impulses": 33342,
+        "geometric_contacts": 2178,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 8.9,
+        "tangent_ratio": 0.0,
+        "mean_gpu_us": 28501.003,
+        "committed": 14024704
+      }
+    },
+    {
+      "file": "trough-colored512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 938,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 2936,
+        "positive_impulses": 24921,
+        "geometric_contacts": 1233,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 6.763,
+        "tangent_ratio": 23.701,
+        "mean_gpu_us": 14430.928,
+        "committed": 14024704
+      }
+    },
+    {
+      "file": "trough-default512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 328,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 465,
+        "positive_impulses": 678,
+        "geometric_contacts": 4,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 1.143,
+        "tangent_ratio": 0.0,
+        "mean_gpu_us": 6086.236,
+        "committed": 9764864
+      }
+    },
+    {
+      "file": "trough-parallel1k.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 1000,
+        "scene": 2,
+        "accepted": 1940,
+        "rejected": 1,
+        "flags": 1,
+        "max_constraints": 32021,
+        "positive_impulses": 107590,
+        "geometric_contacts": 5778,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 0.0,
+        "tangent_ratio": 0.0,
+        "mean_gpu_us": 7964.654,
+        "committed": 14155776
+      }
+    },
+    {
+      "file": "trough-predicated512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 674,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 1703,
+        "positive_impulses": 7396,
+        "geometric_contacts": 73,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 83.019,
+        "tangent_ratio": 46.454,
+        "mean_gpu_us": 24842.885,
+        "committed": 9830400
+      }
+    },
+    {
+      "file": "trough-smooth-wide512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 1922,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 8218,
+        "positive_impulses": 29026,
+        "geometric_contacts": 737,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 1.242,
+        "tangent_ratio": 0.0,
+        "mean_gpu_us": 14587.847,
+        "committed": 14024704
+      }
+    },
+    {
+      "file": "trough-smooth512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 448,
+        "rejected": 1,
+        "flags": 2,
+        "max_constraints": 150,
+        "positive_impulses": 1162,
+        "geometric_contacts": 1,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 0.0,
+        "tangent_ratio": 0.0,
+        "mean_gpu_us": 881.145,
+        "committed": 14024704
+      }
+    },
+    {
+      "file": "trough-spread512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 805,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 1914,
+        "positive_impulses": 9117,
+        "geometric_contacts": 316,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 2.791,
+        "tangent_ratio": 4.413,
+        "mean_gpu_us": 19130.282,
+        "committed": 9830400
+      }
+    },
+    {
+      "file": "trough-warm512.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 789,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 1741,
+        "positive_impulses": 8541,
+        "geometric_contacts": 387,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 5.464,
+        "tangent_ratio": 5.176,
+        "mean_gpu_us": 20099.719,
+        "committed": 14024704
+      }
+    },
+    {
+      "file": "trough-witness.json",
+      "status": "REJECTED EXPLORATORY VARIANT; NOT QUALIFIED",
+      "summary": {
+        "adapter": "NVIDIA GeForce RTX 4070 Ti SUPER",
+        "count": 512,
+        "scene": 2,
+        "accepted": 328,
+        "rejected": 1,
+        "flags": 4,
+        "max_constraints": 465,
+        "positive_impulses": 678,
+        "geometric_contacts": 4,
+        "cross_belt_geometric": 0,
+        "normal_ratio": 1.143,
+        "tangent_ratio": 0.0,
+        "mean_gpu_us": 6125.647,
+        "committed": 9764864
+      }
+    }
+  ],
+  "limitations": [
+    "Roomier smooth-sphere configuration is distinct from rejected narrower/frictional piles.",
+    "Sphere responses in reference runs are speculative positive-gap impulses; raw geometric sphere count is zero. Geometric sphere contacts are separately proven by legacy cube/belt cases.",
+    "Impulse occurrences include support constraints and are not a unique impact count. Upward reversals compare accepted velocities below -.5 to above +.5.",
+    "Requested playback can exceed available throughput; achieved rate is displayed.",
+    "Large-world/full previous-gate campaigns, arbitrary edited settings/seeds, physical adapter removal and independent final review remain unqualified.",
+    "No OS-confirmed displayed-frame or input latency claim."
+  ],
+  "identity_note": "Measured data predates the source commit; source identities below identify the checked-in working source. Final-head rebuild and checks are delivered in the handoff. Earlier exploratory variants are retained observations, not immutable qualified revisions.",
+  "source_sha256": {
+    "build_g7_demo.py": "95da2fe22de08c8f543970db4ccad496cbe48f38853665a545644fc668ce0bef",
+    "build_physics3.py": "69c7ec16c6a4fd7e9fc34c1c3d992fef9d1b0993d93f34cac66c560d9572cbfc",
+    "g7_demo.cpp": "86cc2425a609b5d7eedf3a79417a6aa63283260329d06c12069af9572a805915",
+    "g7_render.hlsl": "2884109bab52e87877f5eef7bf8b0440bcd45f80081e6027eed9645aa5d87ba7",
+    "g7_scene.h": "9437ef7846372aa9898871cbfcbfd2a6679e43d19935bf0679ae531d7a02f8ba",
+    "physics3.c": "f15ee07b398c74df4365ac8e6317ad33a66b858e7b5967b44549ab072c289783",
+    "physics3.h": "592c10026c6b251a9fd23d0fd772c371c2ee1967967d3aa65e3c7d5a69f52e50",
+    "physics3.hlsl": "4663d36b793e509af6253441595bd0f6f4d29ab3a5a5ec4b58d54ff653dd94cd",
+    "reproduce_g7_failure.py": "f971c9ca412f604334fe180ff9c4521cf6630fb2abcfb9daf22359e89e446439",
+    "test_g7_native.py": "fb0fbe6eb817c64ab57ff7a25030a770a3e6fb01e5db8d786ee73be689ec276a",
+    "RUN_G7_RENDER_BENCHMARK.cmd": "3c8283fd3ed6c11eb5471ef0c18eac8aa437cc65635f7b7482bcb526e851d7d5",
+    "docs/G7_DENSE_WORKLOADS.md": "81180afead0f32c6c42f881fdd0b44769a270088f074a5879debd099c536daa0",
+    "docs/ENGINE_ARCHITECTURE.md": "2dc34c15e147c2a8749e07047d67c2396180a0b09b97dceb71e2c7e3bd74b9f8"
+  }
+}

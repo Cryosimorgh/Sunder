@@ -4,7 +4,7 @@
 **Record date:** 2026-11-02
 **Document type:** Living engineering record  
 **Style:** Clear technical English, based on ASD-STE100 principles without strict controlled-language limits  
-**Status:** Experimental GPU physics engine. **P10 native 3D foundation: GO within the historical bounded tested envelope. P10 general-purpose headless world API: BOUNDED NATIVE CORRECTNESS GO at ed618f9; final-head sweep and CI required before merge.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
+**Status:** G7 native Win32/D3D12 3D application IMPLEMENTED; bounded local 512/1K native evidence PASS. PR #9 stays DRAFT / merge NO-GO pending final acceptance. Original dense radial stress and full-scale qualification remain unqualified. **P10 native 3D foundation: GO within the historical bounded tested envelope. P10 general-purpose headless world API: BOUNDED NATIVE CORRECTNESS GO at ed618f9; final-head sweep and CI required before merge.** G5 is **DEFERRED / NOT QUALIFIED**. G6 and production release remain **NOT QUALIFIED**. P9's bitwise replay guarantee remains unresolved and does not block numerically validated 3D development. P4 remains an explicit rendering option; matching-tick rendering remains the default for the planar viewer.
 
 > **Update rule:** Update this document in the same change that closes, rejects, or reopens a development breakpoint. Keep prior results and their limitations. Do not turn a local experiment into a released feature by changing its status here.
 
@@ -34,6 +34,194 @@ Use these labels throughout the document:
 | **Conditionally accepted** | The scoped tests pass, but at least one exit condition is open. |
 | **Experimental** | A local or branch-specific change needs broader evidence. |
 | **Planned** | A design target. No implementation claim. |
+
+### G7 reference motion and solver breakpoint (2026-11-02)
+
+**Current default:** native sphere rain into a rendered sloped trough, based on
+actual inspection of the user's video. Five real Physics3 planes define floor
+z=-8, .75 slopes and end walls +/-16; the front is a visual cutaway. Smooth
+spheres (.92 restitution, zero friction) fall under -19.62 gravity. The larger
+container is a separately qualified demo envelope; narrower/frictional pile
+failures are preserved, not promoted. Cube/belts remain explicit scene presets.
+
+**Solver contract change:** small connected graphs use a GPU-built active-edge
+coloring and projected Gauss-Seidel with accepted-only sparse warm starts.
+Color members share no body. Inactive constraints re-enter the active set when
+needed; all constraints face the unchanged final KKT/penetration validator.
+There are 17 compute kernels, an 8-byte predication resource, grid coloring/list
+workspace and a bounded cache in free-state scratch. The Jacobi path remains for
+larger/uncolorable graphs. Numerical replay remains distinct from bitwise replay.
+
+`ph3_stage_append` preserves existing accepted rows on GPU while admitting new
+slots transactionally. Failure rolls back all admissions. The lease and result
+ABIs are unchanged. Mandatory 256-byte metadata synchronization is part of the
+production solver cost, not optional diagnostic cost. GPU elapsed timestamps
+include host gaps between command packets; isolated kernel busy time is not
+reported. Optional verification readbacks are outside the production display path.
+
+**Render/pacing:** two accepted GPU snapshots supply render-only interpolation;
+new births and epochs bypass history. No candidate/rejected state feeds graphics.
+The 1/128-s clock is unchanged. High-resolution scheduling and requested/achieved
+rate reporting replace the ineffective saturated speed control. Native pacing
+measures approximately 32/64/128/256 TPS at .25/.5/1/2x on the pacing case. Manual
+UI operation confirms changed native rate and truthful throughput-limit reporting.
+Present counters and timestamp aggregation remain bounded through minimization.
+
+**Local evidence:** RTX 4070 Ti SUPER; 512 and 1K reference cases each accept
+3200 ticks, no rejection. The 1K mean GPU timeline is approximately 4.87 ms. Legacy
+512/1K cube/belt cases pass 768 ticks with actual geometric cross-belt contacts.
+The formerly rejected radial activation now passes tick 9; sustained radial
+compression remains unqualified. Six native G7 tests, 28 CPU contracts, eight
+P10 oracle groups and eight native-world groups pass. Native images confirm
+falling, bouncing and accumulation; a full 1K/1080p test renders 600 frames in
+4.997 s after warmup, with minimum/maximum population 1000.
+See [G7 usage/evidence](G7_DENSE_WORKLOADS.md) and the machine-readable
+`G7_REFERENCE_MOTION_EVIDENCE.json`. Earlier failures and per-case data remain in
+one focused ZIP. No final acceptance predicate or tolerance was weakened.
+
+**Gate boundary:** bounded local demo PASS; PR #9 remains DRAFT / merge NO-GO
+pending independent review. Dense frictional piles, edited seeds/settings, big-world
+performance, physical device loss and a full previous-gate sweep are NOT QUALIFIED.
+This solver change does not inherit the old binary's complete hardware campaign.
+G0-G4 retain their historical scope; G5 deferred, G6 unqualified and P9 unresolved.
+
+### Historical first native graphical application breakpoint (2026-11-02)
+
+**2026-11-02 direct-launch correction:** Runtime assets and evidence resolve from
+`zig-out/bin/SunderG7.exe` to the project root, independently of the invoking
+working directory. Missing shader assets receive a specific build instruction.
+The reported 600-frame benchmark failure from `zig-out/bin` reproduced before
+the fix (exit 1) and passes afterward (600 frames at 1920x1080, exit 0). Five
+native tests pass, including unrelated-directory launch, lifecycle, rejection
+rollback and controlled API removal. Physics policy and qualification are unchanged.
+
+Primary entry: `LAUNCH_G7_CAPABILITIES_DEMO.cmd`; the old demo CMD redirects
+there. `g7_demo.cpp`, `g7_scene.h`, and `g7_render.hlsl` replace the primary
+Tkinter display with Win32/D3D12 perspective sphere impostors, analytic surface
+depth, one GPU instanced draw and the pinned ImGui backends. A physics worker
+executes fixed 1/128-s native ticks independently of rendering. CPU scene
+code authors initial conditions only: opposing waves in a 3D sphere cube and
+two separated volumetric toroidal clouds with counterrotation and closing speeds.
+
+**Ownership:** a narrow internal native device/resource bridge validates the
+existing accepted-state lease. An SRW lock serializes Physics3 access; the
+render thread tries it without waiting for a tick. It copies accepted data
+GPU-to-GPU into its own snapshot, tracks the DIRECT-queue fence before submission
+and releases afterward. Buffer COMMON promotion/decay preserves producer resource
+state. Snapshot/allocator reuse waits for the frame fence. Busy physics renders
+the previous accepted GPU snapshot. No per-frame CPU body readback or collision
+interpolation occurs. Fixed capacity is 1,000 native slots, with static parked
+unused slots excluded from admissions/drawing. Scene epochs separate handle
+identities. Rejected ticks cannot advance admissions. Unfenced work is quarantined.
+
+**Physics boundary:** additive diagnostic atomics record normal/tangent residual
+ratios and penetration witnesses. Counts can be partial after fail-closed exit.
+No solver equation, acceptance predicate or tolerance was weakened. The original
+512-body dense radial cube accepts fill tick 8 then rejects flags 12: degree 32,
+6,220 constraints, KKT and penetration witnesses (0.003741 units). Slower radial
+compression also fails later. That stress case remains unsupported. The separate
+native demo uses cube speed 0.7 / belt closing 0.6, 1.0 cell, 12,000 contacts and
+512 application iterations. Engine defaults are unchanged. Late 128-iteration
+rejections are retained as evidence, not silently discarded.
+
+**Measured locally:** RTX 4070 Ti SUPER, driver 32.0.16.1088. Four 512/1K cube/belt
+cases each accept 768 ticks; native raw gap<=0 cross-belt contacts and positive
+impulses are observed. Physics allocation is 4,653,056 bytes. A separate 1K 1080p
+run renders 600 frames in 10.210 s (58.77 FPS), mean rendering GPU time 60.8 us
+including the accepted-state copy. Sampled native physics averages about 49-56 ms;
+no 128-TPS or OS displayed-frame/latency claim. Commands, final repetition and
+focused handoff evidence are described in [G7 documentation](G7_DENSE_WORKLOADS.md).
+
+**Checks:** 28 CPU contracts; eight P10 native oracle groups; eight native-world
+groups; G7 byte-for-byte rollback, delayed/stale lease, actual window lifecycle
+and controlled API device-removal tests pass. Visual inspection confirms shaded
+sphere motion. Physical adapter removal, long leak campaigns, edited settings and
+full-scale qualification remain NOT RUN. Final visual acceptance and independent
+final-head review remain open; **PR #9 stays draft / merge NO-GO**. Historical
+G0-G4 scope, G5 deferred, G6 not qualified and P9 unresolved are unchanged.
+
+**Next action:** review native captures and bounded hardware evidence; qualify
+longer sessions/edited controls; improve solver scheduling without weaker
+validation. Do not promote the original radial stress or larger populations.
+
+### Historical G7 benchmark implementation breakpoint — NOT QUALIFIED (2026-11-02)
+
+**Branch:** `g7-dense-dynamic-collision-workloads-20261102`, based on merged
+P10 main `8a5385b11ef108be7e5e530a12ce133152ea0896`.
+The branch adds `g7_scenarios.py`, `run_g7.py`,
+`run_g7_windows.py`, `RUN_G7_WINDOWS.cmd`,
+`test_g7_scenarios.py`, `.github/workflows/g7-cpu-contracts.yml`,
+and [G7 workload instructions](G7_DENSE_WORKLOADS.md). A small
+`sunder_world.py` adapter change exposes optional native `ph3_contacts`
+readback (128-byte contact records) plus measured candidate staging and
+native host submission/completion, candidate count and maximum degree per
+tick. The D3D12 physics kernel, configured P10 iterations and acceptance
+thresholds, and old planar physics source are **unchanged**.
+
+The cubic spawning volume authors 3D spheres on a seeded nonoverlapping
+lattice, fills exactly the configured capacity in accepted per-tick batches
+as active temporary static spheres, then changes all bodies to dynamic on the
+tick after full acceptance. This holds under nonzero gravity and enables
+inward, swirl or funnel velocity fields. The second scene authors two disjoint
+seeded 3D toroidal clouds that counter-rotate and close along opposite x
+directions. No cube collider, CPU contact solver, N-body gravity, general
+GPU renderer or precomputed contact pairs have been introduced.
+Sparse P10 slots still use inert placeholders. CPU scene authorship and
+structural edits remain separate from GPU simulation timing.
+
+Instrumented native contact readbacks distinguish overlapping/impulsive
+contacts from speculative constraints. A positive-gap normal impulse never
+counts as proved cross-belt geometric overlap. The sampled graph gives connected
+components, largest island, degree, cross-belt edges and contact churn.
+It is a **diagnostic path**, not a normal production tick, and contact
+sampling cadence can miss the absolute peak. Preset-dependent explicit
+contact budgets are used to avoid pretending sparse separated-pair memory
+budgets qualify dense contact topology. Native per-tick counters,
+seven actual GPU-stage timing distributions, GPU/host percentiles,
+separate diagnostic readback and host graph times, fixed-step misses,
+driver/adapter, recorded hashes, active/attempted body counts, rejected
+creation counts and error causes are emitted. Sample-inferred pre-impact,
+first contact, peak and post-impact phases use distinct CSV/JSON records. The Windows
+runner attempts all required 1K/10K/100K workloads with independent native
+worlds and existing P10 full gates; it creates a unique, checksum-inventoried
+failure-inclusive ZIP. Above 100K requires explicit opt-in and memory
+admission. CPU scene tests and CI do **not** validate the D3D12 physics.
+
+**Current evidence:** The user reported one G7 Windows full-suite attempt:
+`build_physics3`, G7 CPU scene contracts and P10 CPU contracts PASS;
+`g7_native_both` and `p10_native_full` FAIL. The original logs have
+not yet been supplied or audited. The first ZIP package attempt also failed
+because archive keys used Windows path separators, so no verified handoff
+was produced. The following focused branch correction uses explicit POSIX
+archive members, streamed SHA-256 verification and a repackage-only option
+(`python run_g7_windows.py --package-existing latest`). A cross-platform
+synthetic failing-run archive regression passes in CPU CI. No new native
+hardware qualification was executed by this author. No measured G7 performance or
+large-island GO is claimed, no 1M arbitrary-connected qualification, and
+no P9 bitwise, G5 or production-release promotion. Keep the PR draft until
+an exact tested SHA, full native accepted runs, genuine cross-belt
+overlaps/impulses, dense multi-body islands, unchanged P10 physical gates,
+full required-vs-executed matrix and independent reviewer audit are present.
+
+**Visual demo follow-up (2026-11-02):** Implemented `g7_visual_demo.py`
+and `LAUNCH_G7_DEMO.cmd` as a real interactive display of native
+accepted GPU sphere positions. User controls switch between the cubic
+spawning volume and the two toroidal belts, orbit/zoom, pause/play, density,
+body capacity and batch size. On every displayed frame, `World.acquire()`
+performs an explicit GPU readback and Tkinter paints projected 3D spheres.
+This is **GUI demonstration evidence**, not an efficient GPU renderer,
+and its host wall/readback times must not be mixed with headless hot-loop
+latency. Native sphere contacts are still computed by P10 D3D12, never by a
+new CPU solver. GUI acceptance on user's Windows adapter is pending.
+
+**2026-11-02 change log:** Created G7 CPU-authoring and native benchmark
+evidence interface on the dedicated branch; hardened temporary static fill
+against gravitational drift; separated positive-gap impulses from geometric
+cross-belt impact evidence; instrumented all seven native GPU phases; retained
+full P10 native raw evidence in the unique G7 handoff. Preserved old
+physics/kernel code and thresholds. Open risks: 100K dense contact budget/admission,
+P10 speed-envelope rejections, biased diagnostic sampling, GPU budget
+limits, and unexecuted hardware qualification. Decision: **G7 NO-GO**.
 
 ### Application-facing headless world API — P10 bounded native evidence GO (2026-11-02)
 
@@ -1396,6 +1584,8 @@ Next action:
 
 | Date | Breakpoint | Record update |
 |---|---|---|
+| 2026-11-02 | G7 reference motion / connected solver / accepted-state smoothing | Native gravity trough, GPU partial admissions, active-colored solver with unchanged final checks, live achieved-rate display. 512/1K reference 3200 ticks and six native tests pass. Dense frictional trials retained; PR draft. |
+| 2026-11-02 | G7 native application / bounded local hardware evidence | Native instanced perspective renderer, accepted GPU lease/copy bridge, cube/belts and invariant witnesses; 512/1K cases and lifecycle pass. Radial stress unsupported; PR #9 draft, acceptance open. G5/G6 unchanged. |
 | 2026-11-02 | P10 hardware evidence audit - bounded correctness GO, final-head integration conditional | 135 checksums and 28 source hashes verified; all 9 gates PASS at ed618f9 on RTX 4070 Ti SUPER. Original evidence retained. No physics changes. Full sweep and CI required on final commit before merge. |
 | 2026-10-31 | P10 native 3D foundation — bounded GO | Added tensor/quaternion 3D GPU sphere/plane dynamics, immutable publication and real delayed-reader proof. Seven native groups, all three stress scales and unchanged full 2D regressions pass. Numerical native validity required; bitwise replay remains unqualified. Formal G6/release remains not qualified. |
 | 2026-10-31 | P10 full native Windows attempt — NO-GO / no suitable D3D12 compute adapter | Source 510192f, 17 CPU-only PASS, 9 shaders and DLL compiled. Empty authored world fails D3D12 context/admission on Hyper-V Video; 16/1K, native oracle/replay, pool/rail and 10K/100K/1M NOT RUN. Immutable Actions artifact 13053607373, SHA-256 retained; PR #8 unmerged. |
