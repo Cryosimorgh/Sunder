@@ -13,6 +13,7 @@ import sys
 import traceback
 import uuid
 import zipfile
+import shutil
 
 ROOT = Path(__file__).resolve().parent
 SEND = ROOT / "G7-RESULTS-TO-SEND"
@@ -20,7 +21,11 @@ EVIDENCE = ROOT / "evidence" / "g7"
 
 
 def sha(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def git(*args):
@@ -54,11 +59,12 @@ def bundle(run_dir, stage, outcome):
     name = "Sunder-G7-" + stage + "-" + run_dir.name + ".zip"
     target = SEND / name
     if target.exists():
-        raise FileExistsError("never overwrite a G7 handoff")
+        target = SEND / ("Sunder-G7-" + stage + "-" + run_dir.name + "-" +
+                         uuid.uuid4().hex[:8] + ".zip")
     payloads = {}
     for file in sorted(run_dir.rglob("*")):
         if file.is_file() and file.name != "MANIFEST.json":
-            payloads[str(file.relative_to(run_dir))] = file
+            payloads[file.relative_to(run_dir).as_posix()] = file
     manifest = {
         "schema": "sunder-g7-evidence-bundle-v1",
         "stage": stage, "run_id": run_dir.name,
@@ -68,15 +74,32 @@ def bundle(run_dir, stage, outcome):
         "python": sys.version, "host": platform.platform(),
         "qualification": "GO requires actual native hardware correctness; ZIP alone never proves GO",
     }
-    (run_dir / "MANIFEST.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    with zipfile.ZipFile(target, "x", compression=zipfile.ZIP_DEFLATED) as z:
-        for key, file in payloads.items():
-            z.write(file, key)
-        z.write(run_dir / "MANIFEST.json", "MANIFEST.json")
-    with zipfile.ZipFile(target) as z:
-        for key, digest in manifest["sha256"].items():
-            if hashlib.sha256(z.read(key)).hexdigest() != digest:
-                raise AssertionError("ZIP verification failed: " + key)
+    manifest_bytes = json.dumps(manifest, indent=2).encode("utf-8")
+    (run_dir / "MANIFEST.json").write_bytes(manifest_bytes)
+    try:
+        with zipfile.ZipFile(target, "x", compression=zipfile.ZIP_DEFLATED) as z:
+            for key, file in payloads.items():
+                with file.open("rb") as source, z.open(key, "w") as dest:
+                    shutil.copyfileobj(source, dest, length=1024 * 1024)
+            z.writestr("MANIFEST.json", manifest_bytes)
+        # Compare both names and SHA-256 against the exact manifest.
+        with zipfile.ZipFile(target, "r") as z:
+            expected = set(manifest["sha256"]) | {"MANIFEST.json"}
+            if set(z.namelist()) != expected:
+                raise AssertionError("ZIP member list differs from manifest")
+            for key, digest in manifest["sha256"].items():
+                actual = hashlib.sha256()
+                with z.open(key) as member:
+                    for chunk in iter(lambda: member.read(1024 * 1024), b""):
+                        actual.update(chunk)
+                if actual.hexdigest() != digest:
+                    raise AssertionError("ZIP SHA-256 mismatch: " + key)
+            if z.read("MANIFEST.json") != manifest_bytes:
+                raise AssertionError("ZIP manifest bytes differ")
+    except BaseException:
+        # The original evidence stays untouched. A partial ZIP is not a handoff.
+        target.unlink(missing_ok=True)
+        raise
     return target
 
 
@@ -85,7 +108,29 @@ def main(argv=None):
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--quick", action="store_true")
     mode.add_argument("--full", action="store_true")
+    parser.add_argument("--package-existing", metavar="RUN_DIR_OR_LATEST",
+                        help="Package a previous failed launcher directory without rerunning")
     args = parser.parse_args(argv)
+    if args.package_existing:
+        source = args.package_existing
+        if source == "latest":
+            candidates = sorted((p for p in (EVIDENCE / "launcher").glob("*")
+                                 if p.is_dir() and (p / "RUN-RESULT.json").is_file()))
+            if not candidates:
+                parser.error("no previous G7 launcher evidence found")
+            run_dir = candidates[-1]
+        else:
+            run_dir = Path(source).resolve()
+        root = (EVIDENCE / "launcher").resolve()
+        if not run_dir.is_dir() or root not in run_dir.parents:
+            parser.error("--package-existing must reference a G7 launcher run directory")
+        result_file = run_dir / "RUN-RESULT.json"
+        if not result_file.is_file():
+            parser.error("previous launcher run has no RUN-RESULT.json")
+        result = json.loads(result_file.read_text(encoding="utf-8"))
+        target = bundle(run_dir, result.get("stage", "failed"), result)
+        print("Repackaged ORIGINAL evidence (no rerun):", target)
+        return 0
     stage = "quick" if args.quick else "full"
     uid = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ") + "-" + uuid.uuid4().hex[:8]
     directory = EVIDENCE / "launcher" / uid
