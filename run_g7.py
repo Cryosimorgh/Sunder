@@ -96,6 +96,7 @@ def topology(contacts, body_belts, active_count, previous):
 
     actual = set()
     cross = 0
+    cross_impulsive = 0
     overlapping = 0
     impulsive = 0
     for rec in contacts:
@@ -116,7 +117,13 @@ def topology(contacts, body_belts, active_count, previous):
         degree[a] += 1
         degree[b] += 1
         if body_belts[a] != -1 and body_belts[a] != body_belts[b]:
-            cross += 1
+            # Cross-belt IMPACT evidence requires geometric overlap/touch.
+            # A positive-gap constraint can still have a solver impulse and
+            # is separately recorded, never promoted to a proved impact.
+            if gap <= 0:
+                cross += 1
+            if impulse > 0:
+                cross_impulsive += 1
         pa, pb = root(a), root(b)
         if pa != pb:
             if sizes[pa] < sizes[pb]:
@@ -127,6 +134,7 @@ def topology(contacts, body_belts, active_count, previous):
     result = {"native_speculative_contacts": len(contacts),
               "overlapping_contacts": overlapping, "positive_impulse_contacts": impulsive,
               "observed_edges": len(actual), "cross_belt_edges": cross,
+              "cross_belt_positive_impulse_edges": cross_impulsive,
               "components_including_isolates": len(roots),
               "largest_island": max((sizes[i] for i in roots), default=0),
               "max_degree": max(degree, default=0),
@@ -213,6 +221,7 @@ def case(spec, args, directory, repeat):
         prior = None
         first_cross_tick = None
         peak_cross = 0
+        peak_cross_impulse = 0
         peak_island = 0
         maximum_overlap = 0
         last_sample_tick = -1
@@ -279,6 +288,8 @@ def case(spec, args, directory, repeat):
                     samples.append(shape)
                     last_sample_tick = frame
                     peak_cross = max(peak_cross, shape["cross_belt_edges"])
+                    peak_cross_impulse = max(peak_cross_impulse,
+                                             shape["cross_belt_positive_impulse_edges"])
                     peak_island = max(peak_island, shape["largest_island"])
                     maximum_overlap = max(maximum_overlap, shape["overlapping_contacts"])
                     if first_cross_tick is None and shape["cross_belt_edges"] > 0:
@@ -359,10 +370,11 @@ def case(spec, args, directory, repeat):
             dw.writerows(phase_rows)
         (directory / "phases.json").write_text(json.dumps(phase_rows, indent=2), encoding="utf-8")
         report["peak_cross_belt_edges"] = peak_cross
+        report["peak_cross_belt_positive_impulse_edges"] = peak_cross_impulse
         report["peak_largest_contact_island"] = peak_island
         report["peak_overlapping_contacts"] = maximum_overlap
         report["first_cross_belt_contact_tick"] = first_cross_tick
-        report["contact_graph_qualification"] = ("observed cross-belt impacts and nontrivial island"
+        report["contact_graph_qualification"] = ("observed geometric cross-belt overlaps and nontrivial island"
             if spec.scenario == "belts" and peak_cross and peak_island >= 3 else
             "observed dense contact graph" if spec.scenario == "cube"
             and spec.preset == "dense" and maximum_overlap and peak_island >= 3 else
