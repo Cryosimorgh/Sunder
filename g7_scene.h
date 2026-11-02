@@ -36,7 +36,7 @@ struct G7Config {
  void validate() const {
   if(!count||count>G7_MAX_STATE_SLOTS) throw std::runtime_error("Body count exceeds the native 4 GiB, 32-bit SoA address limit (not a UI cap)");
   if(!batch||batch>count) throw std::runtime_error("Spawn batch must be positive and not exceed body count");
-  if(!iterations||iterations>4096) throw std::runtime_error("Solver iterations must be within the supported native solver envelope (1..4096)");
+  if(!iterations) throw std::runtime_error("Solver iterations must be positive; high values may exceed GPU watchdog/runtime budgets");
   if(!placementAttempts) throw std::runtime_error("Placement attempts must be positive");
   if(scene<0||scene>2||density<0||density>1) throw std::runtime_error("Unknown scene or density mode");
   auto finite=[](float x){return std::isfinite(x);};
