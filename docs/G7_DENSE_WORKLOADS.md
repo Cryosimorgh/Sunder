@@ -11,9 +11,10 @@ legacy P9/G5 requirement has been relaxed.
 `cube`: a cubic **spawning volume**, not a rigid-body cube collider. All
 entities are P10 spheres. The seeded shuffled 3D lattice is filled in successive
 per-tick batches to the requested slot limit. It uses radius/mass variation
-and guaranteed initial spacing. Bodies stay at rest during filling to avoid
-late-insertion overlaps. Inward motion starts on the **tick after** the final
-fill is accepted. Isolated, moderate and dense velocity/pitch presets are
+and guaranteed initial spacing. Bodies are **active static spheres** during filling so even nonzero authored
+gravity cannot displace them into late-insertion overlaps. They become dynamic
+with their authored masses and chosen velocity field on the **tick after**
+the final fill is accepted. These active static spheres are not unused slots. Isolated, moderate and dense velocity/pitch presets are
 available. Every attempt, provisional handle, accepted count, post-fill tick,
 rejection, cause and boundary error is recorded.
 
@@ -69,7 +70,9 @@ User options: `--scenario cube|belts|both`, `--preset
 isolated|moderate|dense`, `--seed`, `--bodies`, `--duration-ticks`,
 `--post-full-ticks`, `--spawn-batch`, `--radius`, `--mass`,
 `--cube-size`, `--gravity X Y Z`, `--closing-speed`, `--spin-speed`,
-`--counter-rotate/--no-counter-rotate`, `--dt`, `--cell-size`,
+`--counter-rotate/--no-counter-rotate`, `--radius-spread`,
+`--mass-spread`, `--velocity-field inward|swirl|funnel`,
+`--perturbation`, `--dt`, `--cell-size`,
 `--contact-budget`, `--iterations`, `--deadline-ms`,
 `--max-committed-mib`, `--sample-every`, `--repeats`, `--quick`,
 `--full`, `--allow-large`, and `--output`.
@@ -77,7 +80,9 @@ isolated|moderate|dense`, `--seed`, `--bodies`, `--duration-ticks`,
 ## Evidence semantics
 
 `run_g7.py` emits per-run `ticks.csv`, `ticks.jsonl`,
-`samples.jsonl`, `case.json` and run `consolidated.json`. Its
+`samples.jsonl`, `phases.csv`, `phases.json`, `case.json`
+and run `consolidated.json`. Contact phase boundaries are **sample-based**
+(first observed cross-belt contact, sampled peak and post-peak). Its
 bounded GPU readback uses the existing native `ph3_contacts` ABI:
 each 128-byte record contains two body indices, signed geometric gap,
 and the normal impulse. Record samples distinguish speculative constraints
@@ -114,7 +119,8 @@ Native correctness must be independently reviewed before merging.
 1. Native D3D12 qualification and complete 1K/10K/100K performance tables
    have **not** been measured in this authoring environment.
 2. G7 samples are explicit GPU contact-buffer diagnostics. They can add
-   GPU readback overhead between ticks; do not conflate sampled cadence
+   GPU readback overhead between ticks; diagnostic GPU readback and CPU graph
+processing are reported separately. Do not conflate sampled cadence
    throughput with an unsampled sustained production run.
 3. Belt contacts are examined from the GPU's **pre-integration** contact
    buffer; peak graph/impact phases are diagnosed at sampling cadence, not
