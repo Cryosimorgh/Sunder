@@ -1,5 +1,7 @@
 # G7 — Dense Dynamic Collision Workloads (experimental implementation)
 
+See [experimental editable scalable benchmark (PR #11)](G7_SCALABLE_BENCHMARK.md) for branch-specific controls and resource bounds; its GPU scale acceptance remains unqualified.
+
 **Branch:** `g7-dense-dynamic-collision-workloads-20261102` (based on P10 merged `main` 8a5385b).  
 **Qualification:** bounded local native defaults PASS; PR #9 remains DRAFT /
 NO-GO for merge pending independent review and broader qualification. A GitHub CI CPU PASS or compilation alone
