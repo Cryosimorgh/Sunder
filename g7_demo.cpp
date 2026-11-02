@@ -152,7 +152,7 @@ struct Renderer {
    enter|=ImGui::InputText("Contact budget (0=auto)",typedContacts,sizeof(typedContacts),typeFlags);
    enter|=ImGui::InputText("Solver iterations",typedIterations,sizeof(typedIterations),typeFlags);
    ImGui::InputFloat("Spawn / second",&edit.spawnHz,0,0,"%.9g");
-   if(enter||ImGui::Button("APPLY TYPED VALUES"))applyTyped();
+   bool clickedApply=ImGui::Button("APPLY TYPED VALUES");if(enter||clickedApply)applyTyped();
    if(!typedError.empty())ImGui::TextWrapped("Input rejected: %s",typedError.c_str());
    ImGui::TextDisabled("Values take effect when applied. Native resource/physics limits still apply.");
    float speed=sim->speed;if(ImGui::InputFloat("Playback multiplier",&speed,0,0,"%.9g")&&std::isfinite(speed)&&speed>0)sim->speed=speed;ImGui::Text("Actual %.2fx / %.0f ticks per second",sim->paused?0:tps/128,sim->paused?0:tps);if(!sim->paused&&tps>0&&tps/128+.15<speed)ImGui::TextColored({1,.74f,.35f,1},"Physics throughput limits playback");
