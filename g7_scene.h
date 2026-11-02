@@ -19,7 +19,7 @@ struct G7Config {
  uint32_t batch=32, iterations=1024, placementAttempts=10000;
  int scene=2, seed=7, density=1;
  float radius=.30f, mass=1, radiusSpread=.03f, massSpread=.1f;
- float gravity=-19.62f, gravityX=0, gravityY=0, spawnHz=4;
+ float gravity=-19.62f, gravityOther=0, gravityX=0, gravityY=0, spawnHz=4;
  float restitution=-1, friction=-1, initialVz=-7, cell=0; // -1/0: per-scene native defaults
  float cubeSpeed=.7f, beltClosingSpeed=.6f, beltSpin=.025f;
  float beltMajorRadius=0, beltMinorRadius=0; // zero = scale with population
@@ -41,7 +41,7 @@ struct G7Config {
   if(scene<0||scene>2||density<0||density>1) throw std::runtime_error("Unknown scene or density mode");
   auto finite=[](float x){return std::isfinite(x);};
   if(!finite(radius)||!finite(radiusSpread)||!finite(mass)||!finite(massSpread)||
-     !finite(gravity)||!finite(gravityX)||!finite(gravityY)||!finite(spawnHz)||
+     !finite(gravity)||!finite(gravityOther)||!finite(gravityX)||!finite(gravityY)||!finite(spawnHz)||
      !finite(restitution)||!finite(friction)||!finite(initialVz)||!finite(cell)||
      !finite(cubeSpeed)||!finite(beltClosingSpeed)||!finite(beltSpin)||
      !finite(beltMajorRadius)||!finite(beltMinorRadius)||!finite(emitterWidthX)||
