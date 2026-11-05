@@ -29,11 +29,14 @@ jobs:
         run: zig fmt --check entity.zig transaction.zig
       - name: Validate storage and device Zig syntax
         run: zig ast-check storage.zig storage_device.zig reference_state.zig
+      - name: Stage test-only Zig contracts from test branch
+        run: |
+          git fetch --no-tags --depth=1 origin test
+          git show FETCH_HEAD:tests.zig > tests.zig
       - name: Validate entity mapping, generation and transaction rollback
         run: zig test tests.zig -O ReleaseSafe
       - name: Stage reference regression from test branch without committing it to production
         run: |
-          git fetch --no-tags --depth=1 origin test
           git show FETCH_HEAD:test_reference_state.zig > .test-reference.zig
       - name: Verify reference recurrence with test-branch contracts
         run: zig test .test-reference.zig -O ReleaseSafe

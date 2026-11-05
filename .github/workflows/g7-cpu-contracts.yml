@@ -25,6 +25,12 @@ jobs:
           python-version: '3.12'
       - name: Install CPU scene contract dependency
         run: python -m pip install numpy
+      - name: Stage test contracts from the dedicated test branch
+        run: |
+          git fetch --no-tags --depth=1 origin test
+          for file in test_g7_scenarios.py test_g7_infrastructure.py test_sunder_world.py test_p10_packaging.py test_world_sweep.py; do
+            git show "FETCH_HEAD:$file" > "$file"
+          done
       - name: Compile changed Python code (no D3D12 qualification)
         run: python -m py_compile g7_scenarios.py run_g7.py run_g7_windows.py test_g7_scenarios.py test_g7_infrastructure.py g7_visual_demo.py sunder_world.py
       - name: Deterministic scene and existing P10 host regression tests
