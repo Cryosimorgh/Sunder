@@ -19,6 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Stage test contracts from the dedicated test branch
+        run: |
+          git fetch --no-tags --depth=1 origin test
+          for file in test_g7_scene.cpp test_g7_ui_numbers.cpp; do
+            git show "FETCH_HEAD:$file" > "$file"
+          done
       - name: Build standalone scene contract
         run: g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic test_g7_scene.cpp -o /tmp/test_g7_scene
       - name: Check dynamic scene generation and numeric boundaries

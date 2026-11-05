@@ -5,7 +5,7 @@ import json
 import subprocess
 import sys
 from windows_sdk import compiler, headers, sdk
-from dev_test import dependencies
+from build_support import dependencies
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / 'zig-out/bin'
 

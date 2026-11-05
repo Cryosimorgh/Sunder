@@ -17,7 +17,7 @@ for directory in args.evidence:
  for p in directory.rglob('*'):
   if p.is_file():files[(Path('current-evidence')/directory.name/p.relative_to(directory)).as_posix()]=p
 if args.handoff_patch:files['CURRENT_WORKING_TREE.patch']=args.handoff_patch
-for name in ['build_billiards.py','package_billiards.py','test_billiards_build.py','test_billiards_physics.py','test_billiards_gameplay.py','test_billiards_package.py','pool_tests.zig','pool.hlsl','pool-schema.json','pool-layout.h','dev_test.py']:
+for name in ['build_billiards.py','build_support.py','package_billiards.py','pool.hlsl','pool-schema.json','pool-layout.h']:
  files['handoff-source/'+name]=r/name
 hashes={n:hashlib.sha256(p.read_bytes()).hexdigest() for n,p in files.items()}
 exe=files['GPUPhysicsBilliards.exe'].read_bytes();pe=struct.unpack_from('<I',exe,0x3c)[0];assert struct.unpack_from('<H',exe,pe+4)[0]==0x8664;op=pe+24;sec=op+struct.unpack_from('<H',exe,pe+20)[0]

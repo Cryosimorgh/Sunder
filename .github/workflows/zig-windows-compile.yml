@@ -1,0 +1,36 @@
+name: Zig storage Windows compile (no GPU execution)
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'storage.zig'
+      - 'storage_device.zig'
+      - 'reference_state.zig'
+      - 'entity.zig'
+      - 'transaction.zig'
+      - 'main.zig'
+      - 'build.zig'
+      - 'compile.py'
+      - '.github/workflows/zig-windows-compile.yml'
+
+jobs:
+  storage-compile:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: '0.15.2'
+      - name: Compile production Zig storage executable and D3D12 shaders
+        run: python compile.py
+      - name: Verify native output without claiming GPU execution
+        shell: pwsh
+        run: |
+          if (-not (Test-Path zig-out/bin/storage.exe)) { throw "Missing storage.exe" }
+          Write-Output "PASS: Zig storage and shaders compiled. GPU execution NOT QUALIFIED."

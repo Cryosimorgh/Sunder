@@ -1,7 +1,14 @@
 # Sunder test branch
 
-This branch preserves the pre-cleanup test and diagnostic tools from `main` at commit `8c50d6db83a1c31ad6fac7d52dc97c59b05a298b`.
+This is the dedicated home for standalone Python, Zig and C++ tests, native qualification harnesses, and historical G5/G6 diagnostic scripts. Those sources are intentionally excluded from the proposed production tree.
 
-Store all newly created standalone test files and experimental diagnostics here, not on `main`. Test an implementation change by merging/cherry-picking the relevant production commit into this branch, or by using a separate worktree with the proposed source files. Do not merge test-only files back into the production branch.
+The production files changed by draft PR #13 were overlaid here at commit `ce4dfe19ee055d32eea07164c42fdac17a9984ab` without copying production deletions, so existing test files remain intact. The test-branch source must be synchronized to the exact production revision before reporting qualification. Do not blindly merge production cleanup/deletion commits into this branch; selectively cherry-pick source changes or refresh relevant source files while retaining test-only files.
 
-Existing build and native verification dependencies have not yet been separated from production source. Until they are, keep the tests and build pipeline operational rather than deleting required source files on `main`.
+Run:
+```powershell
+python -m unittest test_g7_scenarios test_g7_infrastructure test_sunder_world test_p10_packaging test_world_sweep -v
+zig test tests.zig -O ReleaseSafe
+zig test test_reference_state.zig -O ReleaseSafe
+```
+
+On Windows with a suitable D3D12 adapter, run the appropriate bounded native gates via `python dev_test.py`, `python run_world_sweep.py --full`, or the documented launchers. Native GPU physics qualification cannot be inferred from CI CPU tests or compilation. Historical scripts are preserved for reproducibility, not endorsed as current production workflows.
