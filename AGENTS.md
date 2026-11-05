@@ -34,3 +34,7 @@ Update the relevant technical section, evidence boundary, G0–G6 status, open r
 Keep the record on the working branch and carry its changes back into `main` on integration. Do not create a separate one-off report as a substitute. Ordinary small fixes do not require a full rewrite or full benchmark campaign.
 
 Write short, precise technical English inspired by ASD-STE100, without rigid controlled-language wording.
+
+## Test branch policy
+
+New standalone test files, experimental verification scripts, and one-off harnesses belong on the `test` branch, not `main`. Before removing any existing test or Python utility from production, check imports, native link inputs, launchers, and CI dependencies. Existing build-coupled verification sources may remain until safely decoupled. Preserve regression coverage; never bypass it to satisfy branch hygiene. See `docs/TEST_BRANCH_POLICY.md`.
