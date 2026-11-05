@@ -1,0 +1,37 @@
+# Temporary one-shot branch-only formatter. Remove before merging.
+name: Temporary Zig formatting on cleanup branch
+
+on:
+  push:
+    branches:
+      - cleanup/production-hygiene-20261105
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cleanup/production-hygiene-20261105
+          fetch-depth: 1
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: '0.15.2'
+      - name: Format all handwritten Zig modules, excluding generated schema
+        run: |
+          git ls-files '*.zig' | grep -v '^layout.zig$' | xargs -r zig fmt
+          git diff --check
+      - name: Commit format-only changes to isolated PR branch
+        run: |
+          if git diff --quiet -- '*.zig'; then
+            echo 'Already formatted'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- '*.zig'
+          git commit -m 'Format handwritten Zig modules with Zig 0.15.2'
+          git push origin HEAD:cleanup/production-hygiene-20261105
