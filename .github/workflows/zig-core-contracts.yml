@@ -13,7 +13,6 @@ on:
       - 'storage.zig'
       - 'storage_device.zig'
       - 'reference_state.zig'
-      - 'tests.zig'
       - '.github/workflows/zig-core-contracts.yml'
 
 jobs:
@@ -25,33 +24,20 @@ jobs:
       - uses: mlugg/setup-zig@v2
         with:
           version: '0.15.2'
-      - name: Validate refactored source formatting
+      - name: Validate handwritten production Zig formatting
         run: |
-          git ls-files '*.zig' | grep -v '^layout.zig
+          git ls-files '*.zig' | grep -Ev '(^layout\.zig$|(^|/)(tests\.zig|.*_tests\.zig|adversarial\.zig|test_[^/]+\.zig)$)' | xargs -r zig fmt --check
       - name: Validate storage and device Zig syntax
-        run: for source in storage.zig storage_device.zig reference_state.zig; do zig ast-check "$source"; done
+        run: |
+          for source in storage.zig storage_device.zig reference_state.zig; do
+            zig ast-check "$source"
+          done
       - name: Stage test-only Zig contracts from test branch
         run: |
           git fetch --no-tags --depth=1 origin test
           git show FETCH_HEAD:tests.zig > tests.zig
+          git show FETCH_HEAD:test_reference_state.zig > .test-reference.zig
       - name: Validate entity mapping, generation and transaction rollback
         run: zig test tests.zig -O ReleaseSafe
-      - name: Stage reference regression from test branch without committing it to production
-        run: |
-          git show FETCH_HEAD:test_reference_state.zig > .test-reference.zig
-      - name: Verify reference recurrence with test-branch contracts
-        run: zig test .test-reference.zig -O ReleaseSafe
- | xargs -r zig fmt --check
-      - name: Validate storage and device Zig syntax
-        run: for source in storage.zig storage_device.zig reference_state.zig; do zig ast-check "$source"; done
-      - name: Stage test-only Zig contracts from test branch
-        run: |
-          git fetch --no-tags --depth=1 origin test
-          git show FETCH_HEAD:tests.zig > tests.zig
-      - name: Validate entity mapping, generation and transaction rollback
-        run: zig test tests.zig -O ReleaseSafe
-      - name: Stage reference regression from test branch without committing it to production
-        run: |
-          git show FETCH_HEAD:test_reference_state.zig > .test-reference.zig
-      - name: Verify reference recurrence with test-branch contracts
+      - name: Verify deterministic reference recurrence from test branch
         run: zig test .test-reference.zig -O ReleaseSafe
