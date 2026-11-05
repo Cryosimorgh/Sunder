@@ -1,7 +1,7 @@
 """Incremental current-source playable build; never launches the game."""
 from pathlib import Path
 import datetime,json,os,shutil,sys
-from dev_test import ROOT,Workflow,dependencies,digest,shader_jobs
+from build_support import ROOT,Workflow,dependencies,digest,shader_jobs
 from windows_sdk import sdk
 
 RENDER_JOBS=[('ball_vs','vs_6_0'),('ball_ps','ps_6_0'),('felt_vs','vs_6_0'),('felt_ps','ps_6_0'),('render_clear','cs_6_0'),('render_verify','cs_6_0'),('hud_vs','vs_6_0'),('hud_ps','ps_6_0'),('play_pick','cs_6_0'),('play_pick_resolve','cs_6_0')]
@@ -37,7 +37,7 @@ def main():
         for entry,profile in RENDER_JOBS:
             source='hud.hlsl' if entry.startswith('hud_') else 'render.hlsl';shader_sources.append(source)
             w.build('billiards-'+entry,[source],[entry+'.dxil'],[sdk()[1],'-T',profile,'-E',entry,'-Fo',entry+'.dxil',source])
-        inputs=['build_billiards.py','build_viewer.py','windows_sdk.py','dev_test.py','playground_main.zig','viewer_runtime.c','bench_support.c','spatial.c','physics.c','physics_verify.c','physics_tests.c','play_ui.cpp']
+        inputs=['build_billiards.py','build_viewer.py','windows_sdk.py','build_support.py','playground_main.zig','viewer_runtime.c','bench_support.c','spatial.c','physics.c','physics_verify.c','physics_tests.c','play_ui.cpp']
         inputs += [p.relative_to(ROOT).as_posix() for p in (ROOT/'third_party/imgui').rglob('*') if p.is_file()]
         w.build('billiards-host',inputs,['zig-out/bin/GPUPhysicsPlayground.exe'],[sys.executable,'build_viewer.py','--host-only','--playground'])
         dest=ROOT/'zig-out/bin'

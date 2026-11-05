@@ -1,7 +1,7 @@
 """Verified builds of the existing renderer in a windowless CLI harness."""
 from pathlib import Path
 import subprocess,zipfile,io,importlib.util,sys,shutil,json
-from dev_test import ROOT,Workflow,shader_jobs,digest
+from build_support import ROOT, Workflow, shader_jobs, digest
 from windows_sdk import compiler,headers,sdk
 BASE='7fdd05e38acfe04c264997f880a665f48affe799'
 OVERLAY=['viewer.c','viewer.h','render-consumer.inc','render-consumer-tests.inc','render_consumer_main.zig','viewer-schema.json','viewer-layout.h','viewer-cbuffer.hlsl','render.hlsl','pool-schema.json','pool-layout.h']
@@ -20,7 +20,7 @@ def control_root():
  return stage
 def build(out,control=False,blocking=False):
  stage=control_root() if control else ROOT
- spec=importlib.util.spec_from_file_location('p3_control_dev' if control else 'p3_candidate_dev',stage/'dev_test.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ spec=importlib.util.spec_from_file_location('p3_control_dev' if control else 'p3_candidate_dev',stage/('dev_test.py' if control else 'build_support.py'));module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
  w=module.Workflow(out);w.generate();w.build('viewer-ABI',['generate_viewer.py','viewer-schema.json'],['viewer-layout.h','viewer-cbuffer.hlsl'],[sys.executable,'generate_viewer.py'])
  # Compile only inputs/options lacking verified provenance, never adopt by mtime.
  jobs=module.shader_jobs()
