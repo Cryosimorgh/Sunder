@@ -41,8 +41,10 @@ jobs:
               text=True,
           )
           test_file = re.compile(
-              r"(?:^|/)(?:test_[^/]+\.(?:py|cpp|c|zig)|"
-              r"[^/]+_tests\.zig|tests\.zig|adversarial\.zig)$"
+              r"(?:^|/)(?:tests?/|"
+              r"test_[^/]+\.(?:py|cpp|c|zig|h|hpp|inc|hlsl)|"
+              r"[^/]+_tests?\.(?:py|cpp|c|zig|h|hpp|inc|hlsl)|"
+              r"(?:test|tests)\.py|tests\.zig|adversarial\.zig|dev_test\.py)$"
           )
           violations = [path for path in output.splitlines() if test_file.search(path)]
           if violations:
