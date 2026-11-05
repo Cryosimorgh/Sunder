@@ -1,13 +1,18 @@
-const std=@import("std");
-pub const l=@import("layout.zig");pub const entity=@import("entity.zig");
-pub const c=@cImport({@cInclude("runtime.h");});
-const a=std.heap.c_allocator;
-pub const passes=[_][]const u8{"initialize","classify","scan_counts","add_prefix","scatter_safe","integrate","keys","update_motion","gather","full_state","pack_render","consume_render","convert","mutate","grow_maps","full_state_vector","empty_active","clear_coverage"};
-pub fn ck(v:c_int) !void {if(v==0)return error.GPU;}
-pub fn open(debug:bool) !*c.StorageDevice {
- const d=c.s_open(@intFromBool(debug)) orelse return error.Device;errdefer c.s_close(d);
- for(passes,0..) |name,i|{const path=try std.fmt.allocPrint(a,"{s}.dxil",.{name});defer a.free(path);const bytes=try std.fs.cwd().readFileAlloc(a,path,16*1024*1024);defer a.free(bytes);try ck(c.s_load(d,@intCast(i),bytes.ptr,bytes.len));}return d;
-}
+//! Owns resident GPU storage buffers, memory admission, and compute dispatch.
+//! Device creation and deterministic reference calculations are separate modules.
+const std = @import("std");
+pub const l = @import("layout.zig");
+pub const entity = @import("entity.zig");
+const device = @import("storage_device.zig");
+const reference = @import("reference_state.zig");
+pub const c = device.c;
+pub const passes = device.passes;
+pub const ck = device.ck;
+pub const open = device.open;
+pub const seed = reference.seed;
+pub const activeId = reference.activeId;
+pub const expected = reference.expected;
+
 pub fn aligned(x:u64) !u64{return (try l.add(x,65535)) & ~@as(u64,65535);}
 pub fn scratchWords(cap:u64) !u64 {return l.prefixWords(cap);}
 pub const Ledger=struct {capacity:u32,n:u32,logical:[10]u64,device:[10]u64,total:u64,guard_bytes:u64=256,per_frame_copies:u32=1,contacts:u32=0};
@@ -70,18 +75,3 @@ pub const Bundle=struct {
   s.n=count;s.plan.n=count;s.epoch=epoch;
  }
 };
-pub fn seed(id:u32,field:u32,stride:u32) u32 {
- const value:f32=switch(field){0=>@as(f32,@floatFromInt(id&1023))/1024,1=>@as(f32,@floatFromInt((id>>10)&1023))/1024,2=>@as(f32,@floatFromInt(@as(i32,@intCast(id%7))-3))/1024,3=>@as(f32,@floatFromInt(@as(i32,@intCast(id%5))-2))/1024,6=>1,7=>2,8=>1.0/256.0,else=>0};
- return switch(field){12=>id%3,14=>@intFromBool(activeId(id,stride)),15=>id,else=>@bitCast(value)};
-}
-pub fn activeId(id:u32,stride:u32) bool{return stride!=0 and id%stride==0;}
-pub fn expected(id:u32,steps:u32,stride:u32) [l.field_count]u32 {
- var words:[l.field_count]u32=undefined;for(0..l.field_count) |f|words[f]=seed(id,@intCast(f),stride);
- const k:f64=@floatFromInt(steps);const active_:f64=if(activeId(id,stride))1 else 0;
- const coeff=((2+active_)*k*(k-1)/2+(1+active_)*k)/65536;
- const vx:f32=@bitCast(words[2]);const vy:f32=@bitCast(words[3]);const x:f32=@bitCast(words[0]);const y:f32=@bitCast(words[1]);
- words[0]=@bitCast(@as(f32,@floatCast(@as(f64,x)+(2+active_)*k*@as(f64,vx)/64+coeff)));
- words[1]=@bitCast(@as(f32,@floatCast(@as(f64,y)+(2+active_)*k*@as(f64,vy)/64-coeff)));
- words[2]=@bitCast(@as(f32,@floatCast(@as(f64,vx)+k/1024)));words[3]=@bitCast(@as(f32,@floatCast(@as(f64,vy)-k/1024)));
- return words;
-}
