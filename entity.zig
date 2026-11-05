@@ -83,15 +83,15 @@ pub const Store = struct {
     }
 
     /// Rejects stale handles even when their original slot was reused.
-    pub fn lookup(self: *const Store, handle: Handle) !u32 {
-        if (handle.slot >= self.generation.len or
-            self.generation[handle.slot] != handle.generation)
+    pub fn lookup(self: *const Store, target: Handle) !u32 {
+        if (target.slot >= self.generation.len or
+            self.generation[target.slot] != target.generation)
         {
             return error.Stale;
         }
 
-        const dense = self.to_dense[handle.slot];
-        if (dense >= self.count or self.dense_slot[dense] != handle.slot) {
+        const dense = self.to_dense[target.slot];
+        if (dense >= self.count or self.dense_slot[dense] != target.slot) {
             return error.Stale;
         }
         return dense;
