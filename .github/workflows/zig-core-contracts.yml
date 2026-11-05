@@ -1,0 +1,28 @@
+name: Zig core CPU contracts
+
+on:
+  push:
+    branches:
+      - test
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'entity.zig'
+      - 'transaction.zig'
+      - 'tests.zig'
+      - '.github/workflows/zig-core-contracts.yml'
+
+jobs:
+  cpu-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: '0.15.2'
+      - name: Validate refactored source formatting
+        run: zig fmt --check entity.zig transaction.zig
+      - name: Validate entity mapping, generation and transaction rollback
+        run: zig test tests.zig -O ReleaseSafe
