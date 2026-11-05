@@ -18,6 +18,7 @@ class SweepVerdictTests(unittest.TestCase):
             replacements = {
                 "ROOT": root, "BASE": root, "RUN": run,
                 "RUN_ID": "verdict-test", "digest": lambda: {},
+                "SOURCES": (),  # Source presence is tested separately from verdict ordering.
                 "git_revision": lambda: "test-commit",
                 "tracked_changes": lambda: [], "driver_inventory": lambda: [],
             }
