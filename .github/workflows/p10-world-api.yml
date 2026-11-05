@@ -26,5 +26,11 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install numpy
+      - name: Stage test contracts from the dedicated test branch
+        run: |
+          git fetch --no-tags --depth=1 origin test
+          for file in test_sunder_world.py test_p10_packaging.py test_world_sweep.py; do
+            git show "FETCH_HEAD:$file" > "$file"
+          done
       - name: Verify headless world host contracts (no GPU physics qualification)
         run: python -m unittest test_sunder_world test_p10_packaging test_world_sweep -v

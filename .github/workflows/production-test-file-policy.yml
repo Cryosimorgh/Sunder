@@ -1,0 +1,56 @@
+name: Production test-file policy
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  no-new-standalone-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reject new test-only files on production branch
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import subprocess
+
+          if os.environ["EVENT_NAME"] == "pull_request":
+              base = "origin/" + os.environ["BASE_REF"]
+              range_spec = base + "...HEAD"
+          else:
+              previous = os.environ.get("BEFORE_SHA", "")
+              if not previous or previous == "0" * 40:
+                  raise SystemExit("Cannot verify added files without a prior commit.")
+              range_spec = previous + "..HEAD"
+
+          output = subprocess.check_output(
+              ["git", "diff", "--diff-filter=A", "--name-only", range_spec],
+              text=True,
+          )
+          test_file = re.compile(
+              r"(?:^|/)(?:tests?/|"
+              r"test_[^/]+\.(?:py|cpp|c|zig|h|hpp|inc|hlsl)|"
+              r"[^/]+_tests?\.(?:py|cpp|c|zig|h|hpp|inc|hlsl)|"
+              r"(?:test|tests)\.py|tests\.zig|adversarial\.zig|dev_test\.py)$"
+          )
+          violations = [path for path in output.splitlines() if test_file.search(path)]
+          if violations:
+              raise SystemExit(
+                  "New standalone tests belong only on the test branch:\n"
+                  + "\n".join(violations)
+              )
+          print("PASS: no new standalone test files added to production.")
+          PY

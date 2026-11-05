@@ -29,7 +29,11 @@ CASES = ("cpu-world", "build", "world-empty", "native-world", "world-16",
 
 
 def digest():
-    return {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in SOURCES}
+    return {
+        p: (hashlib.sha256((ROOT / p).read_bytes()).hexdigest()
+            if (ROOT / p).is_file() else "MISSING")
+        for p in SOURCES
+    }
 
 
 def git_revision():
@@ -159,6 +163,14 @@ def main():
         "production_release": "NOT QUALIFIED"
     }
     try:
+        missing = [name for name in SOURCES if not (ROOT / name).is_file()]
+        if missing:
+            result["failure"] = (
+                "Required qualification sources are on the test branch: "
+                + ", ".join(missing)
+                + ". Run qualification from test with the current production source."
+            )
+            return 1
         if platform.system() != "Windows":
             result["failure"] = "Windows x64 with functional D3D12 hardware adapter required"
             return 1

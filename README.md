@@ -59,7 +59,12 @@ The headless 3D sphere/sphere and sphere/plane foundation lives in `physics3.*`.
 The existing planar billiards implementation remains a compatibility path.
 With the existing Zig 0.15.2 / Windows SDK toolchain and Python NumPy installed:
 
+Run the native qualification runners from the `test` branch, after applying the
+production source revision being evaluated. The standalone test scripts are not
+stored on `main`:
+
 ```powershell
+# In a test-branch checkout with current production sources integrated:
 python run_p10.py
 python dev_test.py full
 ```
@@ -75,6 +80,11 @@ See [the living architecture record](docs/ENGINE_ARCHITECTURE.md#p10-native-3d-f
 
 
 ## Fast headless development
+
+**Test-only branch:** These commands require a checkout of `test` with the
+current production changes applied. Production builds use `build_support.py`
+and do not import `dev_test.py`. CI stages individual test contracts from
+`test` into a temporary workspace; test sources are not committed to `main`.
 
 ```powershell
 python dev_test.py                              # quick (default), usually seconds after first build
@@ -150,7 +160,8 @@ seeds, drives and contact model remain. The previous continuous arena and its
 [historical documentation](PLAYGROUND_HISTORY.md) are retained, along with both
 historical source variants. Earlier cleanup removed the old benchmark/playground ZIPs; the previous playable ZIP remains preserved.
 
-Build with Zig 0.15.2, Python 3 and a Windows SDK providing DXC/D3D12/UCRT:
+Build with Zig 0.15.2, Python 3 and a Windows SDK providing DXC/D3D12/UCRT.
+Run commands involving `--tests` or `test_*.py` from the `test` branch:
 
 ```powershell
 python build_billiards.py --tests

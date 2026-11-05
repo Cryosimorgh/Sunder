@@ -2,7 +2,7 @@
 from pathlib import Path
 import hashlib,json,subprocess
 from windows_sdk import sdk,headers,compiler
-from dev_test import dependencies
+from build_support import dependencies
 R=Path(__file__).resolve().parent
 OUT=R/'evidence/p10/build'
 ENTRIES=['clear','prepare','hash','contacts','solve','gather','integrate','validate','publish','converge_clear','converge_check','converge_finish','cache_clear','cache_publish','color','colored_solve','color_prepare']
