@@ -17,9 +17,9 @@ jobs:
           fetch-depth: 0
       - name: Reject new test-only files on production branch
         env:
-          EVENT_NAME: \${{ github.event_name }}
-          BASE_REF: \${{ github.base_ref }}
-          BEFORE_SHA: \${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
         shell: bash
         run: |
           python - <<'PY'
