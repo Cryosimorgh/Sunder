@@ -20,7 +20,7 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 origin test
           $paths = @(git ls-tree -r --name-only FETCH_HEAD) | Where-Object {
-            $_ -match '^(test_[^/]+\\.(?:py|cpp|c|zig)|tests\\.zig|.*_tests\\.zig|adversarial\\.zig|dev_test\\.py)$'
+            $_ -match '^(test_[^/]+\.(?:py|cpp|c|zig)|tests\.zig|.*_tests\.zig|adversarial\.zig|dev_test\.py)$'
           }
           foreach ($path in $paths) {
             $source = git show "FETCH_HEAD:${path}"
