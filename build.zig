@@ -34,7 +34,7 @@ pub fn build(builder: *std.Build) void {
     }
     runtime_module.addCSourceFile(.{
         .file = builder.path("runtime.c"),
-        .flags = &.{ "-O2" },
+        .flags = &.{"-O2"},
     });
     builder.installArtifact(builder.addExecutable(.{
         .name = "storage",
