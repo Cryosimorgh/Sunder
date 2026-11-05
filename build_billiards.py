@@ -24,6 +24,11 @@ def verify_build(root=ROOT):
     return manifest
 
 def main():
+    if '--tests' in sys.argv:
+        required = ('pool_tests.zig', 'playground_gpu_tests.zig')
+        missing = [name for name in required if not (ROOT / name).is_file()]
+        if missing:
+            raise RuntimeError('Test-only sources are on the test branch: ' + ', '.join(missing))
     out=ROOT/'billiards-test-results'/('build-'+datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ'));out.mkdir(parents=True)
     w=Workflow(out);lock=w.cache/'running.lock'
     try:fd=os.open(lock,os.O_CREAT|os.O_EXCL|os.O_WRONLY)

@@ -37,4 +37,4 @@ Write short, precise technical English inspired by ASD-STE100, without rigid con
 
 ## Test branch policy
 
-New standalone test files, experimental verification scripts, and one-off harnesses belong on the `test` branch, not `main`. Before removing any existing test or Python utility from production, check imports, native link inputs, launchers, and CI dependencies. Existing build-coupled verification sources may remain until safely decoupled. Preserve regression coverage; never bypass it to satisfy branch hygiene. See `docs/TEST_BRANCH_POLICY.md`.
+New standalone test files, experimental verification scripts, and one-off harnesses belong on the `test` branch, not `main`. Before removing any existing test or Python utility from production, check imports, native link inputs, launchers, and CI dependencies. Existing build-coupled verification sources may remain until safely decoupled. Shared build helpers live in `build_support.py`; never make a production builder import `dev_test.py`. Preserve regression coverage; never bypass it to satisfy branch hygiene. See `docs/TEST_BRANCH_POLICY.md`.
