@@ -1,0 +1,36 @@
+name: Production build helper contracts
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'build_support.py'
+      - 'build_billiards.py'
+      - 'build_physics3.py'
+      - 'build_g7_demo.py'
+      - 'windows_sdk.py'
+      - '.github/workflows/production-build-helpers.yml'
+
+jobs:
+  python-build-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check build scripts compile
+        run: python -m py_compile build_support.py build_billiards.py build_physics3.py build_g7_demo.py
+      - name: Check shared build helper dependencies without a test runner
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import build_support
+
+          assert build_support.ROOT == Path.cwd()
+          assert build_support.digest('entity.zig') == build_support.digest('entity.zig')
+          assert 'entity.zig' in build_support.dependencies(['entity.zig'])
+          assert 'runtime.h' in build_support.dependencies(['runtime.c'])
+          assert any(entry == 'ph_solve' for _, entry, _ in build_support.shader_jobs())
+          print('PASS production build dependency contracts')
+          PY
