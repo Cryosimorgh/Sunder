@@ -20,21 +20,7 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 origin test
           $paths = @(git ls-tree -r --name-only FETCH_HEAD) | Where-Object {
-            $_ -match '^(test_[^/]+\.(?:py|cpp|c|zig)|tests\.zig|.*_tests\.zig|adversarial\.zig|dev_test\.py) (NO mock, NO --skip-stress)
-        run: python run_world_sweep.py --full
-      - name: Preserve original native evidence and failures
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: p10-native-qualification-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            evidence/p10/world-sweep/
-            evidence/p10/build/manifest.json
-            evidence/p10/build/build-*.log
-            dev-test-results/
-          if-no-files-found: warn
-          retention-days: 30
-
+            $_ -match '^(test_[^/]+\\.(?:py|cpp|c|zig)|tests\\.zig|.*_tests\\.zig|adversarial\\.zig|dev_test\\.py)$'
           }
           foreach ($path in $paths) {
             $source = git show "FETCH_HEAD:${path}"
