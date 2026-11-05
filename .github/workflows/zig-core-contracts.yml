@@ -28,7 +28,7 @@ jobs:
       - name: Validate refactored source formatting
         run: zig fmt --check entity.zig transaction.zig
       - name: Validate storage and device Zig syntax
-        run: zig ast-check storage.zig storage_device.zig reference_state.zig
+        run: for source in storage.zig storage_device.zig reference_state.zig; do zig ast-check "$source"; done
       - name: Stage test-only Zig contracts from test branch
         run: |
           git fetch --no-tags --depth=1 origin test
