@@ -1,1 +1,0 @@
-["C:\\Manavi\\Sunder\\zig-out\\bin\\physics.exe", "--n", "32", "--fixture", "1", "--steps", "4", "--contacts", "256", "--pairs", "256", "--verify-every-tick", "--out", "C:\\Manavi\\Sunder\\dev-test-results\\20261031T195448.597948Z\\cli.json"]

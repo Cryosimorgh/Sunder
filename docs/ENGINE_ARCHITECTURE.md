@@ -1,5 +1,7 @@
 # Sunder — Technical Architecture and Development Record
 
+> **Source-tree hygiene breakpoint — 2026-11-10 (draft PR #13):** The repository's pre-prune main commit `8c50d6db83a1c31ad6fac7d52dc97c59b05a298b` is preserved at `archive/pre-source-prune-20261110`. Draft cleanup removes historical generated/verification artifacts from production tracking and keeps the existing native Zig/C/C++/HLSL code and compatibility DXIL assets intact. Python-dependent native builders and the P10 public Python world API remain unchanged, pending verified Zig replacements. This operation **does not** validate FPS, GPU timing, solver physics, G7 large-population qualification, or a production release. See `docs/REPOSITORY_MAP.md`. Historical evidence remains available via the archive revision; the existing qualification gates and NO-GO boundaries are unchanged.
+
 **Project:** [Cryosimorgh/Sunder](https://github.com/Cryosimorgh/Sunder)  
 **Record date:** 2026-11-02
 **Document type:** Living engineering record  
@@ -1292,6 +1294,12 @@ The playable branch reports independent tests for collision impulses, energy, ro
 
 ## 13. Verification and low-cost test workflow
 
+### 2026-11-05 source and verification isolation — IMPLEMENTED / GPU NOT REQUALIFIED
+
+Standalone Python, Zig, and C++ regressions and historical G5/G6 one-offs are retained on the dedicated `test` branch, not the proposed production tree (draft PR #13). Production builders now import `build_support.py`, which provides dependency scanning and build provenance without importing the test runner. The Zig storage responsibilities are separated into resident-buffer ownership (`storage.zig`), D3D12 device and shader loading (`storage_device.zig`), and deterministic reference calculations (`reference_state.zig`). Entity handles and structural transactions retain their existing ABI and public API; handwritten Zig sources were formatted with Zig 0.15.2.
+
+Pull-request CI temporarily stages test contracts from `test`; no test source is committed into `main` by that staging. Standalone native tests still require a matching test-branch source checkout. Native C verification includes that are linked into production binaries are not yet separable without further host-build changes. A passing CPU contract or Windows compile job is **not** a fresh D3D12 GPU correctness, real-time, or release qualification. G0–G6 and GPU-02 status remain unchanged.
+
 **Code:** `physics_verify.c`, `physics_tests.c`, `tests.zig`; on the playable branch `dev_test.py`, `test_dev_workflow.py`, and the billiards test scripts.
 
 Validation has several levels:
@@ -1533,6 +1541,8 @@ The fixed-step budget is the existing **7,812.5 us**, not a new threshold. GPU s
 
 ## 16. Risks and work still required
 
+- **Test-branch drift and native test coupling (2026-11-05):** Keep the `test` source revision matched to each production commit being qualified; do not merge deletion commits blindly into the test suite. CI checks added-file names, but enforce it as a required status check under repository rules to prevent bypass. The linked native C verification files are deliberately retained pending safe separation. No Windows GPU proof is inferred from source-format, CPU, or compile-only CI.
+
 **P10 scope note (2026-10-31):** Native 3D numerical validity is now independently
 tested and is not blocked by P9 bitwise equality. Its bounded GO does not close
 the historical G5/G6/display risks below. Three stress samples cover independent
@@ -1584,6 +1594,7 @@ Next action:
 
 | Date | Breakpoint | Record update |
 |---|---|---|
+| 2026-11-05 | Source hygiene and test-branch isolation — IMPLEMENTED / GPU NOT REQUALIFIED | Draft PR #13 separates native device, reference oracle and storage ownership; improves Zig readability; extracts Python build support; retains historical and standalone test sources on `test`; adds CI staging and production test-file policy. Existing linked native test C stays until decoupled. G0–G6, P9 and GPU-02 qualification status unchanged. |
 | 2026-11-02 | G7 reference motion / connected solver / accepted-state smoothing | Native gravity trough, GPU partial admissions, active-colored solver with unchanged final checks, live achieved-rate display. 512/1K reference 3200 ticks and six native tests pass. Dense frictional trials retained; PR draft. |
 | 2026-11-02 | G7 native application / bounded local hardware evidence | Native instanced perspective renderer, accepted GPU lease/copy bridge, cube/belts and invariant witnesses; 512/1K cases and lifecycle pass. Radial stress unsupported; PR #9 draft, acceptance open. G5/G6 unchanged. |
 | 2026-11-02 | P10 hardware evidence audit - bounded correctness GO, final-head integration conditional | 135 checksums and 28 source hashes verified; all 9 gates PASS at ed618f9 on RTX 4070 Ti SUPER. Original evidence retained. No physics changes. Full sweep and CI required on final commit before merge. |

@@ -1,34 +1,158 @@
-// Exclusive CPU structural boundary. The bounded undo journal keeps preparation
-// O(command_count), rather than copying all entity metadata for each batch.
-const std=@import("std");const e=@import("entity.zig");const l=@import("layout.zig");
-pub const Action=union(enum){create:void,destroy:e.Handle,lookup:e.Handle};
-const Slot=struct{id:u32,generation:u32,dense:u32,age:u32};
-const Dense=struct{index:u32,value:u32};
-const Undo=struct{count:u32,slots:[2]Slot,slot_count:usize,dense:[2]Dense,dense_count:usize};
-pub const Prepared=struct {
- model:*e.Store,commands:[l.command_capacity]e.Command=undefined,undos:[l.command_capacity]Undo=undefined,len:usize=0,undo_count:usize=0,free_length:usize,free_saved:[l.command_capacity]u32=undefined,free_saved_count:usize=0,finished:bool=false,
- fn slot(m:*e.Store,id:u32) Slot{return .{.id=id,.generation=m.generation[id],.dense=m.to_dense[id],.age=m.age[id]};}
- pub fn rollback(p:*Prepared) void {
-  if(p.finished)return;var j=p.undo_count;while(j>0){j-=1;const u=p.undos[j];for(u.slots[0..u.slot_count]) |v|{p.model.generation[v.id]=v.generation;p.model.to_dense[v.id]=v.dense;p.model.age[v.id]=v.age;}for(u.dense[0..u.dense_count]) |v|p.model.dense_slot[v.index]=v.value;p.model.count=u.count;}
-  p.model.free.items.len=p.free_length;@memcpy(p.model.free.items[p.free_length-p.free_saved_count..],p.free_saved[0..p.free_saved_count]);p.finished=true;
- }
- pub fn publish(p:*Prepared) !void {if(p.finished)return error.Transaction;p.model.epoch=try std.math.add(u32,p.model.epoch,1);p.finished=true;}
+const std = @import("std");
+const entity = @import("entity.zig");
+const layout = @import("layout.zig");
+
+/// Structural changes are prepared at an exclusive CPU boundary.
+/// The bounded undo journal scales with command count, not world capacity.
+pub const Action = union(enum) {
+    create: void,
+    destroy: entity.Handle,
+    lookup: entity.Handle,
 };
-pub fn prepare(m:*e.Store,actions:[]const Action) !Prepared {
- if(actions.len>l.command_capacity)return error.CommandCapacity;if(m.epoch==std.math.maxInt(u32))return error.EpochOverflow;
- var p:Prepared=.{.model=m,.free_length=m.free.items.len};p.free_saved_count=@min(actions.len,m.free.items.len);@memcpy(p.free_saved[0..p.free_saved_count],m.free.items[m.free.items.len-p.free_saved_count..]);errdefer p.rollback();
- for(actions) |action| {
-  switch(action){
-   .create=>{
-    if(m.free.items.len==0)return error.Capacity;const id=m.free.items[m.free.items.len-1];
-    p.undos[p.undo_count]=.{.count=m.count,.slots=.{Prepared.slot(m,id),undefined},.slot_count=1,.dense=.{.{.index=m.count,.value=m.dense_slot[m.count]},undefined},.dense_count=1};p.undo_count+=1;p.commands[p.len]=(try m.create()).command;
-   },
-   .destroy=>|h|{
-    const d=try m.lookup(h);const last=m.count-1;const moved=m.dense_slot[last];
-    p.undos[p.undo_count]=.{.count=m.count,.slots=.{Prepared.slot(m,h.slot),Prepared.slot(m,moved)},.slot_count=2,.dense=.{.{.index=d,.value=m.dense_slot[d]},.{.index=last,.value=m.dense_slot[last]}},.dense_count=2};p.undo_count+=1;p.commands[p.len]=try m.destroy(h);
-   },
-   .lookup=>|h|{if(h.slot>=m.generation.len)return error.Stale;p.commands[p.len]=.{.op=3,.slot=h.slot,.generation=h.generation,.dense=0};},
-  }p.len+=1;
- }
- return p;
+
+const SavedSlot = struct {
+    id: u32,
+    generation: u32,
+    dense: u32,
+    age: u32,
+};
+
+const SavedDense = struct {
+    index: u32,
+    value: u32,
+};
+
+const Undo = struct {
+    count: u32,
+    slots: [2]SavedSlot,
+    slot_count: usize,
+    dense: [2]SavedDense,
+    dense_count: usize,
+};
+
+pub const Prepared = struct {
+    model: *entity.Store,
+    commands: [layout.command_capacity]entity.Command = undefined,
+    undos: [layout.command_capacity]Undo = undefined,
+    len: usize = 0,
+    undo_count: usize = 0,
+    free_length: usize,
+    free_saved: [layout.command_capacity]u32 = undefined,
+    free_saved_count: usize = 0,
+    finished: bool = false,
+
+    fn saveSlot(model: *entity.Store, id: u32) SavedSlot {
+        return .{
+            .id = id,
+            .generation = model.generation[id],
+            .dense = model.to_dense[id],
+            .age = model.age[id],
+        };
+    }
+
+    /// Restores the exact pre-prepare mappings and reusable slot order.
+    /// May be called more than once; a published transaction cannot be undone.
+    pub fn rollback(self: *Prepared) void {
+        if (self.finished) return;
+
+        var index = self.undo_count;
+        while (index > 0) {
+            index -= 1;
+            const undo = self.undos[index];
+
+            for (undo.slots[0..undo.slot_count]) |slot| {
+                self.model.generation[slot.id] = slot.generation;
+                self.model.to_dense[slot.id] = slot.dense;
+                self.model.age[slot.id] = slot.age;
+            }
+            for (undo.dense[0..undo.dense_count]) |dense| {
+                self.model.dense_slot[dense.index] = dense.value;
+            }
+            self.model.count = undo.count;
+        }
+
+        self.model.free.items.len = self.free_length;
+        @memcpy(
+            self.model.free.items[self.free_length - self.free_saved_count ..],
+            self.free_saved[0..self.free_saved_count],
+        );
+        self.finished = true;
+    }
+
+    pub fn publish(self: *Prepared) !void {
+        if (self.finished) return error.Transaction;
+        self.model.epoch = try std.math.add(u32, self.model.epoch, 1);
+        self.finished = true;
+    }
+};
+
+/// Prepares commands or rolls back all CPU mutations if preparation fails.
+pub fn prepare(model: *entity.Store, actions: []const Action) !Prepared {
+    if (actions.len > layout.command_capacity) return error.CommandCapacity;
+    if (model.epoch == std.math.maxInt(u32)) return error.EpochOverflow;
+
+    var prepared: Prepared = .{
+        .model = model,
+        .free_length = model.free.items.len,
+    };
+    prepared.free_saved_count = @min(actions.len, model.free.items.len);
+    @memcpy(
+        prepared.free_saved[0..prepared.free_saved_count],
+        model.free.items[model.free.items.len - prepared.free_saved_count ..],
+    );
+    errdefer prepared.rollback();
+
+    for (actions) |action| {
+        switch (action) {
+            .create => {
+                if (model.free.items.len == 0) return error.Capacity;
+                const slot = model.free.items[model.free.items.len - 1];
+
+                prepared.undos[prepared.undo_count] = .{
+                    .count = model.count,
+                    .slots = .{ Prepared.saveSlot(model, slot), undefined },
+                    .slot_count = 1,
+                    .dense = .{
+                        .{ .index = model.count, .value = model.dense_slot[model.count] },
+                        undefined,
+                    },
+                    .dense_count = 1,
+                };
+                prepared.undo_count += 1;
+                prepared.commands[prepared.len] = (try model.create()).command;
+            },
+            .destroy => |handle| {
+                const dense = try model.lookup(handle);
+                const last_dense = model.count - 1;
+                const moved_slot = model.dense_slot[last_dense];
+
+                prepared.undos[prepared.undo_count] = .{
+                    .count = model.count,
+                    .slots = .{
+                        Prepared.saveSlot(model, handle.slot),
+                        Prepared.saveSlot(model, moved_slot),
+                    },
+                    .slot_count = 2,
+                    .dense = .{
+                        .{ .index = dense, .value = model.dense_slot[dense] },
+                        .{ .index = last_dense, .value = model.dense_slot[last_dense] },
+                    },
+                    .dense_count = 2,
+                };
+                prepared.undo_count += 1;
+                prepared.commands[prepared.len] = try model.destroy(handle);
+            },
+            .lookup => |handle| {
+                if (handle.slot >= model.generation.len) return error.Stale;
+                prepared.commands[prepared.len] = .{
+                    .op = 3,
+                    .slot = handle.slot,
+                    .generation = handle.generation,
+                    .dense = 0,
+                };
+            },
+        }
+        prepared.len += 1;
+    }
+    return prepared;
 }

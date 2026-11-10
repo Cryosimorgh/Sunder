@@ -144,6 +144,17 @@ def main(argv=None):
               "production_release": "NOT QUALIFIED"}
     package_error = None
     try:
+        required = ("test_g7_scenarios.py", "test_sunder_world.py",
+                    "test_p10_packaging.py", "test_world_sweep.py")
+        if stage == "full":
+            required += ("test_native_world.py", "test_physics3.py",
+                         "dev_test.py", "pool_tests.zig",
+                         "playground_gpu_tests.zig", "tests.zig")
+        missing = [name for name in required if not (ROOT / name).is_file()]
+        if missing:
+            raise RuntimeError(
+                "G7 qualification must use the test branch with current production "
+                "sources. Missing test-only files: " + ", ".join(missing))
         tasks = [
             ("build_physics3", ["build_physics3.py"], 600),
             ("g7_cpu_scene_contracts", ["-m", "unittest", "test_g7_scenarios", "-v"], 240),

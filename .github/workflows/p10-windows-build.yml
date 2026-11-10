@@ -28,4 +28,4 @@ jobs:
       - name: Compile native DLL and original HLSL shaders (no execution)
         run: python build_physics3.py
       - name: Check Python CLI syntax
-        run: python -m py_compile sunder_world.py headless_demo.py run_world_sweep.py test_physics3.py test_sunder_world.py test_native_world.py package_p10_evidence.py test_p10_packaging.py
+        run: python -m py_compile sunder_world.py headless_demo.py run_world_sweep.py package_p10_evidence.py
