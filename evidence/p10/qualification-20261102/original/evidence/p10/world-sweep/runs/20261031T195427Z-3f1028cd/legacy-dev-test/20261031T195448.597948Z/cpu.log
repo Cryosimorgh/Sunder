@@ -1,7 +1,0 @@
-["C:\\Manavi\\Sunder\\zig-out\\bin\\dev_cpu_tests.exe"]
-1/5 tests.test.identity randomized swap compaction and generation reuse independent model...OK
-2/5 tests.test.generation wrap never aliases and failed create/delete leave count unchanged...OK
-3/5 tests.test.generated layouts bijection boundaries and checked arithmetic...OK
-4/5 tests.test.bounded structural transaction rollback preserves exact mappings and reusable IDs...OK
-5/5 tests.test.CPU growth allocation failure preserves old authority transactionally...OK
-All 5 tests passed.

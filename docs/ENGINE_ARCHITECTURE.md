@@ -1,5 +1,7 @@
 # Sunder — Technical Architecture and Development Record
 
+> **Source-tree hygiene breakpoint — 2026-11-10 (draft PR #13):** The repository's pre-prune main commit `8c50d6db83a1c31ad6fac7d52dc97c59b05a298b` is preserved at `archive/pre-source-prune-20261110`. Draft cleanup removes historical generated/verification artifacts from production tracking and keeps the existing native Zig/C/C++/HLSL code and compatibility DXIL assets intact. Python-dependent native builders and the P10 public Python world API remain unchanged, pending verified Zig replacements. This operation **does not** validate FPS, GPU timing, solver physics, G7 large-population qualification, or a production release. See `docs/REPOSITORY_MAP.md`. Historical evidence remains available via the archive revision; the existing qualification gates and NO-GO boundaries are unchanged.
+
 **Project:** [Cryosimorgh/Sunder](https://github.com/Cryosimorgh/Sunder)  
 **Record date:** 2026-11-02
 **Document type:** Living engineering record  

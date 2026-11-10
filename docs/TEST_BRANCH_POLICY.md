@@ -1,5 +1,12 @@
 # Test branch and production hygiene
 
+## Source-tree pruning: 2026-11-10
+
+The pre-prune `main` state is preserved on `archive/pre-source-prune-20261110`. Draft PR #13 removes tracked artifacts from the proposed production tree: `zig-out/` binaries, distribution bundles, experimental patch handoffs, `evidence/` logs and data, `examples/` captured run outputs, and the G7/P10 handoff ZIP directories. These are not deleted from Git history and must not be silently replaced with fabricated new qualification evidence. Retain exact historical commit links when citing prior measurements.
+
+The remaining root `*.dxil` objects are retained for compatibility with existing native launch and packaging paths until build-from-source parity is established. `third_party/imgui` is a native GUI dependency, not clutter. Python remaining in production is a known migration liability, not an endorsed permanent architecture; builders, shader generation, packaging, G7 scenario code and the `sunder_world.py` API must be replaced or intentionally retired after parity checks. Do not weaken numeric acceptance or remove coverage simply to meet a file-count target.
+
+
 The `test` branch was created from `main` on 2026-11-05 before the cleanup, so existing diagnostic scripts and tests remain recoverable. Changes to production code go through normal review into `main`; add new stand-alone tests and one-off test harnesses to `test` instead.
 
 ## What stays on production branches

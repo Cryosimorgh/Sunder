@@ -1,5 +1,11 @@
 # Sunder — GPU Physics
 
+## Repository orientation and cleanup status
+
+The production source tree is being reduced in [draft PR #13](https://github.com/Cryosimorgh/Sunder/pull/13). Historical binary builds, generated `zig-out/` executables, test evidence, copied benchmark samples, and handoff ZIPs are kept at [the 2026-11-10 archive revision](https://github.com/Cryosimorgh/Sunder/tree/archive/pre-source-prune-20261110) rather than tracked as active production sources. This archive preserves the pre-cleanup `main` tree. For the source-by-source map and known limitations, see [Repository map](docs/REPOSITORY_MAP.md).
+
+**Migration still pending:** Some production launchers and the P10 public world API require Python. Do not delete or bypass those entrypoints until Zig replacements pass build, API, native GPU, and regression checks. The canonical build/test interface target is Zig 0.15.2 plus the existing Workshop workflow; this is a roadmap, **not an implemented Python-free build**. The cleanup makes no FPS or runtime performance claims.
+
 ## Native 3D visual benchmark — type exact values in the window
 
 On Windows, double-click **LaunchBenchmark.bat** (or

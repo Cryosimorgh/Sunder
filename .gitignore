@@ -41,3 +41,12 @@ zig-out/bin/dev_cpu_tests.exe
 # Native G7 incremental outputs
 zig-out/bin/SunderG7.exe
 zig-out/bin/physics3.lib
+
+# Generated output and archived verification material (2026-11-10)
+/zig-out/
+/dist/
+/evidence/
+/examples/
+/experiments/
+/G7-RESULTS-TO-SEND/
+/P10-RESULTS-TO-SEND/
